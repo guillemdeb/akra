@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Seguiment Creixement · Sara</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a3560">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sara Creix">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#f4f7fb;--surface:#fff;--blue:#2e6be6;--red:#d94040;--orange:#d97020;
+  --green:#2aaa72;--grey:#6a7a90;--text:#18243a;--muted:#7a8ea8;--border:#dce6f0;
+  --shadow:0 2px 12px rgba(30,50,100,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;}
+
+/* HEADER */
+header{background:linear-gradient(120deg,#0f1e38 0%,#1a3560 100%);padding:1.3rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.hd-left{display:flex;align-items:center;gap:1rem;}
+.logo{width:46px;height:46px;background:rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid rgba(255,255,255,.25);}
+header h1{font-family:'Lora',serif;font-size:1.45rem;color:#fff;line-height:1.2;}
+header p{color:rgba(255,255,255,.55);font-size:.78rem;margin-top:2px;}
+.hd-controls{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
+.perc-selector{display:flex;gap:.3rem;}
+.perc-btn{padding:.38rem .85rem;border-radius:20px;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.6);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.perc-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+.perc-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+
+/* TABS */
+.tabs{display:flex;padding:0 2rem;background:#0f1e38;overflow-x:auto;}
+.tab{padding:.65rem 1.2rem;cursor:pointer;font-size:.84rem;font-weight:500;color:rgba(255,255,255,.45);border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab:hover{color:rgba(255,255,255,.8);}
+.tab.active{color:#fff;border-bottom-color:#5a9df5;}
+
+/* LAYOUT */
+.container{max-width:1280px;margin:0 auto;padding:1.5rem 2rem;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.9rem;margin-bottom:1.4rem;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;}
+.sc-blue::before{background:var(--blue);}
+.sc-red::before{background:var(--red);}
+.sc-green::before{background:var(--green);}
+.sc-orange::before{background:var(--orange);}
+.stat-card .lbl{font-size:.69rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.25rem;}
+.stat-card .val{font-family:'Lora',serif;font-size:1.6rem;color:var(--text);line-height:1.1;}
+.stat-card .sub{font-size:.71rem;color:var(--muted);margin-top:.18rem;}
+
+/* CHART CARD */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.4rem 1.5rem;margin-bottom:1.3rem;box-shadow:var(--shadow);}
+.chart-card h2{font-family:'Lora',serif;font-size:1.1rem;margin-bottom:.15rem;}
+.chart-sub{font-size:.75rem;color:var(--muted);margin-bottom:.9rem;}
+.chart-wrap{position:relative;height:440px;}
+
+/* LEGEND */
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.4rem 1rem;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--border);}
+.legend-item{display:flex;align-items:center;gap:.45rem;font-size:.74rem;color:var(--muted);}
+.leg-line{width:20px;flex-shrink:0;border-radius:2px;}
+
+/* VELOCITY PANEL */
+.vel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.3rem;}
+.vel-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);}
+.vel-card h3{font-family:'Lora',serif;font-size:1rem;margin-bottom:.8rem;color:var(--text);}
+.vel-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.6rem;font-size:.83rem;}
+.vel-bar-wrap{flex:1;background:#edf2f8;border-radius:6px;height:10px;overflow:visible;position:relative;}
+.vel-bar{height:10px;border-radius:6px;transition:width .5s ease;}
+.vel-label{min-width:60px;text-align:right;font-weight:600;}
+.vel-who{font-size:.73rem;color:var(--muted);padding-left:.2rem;}
+.vel-year-title{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.4rem;}
+
+/* PERCENTILE GUIDE */
+.guide-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.4rem 1.5rem;margin-bottom:1.3rem;box-shadow:var(--shadow);}
+.guide-card h2{font-family:'Lora',serif;font-size:1.1rem;margin-bottom:.15rem;}
+.sec-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:1.2rem 0 .7rem;font-weight:600;}
+.bands{width:100%;border-collapse:collapse;font-size:.81rem;}
+.bands th{background:var(--bg);padding:.5rem .8rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border);}
+.bands td{padding:.5rem .8rem;border-bottom:1px solid var(--border);}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:5px;}
+.perc-vis{height:38px;border-radius:10px;background:linear-gradient(to right,#e8846a 0%,#e8846a 3%,#d4763a 3%,#d4763a 10%,#4ab8a0 10%,#4ab8a0 25%,#0d8f68 25%,#0d8f68 75%,#4ab8a0 75%,#4ab8a0 90%,#d4763a 90%,#d4763a 97%,#e8846a 97%,#e8846a 100%);position:relative;margin:.8rem 0 .2rem;overflow:visible;}
+.vis-tick{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.7);}
+.sara-pin{position:absolute;top:-16px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none;}
+.pin-lbl{font-size:.6rem;color:var(--blue);font-weight:700;white-space:nowrap;background:#fff;border:1px solid var(--blue);border-radius:4px;padding:1px 4px;margin-bottom:2px;}
+.pin-line{width:2px;height:52px;background:var(--blue);}
+.pin-tip{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--blue);}
+.vis-lbls{display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);padding:0 2px;}
+.info-box{background:#f0f5ff;border:1px solid #c8d8f5;border-left:4px solid var(--blue);border-radius:8px;padding:.9rem 1.1rem;font-size:.79rem;color:#1a3060;line-height:1.7;margin-top:1rem;}
+
+/* EDIT PANEL */
+.edit-toolbar{display:flex;gap:.6rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;}
+.btn{padding:.45rem 1rem;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;transition:all .18s;}
+.btn-primary{background:var(--blue);color:#fff;}.btn-primary:hover{background:#1a55cc;}
+.btn-danger{background:#fde8e8;color:var(--red);border:1px solid #f5c5c5;}.btn-danger:hover{background:#ffd0d0;}
+.btn-secondary{background:var(--bg);color:var(--grey);border:1px solid var(--border);}.btn-secondary:hover{background:#e8f0f8;}
+.btn-success{background:#e0f5ec;color:var(--green);border:1px solid #b0e0cc;}.btn-success:hover{background:#c8eedd;}
+.edit-table-wrap{overflow-x:auto;}
+.edit-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.edit-table th{background:var(--bg);padding:.6rem .8rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border);white-space:nowrap;}
+.edit-table td{padding:.35rem .5rem;border-bottom:1px solid var(--border);}
+.edit-table tr:hover td{background:#f0f5fc;}
+.edit-table tr.tract-row td{background:#f0f6ff;}
+.cell-input{width:100%;padding:.3rem .5rem;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--text);background:#fff;transition:border .15s;}
+.cell-input:focus{outline:none;border-color:var(--blue);background:#f5f8ff;}
+.cell-input.est{background:#f4f4f6;color:#888;font-style:italic;}
+.del-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem;padding:.2rem .4rem;border-radius:4px;transition:color .15s;}
+.del-btn:hover{color:var(--red);}
+.tract-toggle{width:18px;height:18px;accent-color:var(--blue);cursor:pointer;}
+.badge{display:inline-block;padding:.15rem .48rem;border-radius:20px;font-size:.67rem;font-weight:600;}
+.badge-low{background:#fde8e8;color:#b02020;}
+.badge-mid{background:#e0f5ec;color:#1a7a50;}
+.badge-high{background:#fef0e0;color:#a05010;}
+.note-box{background:#f0f5ff;border:1px solid #c8d8f5;border-left:4px solid var(--blue);border-radius:8px;padding:.9rem 1.1rem;font-size:.79rem;color:#1a3060;margin-top:1rem;line-height:1.6;}
+.import-area{width:100%;height:80px;border:1.5px dashed var(--border);border-radius:8px;padding:.7rem;font-size:.78rem;color:var(--muted);font-family:'DM Sans',sans-serif;resize:none;margin-bottom:.5rem;}
+.import-area:focus{outline:none;border-color:var(--blue);}
+
+/* FINAL HEIGHT CARDS */
+.fh-section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1.5rem;box-shadow:var(--shadow);}
+.fh-section h3{font-family:'Lora',serif;font-size:1.05rem;margin-bottom:.3rem;}
+.fh-section .fh-sub{font-size:.75rem;color:var(--muted);margin-bottom:1.1rem;}
+.fh-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;}
+.fh-card{border-radius:12px;padding:1.2rem 1.4rem;position:relative;overflow:hidden;}
+.fh-card-pre{background:linear-gradient(135deg,#fff3ee,#ffe8d8);border:1.5px solid #f0a878;}
+.fh-card-post{background:linear-gradient(135deg,#eef4ff,#dceaff);border:1.5px solid #90b8f5;}
+.fh-card-gain{background:linear-gradient(135deg,#edfaf4,#d0f0e4);border:1.5px solid #70d0a8;}
+.fh-card .fh-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.3rem;}
+.fh-card .fh-val{font-family:'Lora',serif;font-size:2rem;line-height:1;margin-bottom:.2rem;}
+.fh-card .fh-range{font-size:.73rem;color:var(--muted);margin-bottom:.4rem;}
+.fh-card .fh-desc{font-size:.75rem;line-height:1.5;}
+.fh-meter{height:6px;border-radius:3px;background:#e0e8f0;margin-top:.6rem;overflow:hidden;}
+.fh-meter-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+
+@media(max-width:700px){
+  .container{padding:1rem;}
+  .chart-wrap{height:300px;}
+  header{padding:1rem;}
+  .tabs{padding:0 .3rem;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+
+/* PWA */
+#pwa-install-banner{
+  display:none;position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#1a3560,#0f1e38);color:#fff;
+  padding:.9rem 1.4rem;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.35);
+  z-index:9999;max-width:360px;width:calc(100% - 2rem);
+  display:none;align-items:center;gap:1rem;font-size:.88rem;
+  border:1px solid rgba(255,255,255,.12);
+}
+#pwa-install-banner.show{display:flex;}
+#pwa-install-banner .pwa-icon{font-size:1.8rem;flex-shrink:0}
+#pwa-install-banner .pwa-text{flex:1;line-height:1.4}
+#pwa-install-banner .pwa-text strong{display:block;margin-bottom:.2rem}
+#pwa-install-banner .pwa-btns{display:flex;flex-direction:column;gap:.4rem;flex-shrink:0}
+#pwa-install-btn{background:#2e6be6;color:#fff;border:none;border-radius:8px;
+  padding:.45rem .9rem;font-size:.82rem;cursor:pointer;font-weight:600;white-space:nowrap}
+#pwa-install-btn:hover{background:#3a7bf0}
+#pwa-dismiss-btn{background:transparent;color:rgba(255,255,255,.6);border:none;
+  font-size:.75rem;cursor:pointer;text-align:center;padding:.2rem}
+#pwa-dismiss-btn:hover{color:#fff}
+
+#offline-toast{
+  display:none;position:fixed;top:1rem;left:50%;transform:translateX(-50%);
+  background:#c04020;color:#fff;padding:.6rem 1.2rem;border-radius:10px;
+  font-size:.83rem;z-index:9999;box-shadow:0 2px 12px rgba(0,0,0,.3);
+  align-items:center;gap:.5rem;white-space:nowrap;
+}
+#offline-toast.show{display:flex;}
+#pwa-status-dot{
+  width:8px;height:8px;border-radius:50%;background:#2aaa72;
+  display:inline-block;margin-left:.5rem;vertical-align:middle;
+  transition:background .3s;
+}
+#pwa-status-dot.offline{background:#e05030;}
+</style>
+</head>
+<body>
+
+<!-- PWA: Banner d'instal·lació -->
+<div id="pwa-install-banner">
+  <div class="pwa-icon">🌱</div>
+  <div class="pwa-text">
+    <strong>Instal·la l'app</strong>
+    Accés ràpid i funciona sense connexió
+  </div>
+  <div class="pwa-btns">
+    <button id="pwa-install-btn" onclick="pwInstall()">Instal·lar</button>
+    <button id="pwa-dismiss-btn" onclick="pwDismiss()">Ara no</button>
+  </div>
+</div>
+
+<!-- PWA: Toast sense connexió -->
+<div id="offline-toast">
+  📡 Sense connexió — funcionant amb dades en cache
+</div>
+
+<header>
+  <div class="hd-left">
+    <div class="logo">🌱</div>
+    <div>
+      <h1>Seguiment de Creixement · Sara</h1>
+      <p>Percentils oficials · Nenes · 💊 Hormones de creixement des de maig 2022</p>
+    </div>
+  </div>
+  <div class="hd-controls">
+    <div class="perc-selector" id="percSelector">
+      <button class="perc-btn active" onclick="setPerc('orbegozo',this)">Orbegozo</button>
+      <button class="perc-btn" onclick="setPerc('oms',this)">OMS</button>
+      <button class="perc-btn" onclick="setPerc('cdc',this)">CDC</button>
+    </div>
+    <span title="Estat connexió" id="pwa-status-dot"></span>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('altura',this)">📏 Altura</div>
+  <div class="tab" onclick="showTab('pes',this)">⚖️ Pes</div>
+  <div class="tab" onclick="showTab('velocitat',this)">📈 Velocitat</div>
+  <div class="tab" onclick="showTab('guia',this)">📖 Guia</div>
+  <div class="tab" onclick="showTab('editar',this)">✏️ Editar dades</div>
+</div>
+
+<div class="container">
+
+  <!-- ALTURA -->
+  <div id="tab-altura" class="panel active">
+    <div class="stats-row" id="stats-altura"></div>
+    <div class="chart-card">
+      <h2>Corba d'Altura</h2>
+      <p class="chart-sub">Percentils <span id="perc-label-alt">Orbegozo</span> · cm · <span style="color:var(--red)">●</span> Real pre-tractament · <span style="color:var(--blue)">●</span> Amb hormones · <span style="color:#888">●</span> Estimat (buits/futur) · <span style="color:var(--orange)">╌</span> Projecció sense hormones</p>
+      <div class="chart-wrap"><canvas id="chartAltura"></canvas></div>
+      <div class="legend-grid" id="legend-altura"></div>
+    </div>
+    <div class="note-box">
+      💊 <strong>Inici hormones: maig 2022.</strong>
+      En <span style="color:var(--red);font-weight:600">roig</span>: creixement real sense tractament.
+      En <span style="color:var(--blue);font-weight:600">blau</span>: creixement amb hormones.
+      En <span style="color:#888;font-weight:600">gris</span>: estimació dels buits i projecció futura.
+      La línia <span style="color:var(--orange);font-weight:600">taronja</span> mostra el creixement esperat sense tractament.
+    </div>
+    <div id="final-height-cards" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- PES -->
+  <div id="tab-pes" class="panel">
+    <div class="stats-row" id="stats-pes"></div>
+    <div class="chart-card">
+      <h2>Corba de Pes</h2>
+      <p class="chart-sub">Percentils <span id="perc-label-pes">Orbegozo</span> · kg</p>
+      <div class="chart-wrap"><canvas id="chartPes"></canvas></div>
+      <div class="legend-grid" id="legend-pes"></div>
+    </div>
+  </div>
+
+  <!-- VELOCITAT -->
+  <div id="tab-velocitat" class="panel">
+    <div class="stats-row" id="stats-vel"></div>
+    <div class="vel-grid" id="vel-cards"></div>
+    <div class="chart-card">
+      <h2>Velocitat de Creixement Anual</h2>
+      <p class="chart-sub">cm/any calculats entre mesures consecutives · Comparativa Sara vs. normal i vs. amb hormones</p>
+      <div class="chart-wrap"><canvas id="chartVel"></canvas></div>
+    </div>
+    <div class="note-box">
+      📊 <strong>Velocitats de referència (nenes, 4–12 anys):</strong><br>
+      • <strong>Sense hormones (normal):</strong> 4–6 cm/any<br>
+      • <strong>Amb hormona de creixement:</strong> 7–11 cm/any (el primer any sol ser el de major resposta)<br>
+      • Una velocitat per sota de 4 cm/any indica creixement insuficient.<br>
+      • La velocitat es calcula entre cada parell de mesures reals consecutives i s'extrapola a cm/any.
+    </div>
+  </div>
+
+  <!-- GUIA -->
+  <div id="tab-guia" class="panel">
+    <div class="guide-card">
+      <h2>Guia dels Percentils de Creixement</h2>
+      <p class="chart-sub">Referència: <span id="perc-ref-name">Orbegozo (Espanya, 2004–2008, n=32.000+)</span></p>
+      <div class="sec-title">Significat de cada percentil</div>
+      <table class="bands">
+        <thead><tr><th>Percentil</th><th>Significat</th><th>% nenes per sota</th><th>Interpretació</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:#d05040"></span><strong>&lt; P3</strong></td><td>Molt baix</td><td>&lt; 3%</td><td>⚠️ Possible retard de creixement</td></tr>
+          <tr><td><span class="dot" style="background:#d4763a"></span><strong>P3–P10</strong></td><td>Baix-límit</td><td>3–10%</td><td>📋 Requereix seguiment</td></tr>
+          <tr><td><span class="dot" style="background:#4ab8a0"></span><strong>P10–P25</strong></td><td>Baix-normal</td><td>10–25%</td><td>✅ Dins límits normals</td></tr>
+          <tr style="background:#f0f8f5"><td><span class="dot" style="background:#0d8f68"></span><strong>P25–P75</strong></td><td><strong>Normal central</strong></td><td>25–75%</td><td>✅ Rang ideal</td></tr>
+          <tr><td><span class="dot" style="background:#4ab8a0"></span><strong>P75–P90</strong></td><td>Alt-normal</td><td>75–90%</td><td>✅ Per sobre la mitjana</td></tr>
+          <tr><td><span class="dot" style="background:#d4763a"></span><strong>P90–P97</strong></td><td>Alt-límit</td><td>90–97%</td><td>📋 Elevat però normal</td></tr>
+          <tr><td><span class="dot" style="background:#d05040"></span><strong>&gt; P97</strong></td><td>Molt alt</td><td>&gt; 97%</td><td>📋 Talla molt elevada</td></tr>
+        </tbody>
+      </table>
+      <div class="sec-title">Posició actual de la Sara (Altura)</div>
+      <div class="perc-vis" id="percVis">
+        <div class="vis-tick" style="left:3%"></div><div class="vis-tick" style="left:10%"></div>
+        <div class="vis-tick" style="left:25%"></div><div class="vis-tick" style="left:50%"></div>
+        <div class="vis-tick" style="left:75%"></div><div class="vis-tick" style="left:90%"></div>
+        <div class="vis-tick" style="left:97%"></div>
+        <div class="sara-pin" id="saraPin" style="left:50%">
+          <div class="pin-lbl" id="pinLbl">Sara</div>
+          <div class="pin-line"></div><div class="pin-tip"></div>
+        </div>
+      </div>
+      <div class="vis-lbls"><span>0</span><span>P3</span><span>P10</span><span>P25</span><span>P50</span><span>P75</span><span>P90</span><span>P97</span><span>100</span></div>
+      <div class="info-box">
+        <strong>📌 Com llegir el percentil:</strong> P25 vol dir que la Sara és més alta que el 25% de les nenes de la seva edat. El que importa clínicament és la <strong>tendència</strong>: mantenir o pujar de percentil és positiu.<br><br>
+        <strong>📈 Velocitat normal (4–12 anys):</strong> 4–6 cm/any. Amb GH: 7–11 cm/any el primer any, decreixent gradualment.<br><br>
+        <strong>🩺 Fonts dels percentils:</strong> Orbegozo (Espanya 2004–08) · OMS (mundial 2006–07) · CDC (EUA 2000). Cada font té lleugeres diferències basades en les poblacions estudiades.
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITAR -->
+  <div id="tab-editar" class="panel">
+    <div class="chart-card">
+      <h2>Editar dades de la Sara</h2>
+      <p class="chart-sub">Afegeix, modifica o elimina mesures. Els canvis s'apliquen a totes les gràfiques en temps real.</p>
+      <div class="edit-toolbar">
+        <button class="btn btn-primary" onclick="addRow()">+ Afegir mesura</button>
+        <button class="btn btn-success" onclick="applyChanges()">✓ Aplicar canvis</button>
+        <button class="btn btn-secondary" onclick="resetData()">↺ Restaurar originals</button>
+        <span style="font-size:.75rem;color:var(--muted);margin-left:.5rem">💊 marca l'inici del tractament</span>
+      </div>
+      <div class="edit-table-wrap">
+        <table class="edit-table">
+          <thead><tr><th>Data</th><th>Altura (cm)</th><th>Pes (kg)</th><th>💊 Inici tract.</th><th></th></tr></thead>
+          <tbody id="edit-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =============================================
+// DADES ORIGINALS
+// =============================================
+const BIRTHDAY = new Date(2016,8,5);
+const ORIGINAL_DATA = [
+  {date:'2016-09-05',alt:47,   pes:2.9,  tract:false},
+  {date:'2017-02-08',alt:null, pes:4.0,  tract:false},
+  {date:'2017-03-15',alt:59,   pes:5.7,  tract:false},
+  {date:'2017-04-19',alt:60.5, pes:6.06, tract:false},
+  {date:'2017-06-07',alt:62,   pes:6.2,  tract:false},
+  {date:'2017-06-21',alt:62,   pes:6.16, tract:false},
+  {date:'2017-07-05',alt:64,   pes:6.16, tract:false},
+  {date:'2017-08-13',alt:65,   pes:6.24, tract:false},
+  {date:'2017-09-13',alt:65,   pes:6.24, tract:false},
+  {date:'2017-10-23',alt:66.5, pes:6.59, tract:false},
+  {date:'2017-12-20',alt:67.5, pes:6.75, tract:false},
+  {date:'2018-02-07',alt:67.5, pes:6.75, tract:false},
+  {date:'2018-03-07',alt:69.5, pes:6.9,  tract:false},
+  {date:'2018-04-11',alt:69.5, pes:7.0,  tract:false},
+  {date:'2018-05-09',alt:71.5, pes:7.1,  tract:false},
+  {date:'2018-06-04',alt:71.5, pes:7.1,  tract:false},
+  {date:'2018-06-13',alt:71.5, pes:7.36, tract:false},
+  {date:'2018-07-11',alt:73,   pes:7.3,  tract:false},
+  {date:'2018-09-12',alt:74.5, pes:7.45, tract:false},
+  {date:'2018-10-08',alt:74.5, pes:7.75, tract:false},
+  {date:'2018-11-21',alt:75.5, pes:8.0,  tract:false},
+  {date:'2019-03-20',alt:77,   pes:8.8,  tract:false},
+  {date:'2019-07-18',alt:80,   pes:9.5,  tract:false},
+  {date:'2019-09-04',alt:81.5, pes:10.1, tract:false},
+  {date:'2019-09-27',alt:81.5, pes:13.0, tract:false},
+  {date:'2021-04-28',alt:94,   pes:12.8, tract:false},
+  {date:'2021-12-21',alt:97,   pes:13.4, tract:false},
+  {date:'2022-09-12',alt:103,  pes:14.5, tract:true},
+  {date:'2023-04-21',alt:107,  pes:16.5, tract:false},
+  {date:'2023-09-18',alt:111,  pes:18.1, tract:false},
+  {date:'2024-02-28',alt:114,  pes:18.1, tract:false},
+  {date:'2024-05-30',alt:116,  pes:21.0, tract:false},
+  {date:'2024-09-16',alt:119,  pes:21.0, tract:false},
+  {date:'2025-01-24',alt:120,  pes:21.0, tract:false},
+  {date:'2025-02-20',alt:120,  pes:23.25,tract:false},
+  {date:'2025-05-04',alt:124,  pes:23.0, tract:false},
+  {date:'2025-06-21',alt:125,  pes:24.0, tract:false},
+];
+
+let userData = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+let activePerc = 'orbegozo';
+let chartAlt = null, chartPes = null, chartVel = null;
+
+// =============================================
+// PERCENTILES - ORBEGOZO (nenes)
+// =============================================
+const PERC_DATA = {
+  orbegozo: {
+    name: 'Orbegozo (Espanya, 2004–2008, n=32.000+)',
+    altura: {
+      ages:[0,.25,.5,.75,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,16,17,18],
+      P3: [46.1,58,62.5,66,69,74.5,79.5,83.5,87,90.5,94,97,100,103,105.5,108.5,111,113.5,116,118.5,121,123,125.5,127.5,130,133,137,140,143,146,148,149.5,150.5,151,151.5,151.5],
+      P10:[47.8,60,64.7,68.5,71.5,77,82,86,90,93.5,97,100,103.5,106.5,109.5,112,114.5,117,119.5,122,124.5,127,129.5,132,135,138,142,145.5,148.5,151,153,154.5,155.5,156,156.5,156.5],
+      P25:[49.5,62,67,70.5,74,79.5,85,89,93,96.5,100.5,103.5,107,110,113,115.5,118.5,121,123.5,126,129,131.5,134,136.5,139.5,142.5,146.5,149.5,152.5,155,157,158.5,159.5,160,160.5,160.5],
+      P50:[51,64,69,72.5,76,82,87.5,91.5,95.5,99.5,103,106.5,110,113,116,119,121.5,124.5,127,129.5,132.5,135,137.5,140,143,146,150,153.5,156.5,158.5,160,161.5,162.5,163,163.5,163.5],
+      P75:[52.5,65.5,71,74.5,78,84,90,94,98,102,106,109.5,113,116,119,122,124.5,127.5,130,133,136,138.5,141.5,144.5,147,150,153.5,157,159.5,161.5,163,164.5,165.5,166,166.5,166.5],
+      P90:[54,67,72.5,76,80,86.5,92.5,96.5,101,104.5,108.5,112.5,116,119.5,122.5,125.5,128,131,134,136.5,140,142.5,145,148,151,154,158,161,163.5,165.5,167,168.5,169.5,170,170.5,170.5],
+      P97:[55.5,68.5,74,77.5,81.5,88.5,95,99.5,104,108,112,116,119.5,123,126.5,129.5,132,135,138,141,144,147,150,153,156,159,163,166,168.5,170.5,172,173.5,174.5,175,175.5,175.5],
+    },
+    pes: {
+      ages:[0,.25,.5,.75,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,16,17,18],
+      P3: [2.6,4.5,5.6,6.5,7.3,8.5,9.5,10.2,11,11.8,12.5,13.2,14,14.7,15.5,16.2,17,17.8,18.5,19.5,20.5,21.5,22.5,23.5,25,27,29,31,33.5,36,38.5,40.5,42.5,44,45,46],
+      P10:[2.9,5,6.2,7.1,8,9.3,10.3,11.2,12,12.9,13.7,14.5,15.3,16.2,17,18,18.9,19.8,20.8,21.9,23,24.2,25.5,26.9,28.5,30.5,32.5,35,37.5,40,42.5,44.5,46.5,48.5,50,51],
+      P25:[3.3,5.6,6.9,7.9,8.8,10.2,11.3,12.2,13.1,14.1,15,15.9,16.9,17.9,18.9,19.9,21,22.2,23.4,24.7,26,27.5,29,30.7,32.5,34.5,37,39.5,42.5,45,47.5,49.5,51.5,53.5,55,56],
+      P50:[3.7,6.1,7.5,8.5,9.5,11,12.2,13.2,14.2,15.2,16.2,17.2,18.3,19.4,20.6,21.8,23.1,24.4,25.8,27.3,28.9,30.5,32.3,34.3,36.5,39,41.5,44.5,47.5,50,52.5,54.5,56.5,58.5,60,61],
+      P75:[4.2,6.7,8.2,9.3,10.3,12,13.3,14.4,15.5,16.6,17.7,18.9,20.1,21.4,22.7,24.1,25.5,27,28.7,30.4,32.2,34.2,36.2,38.4,41,43.5,46.5,49.5,52.5,55,57.5,59.5,61.5,63.5,65,66],
+      P90:[4.6,7.2,8.8,10,11.1,12.9,14.3,15.6,16.8,18,19.2,20.5,21.9,23.3,24.8,26.4,28,29.7,31.6,33.6,35.7,38,40.3,42.8,45.5,48.5,51.5,54.5,57.5,60,62.5,64.5,66.5,68.5,70,71],
+      P97:[5,7.7,9.5,10.8,11.9,13.8,15.4,16.8,18.2,19.5,20.9,22.3,23.9,25.5,27.2,29,30.8,32.8,35,37.3,39.8,42.5,45,47.8,51,54.5,58,61,64.5,67.5,70,72.5,74.5,77,79,80],
+    }
+  },
+  oms: {
+    name: 'OMS – World Health Organization (2006–07)',
+    altura: {
+      ages:[0,.25,.5,.75,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,16,17,18],
+      P3: [45.4,57.4,62.0,65.6,68.9,74.3,79.3,83.3,87.1,90.5,93.9,97.2,100.4,103.5,106.5,109.3,111.9,114.5,117.0,119.3,121.5,123.6,126.0,128.4,130.8,133.0,136.0,139.5,142.5,145.5,147.5,149.0,150.0,151.0,151.5,151.5],
+      P10:[47.2,59.5,64.2,67.9,71.3,76.8,82.0,86.2,90.2,93.7,97.2,100.5,103.8,107.0,110.0,113.0,115.7,118.3,120.8,123.0,125.3,127.5,130.0,132.5,135.0,137.5,141.0,144.5,147.5,150.0,152.0,153.5,154.5,155.0,155.5,155.5],
+      P25:[49.0,61.5,66.4,70.2,73.7,79.4,84.8,89.1,93.2,97.0,100.5,103.8,107.2,110.5,113.5,116.5,119.3,122.0,124.5,127.0,129.5,132.0,134.5,137.0,139.5,142.5,146.0,149.5,152.5,155.0,157.0,158.5,159.5,160.0,160.5,160.5],
+      P50:[50.7,63.5,68.6,72.4,76.0,82.0,87.5,91.9,96.1,100.0,103.7,107.0,110.5,113.8,116.9,120.0,122.8,125.6,128.2,130.7,133.3,135.8,138.3,140.8,143.5,146.5,150.0,153.5,156.5,158.8,160.5,162.0,163.0,163.5,164.0,164.0],
+      P75:[52.4,65.5,70.8,74.7,78.4,84.7,90.3,94.8,99.1,103.1,107.0,110.3,113.8,117.2,120.4,123.5,126.5,129.3,131.9,134.4,137.0,139.5,142.0,144.8,147.5,150.5,154.0,157.5,160.5,162.7,164.0,165.5,166.5,167.0,167.5,167.5],
+      P90:[54.1,67.5,72.9,76.9,80.8,87.3,93.2,97.7,102.0,106.3,110.2,113.7,117.2,120.7,124.0,127.2,130.2,133.0,135.8,138.4,141.0,143.7,146.3,149.2,152.0,155.0,158.8,162.0,165.0,167.5,169.0,170.5,171.5,172.0,172.5,172.5],
+      P97:[55.7,69.3,74.9,78.9,82.9,89.8,96.1,100.7,105.2,109.5,113.6,117.2,120.8,124.5,127.9,131.2,134.2,137.2,140.0,142.7,145.5,148.2,151.0,154.0,157.0,160.0,163.8,167.0,170.0,172.5,174.0,175.5,176.5,177.0,177.5,177.5],
+    },
+    pes: {
+      ages:[0,.25,.5,.75,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,16,17,18],
+      P3: [2.4,4.4,5.5,6.4,7.1,8.4,9.3,10.0,10.8,11.5,12.2,12.9,13.6,14.3,15.1,15.8,16.7,17.5,18.5,19.4,20.5,21.5,22.7,23.9,25.4,27.1,29.2,31.4,34.0,36.5,39.0,41.5,43.5,46.5,48.5,49.5],
+      P10:[2.8,5.0,6.1,7.0,7.9,9.2,10.2,11.0,11.8,12.6,13.4,14.2,15.0,15.9,16.8,17.8,18.8,19.9,21.0,22.2,23.5,24.9,26.4,28.0,29.8,31.9,34.4,37.0,40.0,43.0,46.0,49.0,51.5,55.0,57.5,59.0],
+      P25:[3.2,5.6,6.8,7.8,8.8,10.2,11.3,12.2,13.1,14.0,14.9,15.8,16.8,17.8,18.9,20.0,21.2,22.5,23.8,25.2,26.8,28.4,30.2,32.1,34.2,36.6,39.4,42.5,46.0,49.5,53.0,56.0,58.5,62.0,65.0,67.0],
+      P50:[3.7,6.2,7.5,8.5,9.5,11.0,12.2,13.1,14.1,15.0,16.0,17.0,18.1,19.2,20.4,21.7,23.1,24.6,26.2,27.8,29.6,31.4,33.5,35.7,38.2,40.9,44.0,47.5,51.5,55.5,59.5,62.5,65.5,70.0,73.0,75.0],
+      P75:[4.2,6.8,8.3,9.4,10.5,12.1,13.4,14.5,15.5,16.7,17.8,19.0,20.2,21.6,23.1,24.7,26.4,28.2,30.2,32.2,34.4,36.8,39.4,42.2,45.2,48.5,52.5,57.0,62.0,67.0,71.5,75.0,78.0,83.0,87.0,90.0],
+      P90:[4.8,7.4,9.0,10.2,11.3,13.1,14.6,15.8,17.0,18.3,19.7,21.1,22.7,24.3,26.1,28.1,30.2,32.5,34.9,37.5,40.2,43.2,46.5,50.0,53.8,58.0,62.8,68.0,73.5,79.0,84.0,88.0,91.5,97.0,101.0,104.0],
+      P97:[5.4,8.0,9.7,11.0,12.2,14.1,15.9,17.3,18.7,20.2,21.8,23.5,25.4,27.3,29.5,31.9,34.5,37.3,40.3,43.5,47.0,50.8,55.0,59.5,64.5,69.5,75.5,81.5,88.0,94.0,100.0,104.5,108.5,114.5,119.0,122.0],
+    }
+  },
+  cdc: {
+    name: 'CDC – Centers for Disease Control (EUA, 2000)',
+    altura: {
+      ages:[2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,16,17,18],
+      P3: [80.1,83.9,87.6,91.1,94.5,97.7,100.9,103.9,106.8,109.5,112.1,114.7,117.3,119.9,122.5,125.0,127.5,130.0,133.0,136.5,140.5,144.5,148.0,151.0,153.0,154.5,155.5,156.0,156.5,156.5],
+      P10:[84.0,87.9,91.8,95.4,98.9,102.2,105.4,108.5,111.5,114.3,116.9,119.6,122.3,124.9,127.5,130.0,132.5,135.0,138.5,142.0,146.0,149.5,153.0,155.5,157.0,158.5,159.5,160.0,160.5,160.5],
+      P25:[87.5,91.5,95.6,99.4,102.9,106.3,109.5,112.7,115.8,118.8,121.5,124.3,127.0,129.7,132.5,135.3,137.8,140.5,144.0,147.5,151.5,155.0,158.0,160.0,161.5,163.0,163.5,164.0,164.0,164.0],
+      P50:[90.8,95.0,99.3,103.3,107.0,110.5,113.9,117.2,120.3,123.4,126.3,129.1,132.0,134.8,137.8,140.7,143.5,146.5,149.8,153.0,156.5,159.5,162.0,163.5,164.5,165.5,166.0,166.5,167.0,167.0],
+      P75:[94.1,98.5,102.9,107.0,110.9,114.5,118.1,121.5,124.8,128.0,131.0,134.0,137.0,139.9,142.8,145.7,148.5,151.5,154.8,158.0,161.5,164.0,166.0,167.0,168.0,168.5,169.0,169.5,169.5,169.5],
+      P90:[97.3,101.9,106.4,110.7,114.7,118.5,122.2,125.8,129.3,132.6,135.8,138.9,142.0,144.9,147.9,150.8,153.8,157.0,160.5,163.8,167.0,169.5,171.0,172.0,172.5,173.0,173.5,174.0,174.0,174.0],
+      P97:[100.2,104.9,109.6,114.1,118.2,122.2,126.0,129.7,133.3,136.8,140.1,143.3,146.5,149.4,152.4,155.4,158.5,161.8,165.3,168.5,171.5,173.8,175.0,175.5,176.0,176.5,177.0,177.0,177.0,177.0],
+    },
+    pes: {
+      ages:[2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,16,17,18],
+      P3: [9.5,10.1,10.8,11.3,11.9,12.5,13.1,13.7,14.3,15.0,15.7,16.5,17.4,18.4,19.4,20.5,21.7,23.0,24.5,26.2,28.2,30.4,33.0,35.7,38.5,41.2,43.7,46.5,48.5,50.0],
+      P10:[10.2,10.9,11.5,12.2,12.8,13.5,14.2,14.9,15.7,16.5,17.4,18.4,19.5,20.7,22.0,23.4,24.9,26.6,28.5,30.6,33.0,35.7,38.7,42.0,45.5,49.0,52.0,56.0,59.0,61.0],
+      P25:[11.0,11.7,12.4,13.1,13.9,14.7,15.5,16.4,17.3,18.4,19.5,20.7,22.1,23.6,25.2,27.0,28.9,31.0,33.4,36.0,39.0,42.5,46.2,50.2,54.5,58.5,62.0,67.0,71.0,74.0],
+      P50:[12.0,12.8,13.7,14.5,15.4,16.3,17.2,18.2,19.3,20.5,21.8,23.2,24.8,26.5,28.4,30.4,32.6,35.0,37.8,40.8,44.2,48.2,52.5,57.0,61.5,66.0,70.0,75.5,80.5,84.0],
+      P75:[13.0,14.0,15.0,16.0,17.0,18.0,19.1,20.3,21.7,23.2,24.8,26.6,28.6,30.7,33.0,35.5,38.2,41.2,44.8,48.7,53.0,57.8,63.0,68.5,73.5,78.5,83.0,90.0,96.0,101.0],
+      P90:[14.3,15.4,16.5,17.7,18.9,20.1,21.4,22.9,24.6,26.5,28.5,30.8,33.4,36.1,39.0,42.1,45.5,49.3,53.8,58.7,64.0,69.8,76.0,82.5,88.5,94.0,99.0,107.0,113.5,119.0],
+      P97:[15.7,17.0,18.3,19.7,21.2,22.8,24.4,26.4,28.6,31.0,33.7,36.7,40.0,43.4,47.2,51.3,56.0,61.2,67.0,73.5,80.0,87.0,94.5,101.5,108.0,114.0,119.5,128.5,136.0,142.5],
+    }
+  }
+};
+
+// =============================================
+// UTILS
+// =============================================
+function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function fmtDate(d){return d.toLocaleDateString('ca-ES',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtAge(y){const yr=Math.floor(y),mo=Math.round((y-yr)*12);if(yr===0)return`${mo}m`;if(mo===0)return`${yr}a`;return`${yr}a ${mo}m`;}
+function getAge(d){return(d-BIRTHDAY)/(365.25*24*3600*1000);}
+
+function interp(tbl,a){
+  const ag=tbl.ages,ks=['P3','P10','P25','P50','P75','P90','P97'],r={};
+  for(let i=0;i<ag.length-1;i++){
+    if(a>=ag[i]&&a<=ag[i+1]){
+      const t=(a-ag[i])/(ag[i+1]-ag[i]);
+      ks.forEach(k=>r[k]=tbl[k][i]+t*(tbl[k][i+1]-tbl[k][i]));
+      return r;
+    }
+  }
+  const last=ag.length-1;
+  ks.forEach(k=>r[k]=tbl[k][last]);
+  return r;
+}
+
+function plabel(v,pv){
+  if(v<pv.P3) return{l:'<P3',c:'badge-low'};
+  if(v<pv.P10)return{l:'P3–P10',c:'badge-low'};
+  if(v<pv.P25)return{l:'P10–P25',c:'badge-mid'};
+  if(v<pv.P50)return{l:'P25–P50',c:'badge-mid'};
+  if(v<pv.P75)return{l:'P50–P75',c:'badge-mid'};
+  if(v<pv.P90)return{l:'P75–P90',c:'badge-high'};
+  if(v<pv.P97)return{l:'P90–P97',c:'badge-high'};
+  return{l:'>P97',c:'badge-high'};
+}
+
+function getTractAge(){
+  const td=userData.find(d=>d.tract);
+  if(td){const pd=parseDate(td.date);return getAge(pd);}
+  return getAge(new Date(2022,4,1));
+}
+
+// =============================================
+// PREDICCIÓ ALTURA FINAL ADULTA
+// Dades mèdiques reals (endocrina):
+//   · Sense hormones:   155 cm  (predicció metge, inici tractament 2022)
+//   · Amb hormones:    ~162 cm  (estimació endocrina actual, informe recent)
+//   · Talla Diana (TD): 160.5 cm (informe endocrina, corregida per edat òssia)
+//   · TD Tanner (pares): 162.75 cm = (170.5 - 13 + 168) / 2
+//   · Pare: 170.5 cm · Mare: 168 cm
+//   · Edat òssia: 1 any endarrerida (últim informe endocrina)
+// =============================================
+const PARENTS={pare:170.5, mare:168};
+const TD_TANNER = Math.round(((PARENTS.pare - 13) + PARENTS.mare) / 2 * 10) / 10; // 162.75 cm
+const TD_MEDICA = 160.5;
+const BONE_AGE_DELAY = 1.0; // anys endarreriment edat òssia (últim informe)
+
+const MEDICAL={
+  noTreat:  {val:155,   low:153,   high:157,  source:'Predicció mèdica inici tractament (2022)'},
+  withTreat:{val:162,   low:159.5, high:164,  source:'Estimació endocrina actual (informe recent)'},
+  talDiana: {val:TD_MEDICA, tannerVal:TD_TANNER, source:'TD endocrina (corregida) · TD Tanner (pares): '+TD_TANNER+' cm'},
+  // La meva predicció: incorpora l'any d'endarreriment d'edat òssia
+  // Edat òssia 8.5a → ~7 anys més de creixement → rang 161–166 cm
+  myPred:   {val:163, low:161, high:167, source:'Predicció pròpia (incorpora edat òssia endarrerida)'},
+};
+
+function calcFinalHeight(){
+  const tractAge=getTractAge();
+  const percTbl=PERC_DATA[activePerc].altura;
+  const valid=userData.filter(d=>d.alt!=null)
+    .map(d=>({age:getAge(parseDate(d.date)),val:d.alt}))
+    .sort((a,b)=>a.age-b.age);
+  if(valid.length<3) return null;
+
+  const TARGET_AGE=18;
+  const pv18=interp(percTbl,TARGET_AGE);
+
+  // SDS respecte Talla Diana
+  // TD = 160.5 cm · desviació estàndard Orbegozo adulta ~6.5 cm
+  const SD_ADULT=6.5;
+  const sdsNoTreat = Math.round((MEDICAL.noTreat.val - MEDICAL.talDiana.val)/SD_ADULT*10)/10;
+  const sdsWith    = Math.round((MEDICAL.withTreat.val - MEDICAL.talDiana.val)/SD_ADULT*10)/10;
+
+  // Percentatge visual entre P3 i P97
+  function percPct(cm){
+    return Math.max(2,Math.min(98,Math.round((cm-pv18.P3)/(pv18.P97-pv18.P3)*100)));
+  }
+  function percAt18(cm){
+    if(cm<=pv18.P3) return '<P3';
+    if(cm<=pv18.P10)return 'P3–P10';
+    if(cm<=pv18.P25)return 'P10–P25';
+    if(cm<=pv18.P50)return 'P25–P50';
+    if(cm<=pv18.P75)return 'P50–P75';
+    if(cm<=pv18.P90)return 'P75–P90';
+    if(cm<=pv18.P97)return 'P90–P97';
+    return '>P97';
+  }
+
+  // Projecció estadística actual (per comparar amb dades mèdiques)
+  const post=valid.filter(d=>d.age>=tractAge);
+  let statPost=null;
+  if(post.length>=1){
+    const recent=post.slice(-4);
+    let s=0,n=0;
+    for(const d of recent){const pv=interp(percTbl,d.age);const rng=pv.P97-pv.P3;if(rng>0){s+=(d.val-pv.P3)/rng;n++;}}
+    const frac=n>0?s/n:0.3;
+    statPost=Math.round((pv18.P3+frac*(pv18.P97-pv18.P3))*10)/10;
+  }
+
+  // ---- LA MEVA PREDICCIÓ (amb edat òssia endarrerida) ----
+  // Edat cronològica ara: ~9.5a | Edat òssia: ~8.5a (1 any endarrerida)
+  // → Sara té el potencial de creixement d'una nena de 8.5a
+  // → Fi creixement: quan edat òssia arribi a ~15.5a → edat cron. ~16.5a
+  // → Li queden ~7 anys d'edat òssia de creixement (vs. 6 sense endarreriment)
+  // Model velocitat decreixent amb GH:
+  //   2a × 8cm = +16cm (prepuberal, GH actiu)
+  //   2a × 6cm = +12cm (transició pre-pubertat)
+  //   2a × 4cm = +8cm  (pubertat)
+  //   1a × 2.5cm = +2.5cm (final)
+  // → +38.5cm residuals | Sara ara ~127cm → ~165cm central
+  const today=new Date();
+  const ageNow=getAge(today);
+  const boneAgeNow=ageNow-BONE_AGE_DELAY;
+  const lastAltVal=valid.length?valid[valid.length-1].val:125;
+  const lastAltAge=valid.length?valid[valid.length-1].age:8.8;
+  // Estima altura actual (afegint creixement des de l'última mesura)
+  const daysSinceLast=(today-parseDate(valid[valid.length-1]?.age?userData.filter(d=>d.alt!=null).sort((a,b)=>parseDate(a.date)-parseDate(b.date)).pop().date:'2025-06-21')).valueOf()/(86400000);
+  const velRecent=7.0; // cm/any recent
+  const estNow=Math.round((lastAltVal + velRecent*(ageNow-lastAltAge))*10)/10;
+
+  // Creixement restant model
+  const growthModel=[[2,8.0],[2,6.0],[2,4.0],[1,2.5]];
+  const residual=growthModel.reduce((s,[y,v])=>s+y*v,0); // 38.5 cm
+  const myFinal=Math.round((estNow+residual)*10)/10;
+  const myLow  =Math.round((estNow+2*7.0+2*5.5+2*3.5+1*2.0)*10)/10;
+  const myHigh =Math.round((estNow+2*9.0+2*7.0+2*5.0+1*3.0)*10)/10;
+
+  const sdsMyPred=Math.round((myFinal-MEDICAL.talDiana.val)/SD_ADULT*10)/10;
+
+  return{
+    noTreat:{...MEDICAL.noTreat, perc:percAt18(MEDICAL.noTreat.val), pct:percPct(MEDICAL.noTreat.val), sds:sdsNoTreat},
+    withTreat:{...MEDICAL.withTreat, perc:percAt18(MEDICAL.withTreat.val), pct:percPct(MEDICAL.withTreat.val), sds:sdsWith},
+    talDiana:{...MEDICAL.talDiana, perc:percAt18(MEDICAL.talDiana.val), pct:percPct(MEDICAL.talDiana.val)},
+    gain: MEDICAL.withTreat.val - MEDICAL.noTreat.val,
+    statPost,
+    pv18,
+    myPred:{
+      val:myFinal, low:myLow, high:myHigh,
+      estNow, boneAgeNow:Math.round(boneAgeNow*10)/10,
+      residual:Math.round(residual*10)/10,
+      perc:percAt18(myFinal), pct:percPct(myFinal), sds:sdsMyPred,
+    },
+  };
+}
+
+// Genera els punts de projecció cap a 18a per al gràfic
+// Ancorats als valors mèdics reals: 155 cm (sense) i 162 cm (amb)
+function buildFinalProjection(tractAge,unit){
+  if(unit!=='alt') return{preProj:[],postProj:[]};
+  const percTbl=PERC_DATA[activePerc].altura;
+  const valid=userData.filter(d=>d.alt!=null)
+    .map(d=>({age:getAge(parseDate(d.date)),val:d.alt}))
+    .sort((a,b)=>a.age-b.age);
+  if(!valid.length) return{preProj:[],postProj:[]};
+  const TARGET_AGE=18;
+
+  // PRE: parteix de l'última mesura pre-tractament → aterra a 155 cm (valor metge)
+  const pre=valid.filter(d=>d.age<tractAge);
+  const preProj=[];
+  if(pre.length>=1){
+    const anchor=pre[pre.length-1];
+    const targetVal=MEDICAL.noTreat.val; // 155 cm
+    const ageSpan=TARGET_AGE-anchor.age;
+    for(let a=anchor.age;a<=TARGET_AGE+0.1;a+=0.25){
+      const t=Math.min(1,(a-anchor.age)/ageSpan);
+      // Interpolació suavitzada (ease-out) cap al valor final
+      const eased=t<1?1-Math.pow(1-t,2):1;
+      preProj.push({x:Math.round(a*100)/100, y:Math.round((anchor.val+eased*(targetVal-anchor.val))*10)/10});
+    }
+  }
+
+  // POST: parteix de l'última mesura post-tractament → aterra a 162 cm (valor metge)
+  const post=valid.filter(d=>d.age>=tractAge);
+  const postProj=[];
+  if(post.length>=1){
+    const anchor=post[post.length-1];
+    const targetVal=MEDICAL.withTreat.val; // 162 cm
+    const ageSpan=TARGET_AGE-anchor.age;
+    for(let a=anchor.age;a<=TARGET_AGE+0.1;a+=0.25){
+      const t=Math.min(1,(a-anchor.age)/ageSpan);
+      const eased=t<1?1-Math.pow(1-t,2):1;
+      postProj.push({x:Math.round(a*100)/100, y:Math.round((anchor.val+eased*(targetVal-anchor.val))*10)/10});
+    }
+  }
+
+  // Talla Diana: línia horitzontal a 160.5 cm des de la data actual fins 18a
+  const nowAge=getAge(new Date());
+  const tdLine=[];
+  for(let a=nowAge;a<=TARGET_AGE+0.1;a+=0.5){
+    tdLine.push({x:Math.round(a*100)/100, y:MEDICAL.talDiana.val});
+  }
+
+  return{preProj,postProj,tdLine};
+}
+
+// =============================================
+// ESTIMACIÓ SENSE TRACTAMENT
+// =============================================
+function buildNoTreat(percTbl,unit,tractAge){
+  const valid=userData.filter(d=>d[unit]!=null).map(d=>({age:getAge(parseDate(d.date)),val:d[unit]}));
+  const pre=valid.filter(d=>d.age<tractAge);
+  if(pre.length<2)return[];
+  const recent=pre.slice(-5);
+  let s=0,n=0;
+  for(const d of recent){
+    const pv=interp(percTbl,d.age);
+    const rng=pv.P97-pv.P3;
+    if(rng>0){s+=(d.val-pv.P3)/rng;n++;}
+  }
+  const frac=s/n;
+  const anchor=pre[pre.length-1];
+  const maxAge=Math.max(...valid.map(d=>d.age))+1;
+  const pts=[];
+  for(let a=anchor.age;a<=maxAge;a+=0.083){
+    const pv=interp(percTbl,a);
+    pts.push({x:a,y:Math.round((pv.P3+frac*(pv.P97-pv.P3))*10)/10});
+  }
+  return pts;
+}
+
+// =============================================
+// ESTIMACIÓ BUITS I PROJECCIÓ FUTURA (gris)
+// =============================================
+function buildEstimated(unit,tractAge){
+  const realPts=userData.filter(d=>d[unit]!=null).map(d=>({age:getAge(parseDate(d.date)),val:d[unit],real:true}));
+  if(realPts.length===0)return{gaps:[],future:[]};
+  
+  const gaps=[];
+  // Interpolació entre mesures reals amb buit
+  for(let i=0;i<realPts.length-1;i++){
+    const a1=realPts[i],a2=realPts[i+1];
+    const daysDiff=(a2.age-a1.age)*365.25;
+    if(daysDiff>90){
+      for(let a=a1.age+0.083;a<a2.age-0.04;a+=0.083){
+        const t=(a-a1.age)/(a2.age-a1.age);
+        gaps.push({x:a,y:Math.round((a1.val+t*(a2.val-a1.val))*10)/10});
+      }
+    }
+  }
+  
+  // Projecció futura: des de l'última mesura real
+  const lastReal=realPts[realPts.length-1];
+  const nowAge=getAge(new Date());
+  const future=[];
+  if(lastReal.age<nowAge){
+    const percTbl=PERC_DATA[activePerc][unit==='alt'?'altura':'pes'];
+    const pvLast=interp(percTbl,lastReal.age);
+    const rng=pvLast.P97-pvLast.P3;
+    const frac=rng>0?(lastReal.val-pvLast.P3)/rng:0.5;
+    for(let a=lastReal.age;a<=nowAge+0.2;a+=0.083){
+      const pv=interp(percTbl,a);
+      future.push({x:a,y:Math.round((pv.P3+frac*(pv.P97-pv.P3))*10)/10});
+    }
+  }
+  return{gaps,future};
+}
+
+// =============================================
+// PERCENTIL LINES
+// =============================================
+function buildPercLines(percTbl,maxAge){
+  const ks=['P3','P10','P25','P50','P75','P90','P97'],pts={};
+  ks.forEach(k=>pts[k]=[]);
+  for(let a=Math.max(0,percTbl.ages[0]);a<=maxAge;a+=0.083){
+    const ip=interp(percTbl,a);
+    ks.forEach(k=>pts[k].push({x:a,y:ip[k]}));
+  }
+  return pts;
+}
+
+const pColors={P3:'#e8846a',P10:'#d4763a',P25:'#4ab8a0',P50:'#0d8f68',P75:'#4ab8a0',P90:'#d4763a',P97:'#e8846a'};
+
+// Plugin línia tractament + etiquetes altura final
+const tractPlugin={
+  id:'tractLine',
+  afterDraw(chart){
+    const{ctx,scales:{x,y}}=chart;
+    const tractAge=getTractAge();
+    const xp=x.getPixelForValue(tractAge);
+    if(xp>=chart.chartArea.left&&xp<=chart.chartArea.right){
+      ctx.save();
+      ctx.setLineDash([7,4]);
+      ctx.strokeStyle='rgba(46,107,230,.4)';
+      ctx.lineWidth=1.8;
+      ctx.beginPath();ctx.moveTo(xp,chart.chartArea.top);ctx.lineTo(xp,chart.chartArea.bottom);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#2e6be6';
+      ctx.font='13px serif';ctx.textAlign='center';
+      ctx.fillText('💊',xp,chart.chartArea.top+14);
+      ctx.font='bold 9.5px DM Sans,sans-serif';
+      ctx.fillText('Inici hormones',xp,chart.chartArea.top+27);
+      ctx.restore();
+    }
+    // Etiquetes altura final a l'edat 18
+    const fh=calcFinalHeight();
+    if(!fh||chart.canvas.id!=='chartAltura')return;
+    const x18=x.getPixelForValue(18);
+    if(x18<chart.chartArea.left||x18>chart.chartArea.right+10)return;
+    ctx.save();
+    // Línia vertical a 18a
+    ctx.setLineDash([4,3]);
+    ctx.strokeStyle='rgba(120,130,150,.35)';
+    ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(x18,chart.chartArea.top);ctx.lineTo(x18,chart.chartArea.bottom);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='bold 9px DM Sans,sans-serif';
+    ctx.textAlign='right';
+    ctx.fillStyle='rgba(120,130,150,.7)';
+    ctx.fillText('18 anys',x18-4,chart.chartArea.top+10);
+
+    // Etiqueta Talla Diana (verd)
+    const yTD=y.getPixelForValue(MEDICAL.talDiana.val);
+    if(yTD>=chart.chartArea.top&&yTD<=chart.chartArea.bottom){
+      const bw=72,bh=18;
+      const bx=Math.max(chart.chartArea.left+4,x18-bw-10);
+      const by=yTD-bh-4;
+      ctx.fillStyle='rgba(20,150,90,.88)';
+      roundRect(ctx,bx,by,bw,bh,4);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 9.5px DM Sans,sans-serif';ctx.textAlign='center';
+      ctx.fillText(`TD ${MEDICAL.talDiana.val} cm`,bx+bw/2,by+12);
+    }
+
+    // Etiqueta POST (blau) → 162 cm
+    const yPost=y.getPixelForValue(MEDICAL.withTreat.val);
+    if(yPost>=chart.chartArea.top&&yPost<=chart.chartArea.bottom){
+      ctx.fillStyle='rgba(30,90,220,.92)';
+      ctx.beginPath();ctx.arc(x18,yPost,6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 8px DM Sans,sans-serif';ctx.textAlign='center';
+      ctx.fillText('💊',x18,yPost+3);
+      const bw=74,bh=20;
+      const bx=Math.max(chart.chartArea.left+4,x18-bw-10);
+      const by=yPost-bh/2;
+      ctx.fillStyle='rgba(30,90,220,.92)';
+      roundRect(ctx,bx,by,bw,bh,5);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 10px DM Sans,sans-serif';ctx.textAlign='center';
+      ctx.fillText(`~${MEDICAL.withTreat.val} cm`,bx+bw/2,by+13);
+    }
+
+    // Etiqueta PRE (taronja) → 155 cm
+    const yPre=y.getPixelForValue(MEDICAL.noTreat.val);
+    if(yPre>=chart.chartArea.top&&yPre<=chart.chartArea.bottom){
+      ctx.fillStyle='rgba(180,70,10,.9)';
+      ctx.beginPath();ctx.arc(x18,yPre,6,0,Math.PI*2);ctx.fill();
+      const bw=74,bh=20;
+      const bx=Math.max(chart.chartArea.left+4,x18-bw-10);
+      const by=yPre-bh/2;
+      ctx.fillStyle='rgba(180,70,10,.9)';
+      roundRect(ctx,bx,by,bw,bh,5);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 10px DM Sans,sans-serif';ctx.textAlign='center';
+      ctx.fillText(`~${MEDICAL.noTreat.val} cm`,bx+bw/2,by+13);
+    }
+    ctx.restore();
+  }
+};
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+// =============================================
+// BUILD CHART
+// =============================================
+function buildChart(canvasId,unit){
+  const tractAge=getTractAge();
+  const percTbl=PERC_DATA[activePerc][unit==='alt'?'altura':'pes'];
+  // IMPORTANT: ordenar sempre per edat abans de passar a Chart.js
+  // Si els punts no estan ordenats per X, la línia scatter va cap enrere i baixa visualment
+  const realPts=userData.filter(d=>d[unit]!=null)
+    .map(d=>({age:getAge(parseDate(d.date)),val:d[unit]}))
+    .sort((a,b)=>a.age-b.age); // ← clau: ordenat per edat
+
+  const maxAge=Math.max(realPts.length?Math.max(...realPts.map(d=>d.age)):10,getAge(new Date()),unit==='alt'?18:0)+0.5;
+
+  const percLines=buildPercLines(percTbl,maxAge);
+  const noTreat=buildNoTreat(percTbl,unit,tractAge);
+  const{gaps,future}=buildEstimated(unit,tractAge);
+  const{preProj,postProj,tdLine}=buildFinalProjection(tractAge,unit);
+
+  const before=realPts.filter(d=>d.age<=tractAge).map(d=>({x:d.age,y:d.val}));
+  const after=realPts.filter(d=>d.age>=tractAge).map(d=>({x:d.age,y:d.val}));
+  const u=unit==='alt'?'cm':'kg';
+  
+  const percDS=Object.entries(percLines).map(([k,pts])=>({
+    label:k,data:pts,borderColor:pColors[k],backgroundColor:'transparent',
+    borderWidth:k==='P50'?3:1.8,borderDash:k==='P50'?[]:[6,4],
+    pointRadius:0,tension:.4,order:10,
+  }));
+  
+  const datasets=[
+    ...percDS,
+    {label:'Estimació buits',data:gaps,borderColor:'rgba(100,110,130,.5)',backgroundColor:'transparent',
+     borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4,order:4,showLine:true},
+    {label:'Projecció futura',data:future,borderColor:'rgba(80,90,115,.6)',backgroundColor:'transparent',
+     borderWidth:1.8,borderDash:[6,4],pointRadius:0,tension:.4,order:4,showLine:true},
+    {label:'Estimació sense hormones',data:noTreat,borderColor:'#d97020',backgroundColor:'transparent',
+     borderWidth:2,borderDash:[9,5],pointRadius:0,tension:.4,order:3,showLine:true},
+    // Projeccions d'altura final (ancores als valors mèdics reals)
+    ...(unit==='alt'?[
+      {label:'Projecció sense tractament → 155 cm',data:preProj,borderColor:'rgba(180,70,10,.6)',backgroundColor:'transparent',
+       borderWidth:2,borderDash:[4,4],pointRadius:preProj.length>0?[...new Array(preProj.length-1).fill(0),8]:[],
+       pointBackgroundColor:'rgba(180,70,10,.85)',pointStyle:'rectRot',tension:.3,order:2,showLine:true},
+      {label:'Projecció amb hormones → 162 cm',data:postProj,borderColor:'rgba(30,90,220,.65)',backgroundColor:'transparent',
+       borderWidth:2.5,borderDash:[4,4],pointRadius:postProj.length>0?[...new Array(postProj.length-1).fill(0),9]:[],
+       pointBackgroundColor:'rgba(30,90,220,.9)',pointStyle:'rectRot',tension:.3,order:2,showLine:true},
+      {label:'Talla Diana (TD) 160.5 cm',data:tdLine||[],borderColor:'rgba(30,160,100,.7)',backgroundColor:'transparent',
+       borderWidth:1.8,borderDash:[10,5],pointRadius:0,tension:0,order:3,showLine:true},
+    ]:[]),
+    {label:'Sara · Pre-tractament',data:before,borderColor:'#d94040',backgroundColor:'#d94040',
+     pointRadius:5,pointHoverRadius:8,borderWidth:2.5,showLine:true,tension:0,order:1},
+    {label:'Sara · Amb hormones',data:after,borderColor:'#2e6be6',backgroundColor:'#2e6be6',
+     pointRadius:6,pointHoverRadius:9,borderWidth:2.5,showLine:true,tension:0,order:1},
+  ];
+  
+  const ctx=document.getElementById(canvasId).getContext('2d');
+  return new Chart(ctx,{
+    type:'scatter',
+    data:{datasets},
+    plugins:[tractPlugin],
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'nearest',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          filter:i=>i.raw.x!=null,
+          callbacks:{
+            title:items=>`Edat: ${fmtAge(items[0].raw.x)}`,
+            label:i=>{
+              const l=i.dataset.label;
+              return`${l}: ${i.raw.y} ${u}`;
+            }
+          },
+          backgroundColor:'rgba(15,25,45,.93)',titleColor:'#80b0f0',bodyColor:'#dde8f5',
+          padding:12,cornerRadius:8,
+        }
+      },
+      scales:{
+        x:{type:'linear',title:{display:true,text:'Edat (anys)',color:'#7a8ea8',font:{size:11}},
+           min:0,max:Math.ceil(maxAge),
+           ticks:{stepSize:1,callback:v=>`${v}a`,color:'#7a8ea8',font:{size:10}},
+           grid:{color:'#e4eaf2'}},
+        y:{title:{display:true,text:unit==='alt'?'Altura (cm)':'Pes (kg)',color:'#7a8ea8',font:{size:11}},
+           grid:{color:'#e4eaf2'},ticks:{color:'#7a8ea8',font:{size:10}}},
+      }
+    }
+  });
+}
+
+// =============================================
+// VELOCITY CHART
+// =============================================
+function buildVelocityChart(){
+  const realAlt=userData.filter(d=>d.alt!=null).map(d=>({age:getAge(parseDate(d.date)),val:d.alt,date:parseDate(d.date)}));
+  if(realAlt.length<2)return;
+  
+  const tractAge=getTractAge();
+  const velPts=[];
+  for(let i=1;i<realAlt.length;i++){
+    const da=realAlt[i].age-realAlt[i-1].age;
+    if(da<0.05)continue;
+    const velAny=(realAlt[i].val-realAlt[i-1].val)/da;
+    const midAge=(realAlt[i].age+realAlt[i-1].age)/2;
+    velPts.push({midAge,velAny,isAfter:midAge>=tractAge,
+      label:`${fmtAge(realAlt[i-1].age)}→${fmtAge(realAlt[i].age)}`});
+  }
+  
+  // Velocitat anual per any natural (grup per any)
+  const byYear={};
+  for(const p of velPts){
+    const yr=Math.floor(p.midAge+getAge(BIRTHDAY)/1);
+    const key=Math.floor(p.midAge);
+    if(!byYear[key])byYear[key]={sum:0,n:0,isAfter:p.isAfter,yr:p.midAge};
+    byYear[key].sum+=p.velAny;byYear[key].n++;byYear[key].isAfter=p.isAfter;
+  }
+  
+  const labels=velPts.map(p=>`${fmtAge(p.midAge)}`);
+  const velColors=velPts.map(p=>p.isAfter?'rgba(46,107,230,.8)':'rgba(217,64,64,.8)');
+  
+  const ctx=document.getElementById('chartVel').getContext('2d');
+  if(chartVel){chartVel.destroy();}
+  chartVel=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Velocitat Sara (cm/any)',data:velPts.map(p=>Math.round(p.velAny*10)/10),
+         backgroundColor:velColors,borderRadius:4,order:1},
+        {label:'Normal sense hormones (5 cm/any)',
+         data:new Array(velPts.length).fill(5),
+         type:'line',borderColor:'#d97020',backgroundColor:'transparent',
+         borderWidth:2,borderDash:[7,4],pointRadius:0,order:2},
+        {label:'Objectiu amb hormones (8 cm/any)',
+         data:new Array(velPts.length).fill(8),
+         type:'line',borderColor:'#2e6be6',backgroundColor:'transparent',
+         borderWidth:2,borderDash:[4,3],pointRadius:0,order:3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top',labels:{font:{size:11},boxWidth:14,padding:12}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${i.raw} cm/any`},
+          backgroundColor:'rgba(15,25,45,.93)',titleColor:'#80b0f0',bodyColor:'#dde8f5',cornerRadius:8}
+      },
+      scales:{
+        x:{ticks:{color:'#7a8ea8',font:{size:9},maxRotation:45},grid:{display:false}},
+        y:{title:{display:true,text:'cm / any',color:'#7a8ea8',font:{size:11}},
+           grid:{color:'#e4eaf2'},ticks:{color:'#7a8ea8',font:{size:10}},min:0}
+      }
+    }
+  });
+  
+  // Stats velocitat
+  const afterPts=velPts.filter(p=>p.isAfter);
+  const beforePts=velPts.filter(p=>!p.isAfter);
+  const avgAfter=afterPts.length?afterPts.reduce((s,p)=>s+p.velAny,0)/afterPts.length:null;
+  const avgBefore=beforePts.length?beforePts.reduce((s,p)=>s+p.velAny,0)/beforePts.length:null;
+  const lastVel=velPts.length?velPts[velPts.length-1].velAny:null;
+  
+  document.getElementById('stats-vel').innerHTML=`
+    ${lastVel!=null?`<div class="stat-card sc-blue"><div class="lbl">Última velocitat</div>
+      <div class="val">${lastVel.toFixed(1)} <span style="font-size:1rem">cm/any</span></div>
+      <div class="sub">Entre les 2 últimes mesures</div></div>`:''}
+    ${avgAfter!=null?`<div class="stat-card sc-blue"><div class="lbl">Mitjana amb hormones</div>
+      <div class="val">${avgAfter.toFixed(1)} <span style="font-size:1rem">cm/any</span></div>
+      <div class="sub">Des de l'inici del tractament</div></div>`:''}
+    ${avgBefore!=null?`<div class="stat-card sc-red"><div class="lbl">Mitjana pre-tractament</div>
+      <div class="val">${avgBefore.toFixed(1)} <span style="font-size:1rem">cm/any</span></div>
+      <div class="sub">Sense hormones</div></div>`:''}
+    <div class="stat-card sc-orange"><div class="lbl">Normal sense hormones</div>
+      <div class="val">4–6 <span style="font-size:1rem">cm/any</span></div>
+      <div class="sub">Referència nenes 4–12a</div></div>
+    <div class="stat-card sc-green"><div class="lbl">Objectiu amb hormones</div>
+      <div class="val">7–11 <span style="font-size:1rem">cm/any</span></div>
+      <div class="sub">Primer any de tractament</div></div>
+  `;
+  
+  // Cards comparativa per any
+  buildVelCards(velPts);
+}
+
+function buildVelCards(velPts){
+  // Agrupa per any natural d'edat
+  const byYear=new Map();
+  for(const p of velPts){
+    const yr=Math.floor(p.midAge);
+    if(!byYear.has(yr))byYear.set(yr,{pts:[],isAfter:p.isAfter});
+    byYear.get(yr).pts.push(p);
+    if(p.isAfter)byYear.get(yr).isAfter=true;
+  }
+  
+  const cards=[];
+  for(const[yr,{pts,isAfter}]of byYear){
+    const avg=pts.reduce((s,p)=>s+p.velAny,0)/pts.length;
+    const normal=5,objectiu=8;
+    const barW=Math.min(100,avg/12*100);
+    const normalW=normal/12*100;
+    const color=isAfter?'#2e6be6':'#d94040';
+    cards.push(`
+      <div class="vel-card">
+        <h3>${isAfter?'💊':''} ${yr}–${yr+1}a <span style="font-size:.8rem;color:var(--muted);font-weight:400">(${isAfter?'amb hormones':'pre-tractament'})</span></h3>
+        <div class="vel-row">
+          <div style="min-width:55px;font-size:.79rem;color:var(--muted)">Sara</div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar" style="width:${barW}%;background:${color}"></div>
+          </div>
+          <div class="vel-label" style="color:${color}">${avg.toFixed(1)} cm</div>
+        </div>
+        <div class="vel-row">
+          <div style="min-width:55px;font-size:.79rem;color:var(--muted)">Normal</div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar" style="width:${normalW}%;background:#d97020"></div>
+          </div>
+          <div class="vel-label" style="color:#d97020">~5 cm</div>
+        </div>
+        ${isAfter?`<div class="vel-row">
+          <div style="min-width:55px;font-size:.79rem;color:var(--muted)">Obj. GH</div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar" style="width:${objectiu/12*100}%;background:#2e6be6aa"></div>
+          </div>
+          <div class="vel-label" style="color:#2e6be6">~8 cm</div>
+        </div>`:''}
+        <div style="margin-top:.5rem;font-size:.73rem;color:${avg>=(isAfter?7:4)?'var(--green)':'#c04030'}">
+          ${avg>=(isAfter?7:4)?'✅':'⚠️'} ${avg>=(isAfter?7:4)?'Velocitat adequada':'Velocitat per sota de l\'objectiu'}
+        </div>
+      </div>`);
+  }
+  document.getElementById('vel-cards').innerHTML=cards.join('');
+}
+
+// =============================================
+// STATS CARDS
+// =============================================
+function buildStats(id,unit){
+  const tractAge=getTractAge();
+  const percTbl=PERC_DATA[activePerc][unit==='alt'?'altura':'pes'];
+  const vld=userData.filter(d=>d[unit]!=null).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+  if(!vld.length){document.getElementById(id).innerHTML='';return;}
+  const last=vld[vld.length-1],prev=vld[vld.length-2];
+  const lastAge=getAge(parseDate(last.date));
+  const pLast=interp(percTbl,lastAge);
+  const pl=plabel(last[unit],pLast);
+  const u=unit==='alt'?'cm':'kg';
+  
+  const tractPt=vld.find(d=>d.tract)||vld.find(d=>getAge(parseDate(d.date))>=tractAge);
+  
+  // Guany vs estimació sense tractament
+  const noTrPts=buildNoTreat(percTbl,unit,tractAge);
+  const lastEst=noTrPts.length?noTrPts[noTrPts.length-1]?.y:null;
+  const guany=lastEst!=null?(last[unit]-lastEst).toFixed(1):null;
+  
+  document.getElementById(id).innerHTML=`
+    <div class="stat-card sc-blue"><div class="lbl">Última mesura</div>
+      <div class="val">${last[unit]} ${u}</div>
+      <div class="sub">${fmtDate(parseDate(last.date))} · ${fmtAge(lastAge)}</div></div>
+    <div class="stat-card sc-blue"><div class="lbl">Percentil actual</div>
+      <div class="val" style="font-size:1.2rem"><span class="badge ${pl.c}">${pl.l}</span></div>
+      <div class="sub">${PERC_DATA[activePerc].name.split(' ')[0]}</div></div>
+    ${prev?`<div class="stat-card sc-blue"><div class="lbl">Última variació</div>
+      <div class="val">+${(last[unit]-prev[unit]).toFixed(1)} ${u}</div>
+      <div class="sub">Des de ${fmtDate(parseDate(prev.date))}</div></div>`:''}
+    ${guany!=null&&Number(guany)>0?`<div class="stat-card sc-green"><div class="lbl">💊 Guany estimat</div>
+      <div class="val" style="color:var(--green)">+${guany} ${u}</div>
+      <div class="sub">vs. estimació sense hormones</div></div>`:''}
+    ${tractPt?`<div class="stat-card sc-red"><div class="lbl">Des del tractament</div>
+      <div class="val">+${(last[unit]-tractPt[unit]).toFixed(1)} ${u}</div>
+      <div class="sub">Inici: ${fmtDate(parseDate(tractPt.date))}</div></div>`:''}`;
+}
+
+// =============================================
+// LEGEND
+// =============================================
+function buildLegend(id){
+  const items=[
+    {c:'#0d8f68',l:'P50 — Mediana',d:false,h:3},
+    {c:'#4ab8a0',l:'P25 / P75',d:true,h:2},
+    {c:'#d4763a',l:'P10 / P90',d:true,h:2},
+    {c:'#e8846a',l:'P3 / P97',d:true,h:2},
+    {c:'#d94040',l:'● Sara · Pre-tractament',d:false,h:3},
+    {c:'#2e6be6',l:'● Sara · Amb hormones',d:false,h:3},
+    {c:'rgba(80,90,115,.7)',l:'╌╌ Estimació buits/futur',d:true,h:2},
+    {c:'#d97020',l:'╌ Projecció sense hormones',d:true,h:2},
+    {c:'rgba(180,70,10,.7)',l:'╌ Projecció → 155 cm (sense GH)',d:true,h:2},
+    {c:'rgba(30,90,220,.7)',l:'╌ Projecció → 162 cm (amb GH)',d:true,h:2},
+    {c:'rgba(20,160,100,.8)',l:'╌ Talla Diana · TD 160.5 cm',d:true,h:2},
+  ];
+  document.getElementById(id).innerHTML=items.map(i=>`
+    <div class="legend-item">
+      <div class="leg-line" style="background:${i.d?`repeating-linear-gradient(90deg,${i.c} 0,${i.c} 5px,transparent 5px,transparent 9px)`:i.c};height:${i.h}px"></div>
+      <span>${i.l}</span>
+    </div>`).join('');
+}
+
+// =============================================
+// PERCENTILE GUIDE MARKER
+// =============================================
+function updatePercGuide(){
+  const percTbl=PERC_DATA[activePerc].altura;
+  const lastAlt=userData.filter(d=>d.alt!=null).sort((a,b)=>parseDate(a.date)-parseDate(b.date)).pop();
+  if(!lastAlt)return;
+  const a=getAge(parseDate(lastAlt.date));
+  const pv=interp(percTbl,a);
+  const v=lastAlt.alt;
+  let pos=50;
+  if(v<=pv.P3)       pos=Math.max(0,(v/pv.P3)*3);
+  else if(v<=pv.P10) pos=3+(v-pv.P3)/(pv.P10-pv.P3)*7;
+  else if(v<=pv.P25) pos=10+(v-pv.P10)/(pv.P25-pv.P10)*15;
+  else if(v<=pv.P50) pos=25+(v-pv.P25)/(pv.P50-pv.P25)*25;
+  else if(v<=pv.P75) pos=50+(v-pv.P50)/(pv.P75-pv.P50)*25;
+  else if(v<=pv.P90) pos=75+(v-pv.P75)/(pv.P90-pv.P75)*15;
+  else if(v<=pv.P97) pos=90+(v-pv.P90)/(pv.P97-pv.P90)*7;
+  else               pos=Math.min(100,97+(v-pv.P97)/10*3);
+  const pin=document.getElementById('saraPin');
+  const lbl=document.getElementById('pinLbl');
+  if(pin)pin.style.left=Math.max(2,Math.min(97,pos))+'%';
+  if(lbl)lbl.textContent=`Sara · ${v} cm`;
+  const rname=document.getElementById('perc-ref-name');
+  if(rname)rname.textContent=PERC_DATA[activePerc].name;
+}
+
+// =============================================
+// EDIT TABLE
+// =============================================
+function buildEditTable(){
+  // NO ordenem aquí — ordenem només quan s'aplica
+  const tbody=document.getElementById('edit-tbody');
+  tbody.innerHTML=userData.map((d,i)=>`
+    <tr data-idx="${i}" class="${d.tract?'tract-row':''}">
+      <td><input class="cell-input" data-i="${i}" data-field="date" value="${d.date||''}" type="date" oninput="liveEdit(this)"></td>
+      <td><input class="cell-input" data-i="${i}" data-field="alt"  value="${d.alt!=null?d.alt:''}" placeholder="—" style="width:80px" oninput="liveEdit(this)"></td>
+      <td><input class="cell-input" data-i="${i}" data-field="pes"  value="${d.pes!=null?d.pes:''}" placeholder="—" style="width:80px" oninput="liveEdit(this)"></td>
+      <td style="text-align:center"><input type="checkbox" class="tract-toggle" data-i="${i}" ${d.tract?'checked':''} onchange="setTractRow(${i},this.checked)"></td>
+      <td><button class="del-btn" onclick="deleteRow(${i})" title="Eliminar">✕</button></td>
+    </tr>`).join('');
+}
+
+// Llegeix TOTS els inputs del DOM i actualitza userData
+function readAllTableInputs(){
+  document.querySelectorAll('#edit-tbody tr').forEach(tr=>{
+    const i=parseInt(tr.dataset.idx);
+    if(isNaN(i)||i<0||i>=userData.length) return;
+    const dateEl=tr.querySelector('[data-field="date"]');
+    const altEl =tr.querySelector('[data-field="alt"]');
+    const pesEl =tr.querySelector('[data-field="pes"]');
+    if(dateEl) userData[i].date=dateEl.value||'';
+    if(altEl)  userData[i].alt =altEl.value===''?null:parseFloat(altEl.value);
+    if(pesEl)  userData[i].pes =pesEl.value===''?null:parseFloat(pesEl.value);
+  });
+}
+
+// Actualitza userData en temps real quan l'usuari escriu
+function liveEdit(input){
+  const i    =parseInt(input.dataset.i);
+  const field=input.dataset.field;
+  if(isNaN(i)||i<0||i>=userData.length) return;
+  if(field==='date')     userData[i].date=input.value;
+  else if(field==='alt') userData[i].alt =input.value===''?null:parseFloat(input.value);
+  else if(field==='pes') userData[i].pes =input.value===''?null:parseFloat(input.value);
+  // Ressalta fila modificada
+  const tr=input.closest('tr');
+  if(tr) tr.style.background='#fffbe8';
+}
+
+function setTractRow(i,v){
+  readAllTableInputs();
+  userData.forEach((d,j)=>d.tract=j===i?v:false);
+  buildEditTable();
+}
+
+function deleteRow(i){
+  if(confirm('Eliminar aquesta mesura?')){
+    readAllTableInputs();
+    userData.splice(i,1);
+    buildEditTable();
+  }
+}
+
+function addRow(){
+  // Primer llegir els valors actuals abans de reconstruir la taula
+  readAllTableInputs();
+  const today=new Date().toISOString().slice(0,10);
+  userData.push({date:today,alt:null,pes:null,tract:false});
+  // NO ordenem — deixem la fila nova al final per facilitar l'edició
+  buildEditTable();
+  // Fer scroll a la nova fila i posar el focus al camp data
+  setTimeout(()=>{
+    const rows=document.querySelectorAll('#edit-tbody tr');
+    const lastRow=rows[rows.length-1];
+    if(lastRow){
+      lastRow.scrollIntoView({behavior:'smooth',block:'center'});
+      const dateInput=lastRow.querySelector('[data-field="date"]');
+      if(dateInput) dateInput.focus();
+    }
+  },80);
+}
+
+function applyChanges(){
+  // Llegir tot el DOM primer per capturar qualsevol valor pendent
+  readAllTableInputs();
+  // Filtrar files completament buides (ni data ni alt ni pes)
+  userData=userData.filter(d=>d.date&&d.date.length>=8);
+  // Validar dates
+  const invalid=userData.filter(d=>{try{parseDate(d.date);return false;}catch{return true;}});
+  if(invalid.length){
+    alert(`⚠️ Hi ha ${invalid.length} fila(es) amb data no vàlida. Format: AAAA-MM-DD`);
+    return;
+  }
+  // Ordenar per data
+  userData.sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+  buildEditTable();
+  renderAll();
+  // Feedback visual al botó
+  const btn=document.querySelector('[onclick="applyChanges()"]');
+  if(btn){
+    const orig=btn.textContent;
+    btn.textContent=`✓ Aplicat! (${userData.length} mesures)`;
+    btn.style.background='#2aaa72';btn.style.color='#fff';
+    setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color='';},2500);
+  }
+}
+
+function resetData(){
+  if(confirm('Restaurar les dades originals?')){
+    userData=JSON.parse(JSON.stringify(ORIGINAL_DATA));
+    buildEditTable();
+    renderAll();
+  }
+}
+
+// =============================================
+// TARGETES ALTURA FINAL ADULTA
+// =============================================
+function buildFinalHeightCards(){
+  const el=document.getElementById('final-height-cards');
+  if(!el)return;
+  const fh=calcFinalHeight();
+  if(!fh){el.innerHTML='';return;}
+
+  const {noTreat,withTreat,talDiana,gain,statPost,pv18,myPred}=fh;
+
+  // Barra de posició: entre 148 cm (P3) i 178 cm (P97) aprox adulta
+  function barPct(cm){return Math.max(2,Math.min(97,Math.round((cm-pv18.P3)/(pv18.P97-pv18.P3)*100)));}
+
+  // Diferència Sara actual vs TD
+  const lastAlt=userData.filter(d=>d.alt!=null).sort((a,b)=>parseDate(a.date)-parseDate(b.date)).pop();
+  const diffTD=lastAlt?(lastAlt.alt-talDiana.val).toFixed(1):null;
+
+  // Avaluació de resposta al tractament
+  const resposta=gain>=9?{icon:'🌟',txt:'Resposta excel·lent',col:'#0a7a50'}:
+                 gain>=6?{icon:'✅',txt:'Bona resposta',col:'#1a8a60'}:
+                 gain>=3?{icon:'📈',txt:'Resposta moderada',col:'#8a6020'}:
+                         {icon:'⚠️',txt:'Resposta limitada',col:'#a03020'};
+
+  el.innerHTML=`
+  <div class="fh-section">
+    <h3>🎯 Predicció d'Altura Final Adulta</h3>
+    <p class="fh-sub">Basat en les prediccions de l'endocrina · <strong>Font: informe mèdic oficial</strong></p>
+
+    <div class="fh-cards">
+
+      <!-- SENSE TRACTAMENT -->
+      <div class="fh-card fh-card-pre">
+        <div class="fh-lbl">📏 Sense tractament hormonal</div>
+        <div class="fh-val" style="color:#b04010">~${noTreat.val} cm</div>
+        <div class="fh-range">Rang: ${noTreat.low}–${noTreat.high} cm</div>
+        <div class="fh-desc" style="color:#804010">
+          Percentil adult: <strong>${noTreat.perc}</strong><br>
+          SDS vs TD: <strong>${noTreat.sds > 0?'+':''}${noTreat.sds}</strong> (${noTreat.sds<-1?'per sota de la talla diana':noTreat.sds<0?'lleugerament per sota':'dins del rang'})<br>
+          <span style="color:#a03010;font-size:.7rem">Predicció inicial sense tractament GH</span>
+        </div>
+        <div style="margin-top:.7rem">
+          <div style="display:flex;justify-content:space-between;font-size:.67rem;color:#a07060;margin-bottom:2px">
+            <span>P3 (${pv18.P3.toFixed(0)}cm)</span><span>P50 (${pv18.P50.toFixed(0)}cm)</span><span>P97 (${pv18.P97.toFixed(0)}cm)</span>
+          </div>
+          <div class="fh-meter">
+            <div class="fh-meter-fill" style="width:${barPct(noTreat.val)}%;background:linear-gradient(90deg,#f0a060,#c04010)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AMB HORMONES -->
+      <div class="fh-card fh-card-post">
+        <div class="fh-lbl">💊 Amb tractament GH (predicció actual)</div>
+        <div class="fh-val" style="color:#1040b0">~${withTreat.val} cm</div>
+        <div class="fh-range">Rang: ${withTreat.low}–${withTreat.high} cm</div>
+        <div class="fh-desc" style="color:#1030a0">
+          Percentil adult: <strong>${withTreat.perc}</strong><br>
+          SDS vs TD: <strong>${withTreat.sds > 0?'+':''}${withTreat.sds}</strong> (${withTreat.val>=talDiana.val?'assoleix la talla diana 🎯':'molt a prop de la talla diana'})<br>
+          <span style="color:#2050c0;font-size:.7rem">Estimació endocrina amb tractament continuat</span>
+        </div>
+        <div style="margin-top:.7rem">
+          <div style="display:flex;justify-content:space-between;font-size:.67rem;color:#6080c0;margin-bottom:2px">
+            <span>P3 (${pv18.P3.toFixed(0)}cm)</span><span>P50 (${pv18.P50.toFixed(0)}cm)</span><span>P97 (${pv18.P97.toFixed(0)}cm)</span>
+          </div>
+          <div class="fh-meter">
+            <div class="fh-meter-fill" style="width:${barPct(withTreat.val)}%;background:linear-gradient(90deg,#60a0f0,#1040c0)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TALLA DIANA -->
+      <div class="fh-card" style="background:linear-gradient(135deg,#f0faf5,#d8f5e8);border:1.5px solid #50c090;">
+        <div class="fh-lbl">🧬 Talla Diana (TD) genètica</div>
+        <div class="fh-val" style="color:#0a7050">${talDiana.val} cm</div>
+        <div class="fh-range" style="margin-bottom:.5rem">Objectiu genètic corregit per l'endocrina</div>
+        <div class="fh-desc" style="color:#0a5038">
+          Percentil adult: <strong>${talDiana.perc}</strong><br>
+          <div style="margin-top:.45rem;padding:.45rem .6rem;background:rgba(10,120,80,.08);border-radius:6px;font-size:.72rem;line-height:1.6">
+            <strong>📐 Fórmula Tanner (pares):</strong><br>
+            Pare ${PARENTS.pare} cm · Mare ${PARENTS.mare} cm<br>
+            TD = (${PARENTS.pare}−13 + ${PARENTS.mare}) ÷ 2 = <strong>${TD_TANNER} cm</strong><br>
+            <span style="color:#507060">↓ L'endocrina aplica −${Math.round((TD_TANNER-TD_MEDICA)*10)/10} cm per edat òssia retardada</span><br>
+            TD corregida endocrina: <strong>${TD_MEDICA} cm</strong>
+          </div>
+          <div style="margin-top:.4rem;font-size:.73rem">
+            Predicció GH (${withTreat.val} cm) <strong style="color:${withTreat.val>=talDiana.val?'#0a7050':'#804010'}">${withTreat.val>=talDiana.val?'≥ TD ✅ supera l\'objectiu genètic':'< TD per '+(talDiana.val-withTreat.val).toFixed(1)+' cm'}</strong>
+          </div>
+        </div>
+        <div style="margin-top:.7rem">
+          <div style="display:flex;justify-content:space-between;font-size:.67rem;color:#508070;margin-bottom:2px">
+            <span>P3 (${pv18.P3.toFixed(0)}cm)</span><span>P50 (${pv18.P50.toFixed(0)}cm)</span><span>P97 (${pv18.P97.toFixed(0)}cm)</span>
+          </div>
+          <div class="fh-meter" style="position:relative">
+            <div class="fh-meter-fill" style="width:${barPct(talDiana.val)}%;background:linear-gradient(90deg,#50d0a0,#0a9060)"></div>
+          </div>
+          <!-- Marca addicional TD Tanner -->
+          <div style="position:relative;height:8px;margin-top:2px">
+            <div style="position:absolute;left:${barPct(TD_TANNER)}%;transform:translateX(-50%);font-size:.6rem;color:#508060;white-space:nowrap">▲ Tanner ${TD_TANNER}cm</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GUANY TRACTAMENT -->
+      <div class="fh-card fh-card-gain" style="grid-column:1/-1">
+        <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap">
+          <div>
+            <div class="fh-lbl">🌱 Guany estimat del tractament GH</div>
+            <div style="display:flex;align-items:baseline;gap:.5rem">
+              <div class="fh-val" style="color:#0a6a40">+${gain} cm</div>
+              <div style="font-size:.85rem;color:#1a9060">${resposta.icon} ${resposta.txt}</div>
+            </div>
+            <div style="font-size:.75rem;color:#0a5030;margin-top:.25rem">
+              ${noTreat.val} cm (sense GH) → ${withTreat.val} cm (amb GH) · diferència: <strong>+${gain} cm</strong>
+            </div>
+          </div>
+          <div style="flex:1;min-width:180px">
+            <!-- Termòmetre comparatiu -->
+            <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.3rem">
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.78rem">
+                <div style="min-width:90px;color:#804010">Sense GH</div>
+                <div style="flex:1;background:#f0e8e0;border-radius:4px;height:10px;overflow:hidden">
+                  <div style="width:${barPct(noTreat.val)}%;height:100%;background:#c04010;border-radius:4px"></div>
+                </div>
+                <div style="min-width:40px;text-align:right;font-weight:700;color:#b03010">${noTreat.val} cm</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.78rem">
+                <div style="min-width:90px;color:#1040b0">Amb GH 💊</div>
+                <div style="flex:1;background:#e0e8f8;border-radius:4px;height:10px;overflow:hidden">
+                  <div style="width:${barPct(withTreat.val)}%;height:100%;background:#1040c0;border-radius:4px"></div>
+                </div>
+                <div style="min-width:40px;text-align:right;font-weight:700;color:#1040b0">${withTreat.val} cm</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.6rem;font-size:.78rem">
+                <div style="min-width:90px;color:#0a6040">TD 🧬</div>
+                <div style="flex:1;background:#ddf0e8;border-radius:4px;height:10px;overflow:hidden">
+                  <div style="width:${barPct(talDiana.val)}%;height:100%;background:#0a9060;border-radius:4px"></div>
+                </div>
+                <div style="min-width:40px;text-align:right;font-weight:700;color:#0a7050">${talDiana.val} cm</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LA MEVA PREDICCIÓ (incorpora edat òssia endarrerida) -->
+    ${myPred?`
+    <div style="margin-top:1rem;background:linear-gradient(135deg,#f5f0ff,#e8e0ff);border:2px solid #9070d0;border-radius:14px;padding:1.3rem 1.5rem;">
+      <div style="display:flex;align-items:flex-start;gap:1.2rem;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:#6040a0;margin-bottom:.3rem">🤖 La meva predicció (edat òssia incorporada)</div>
+          <div style="display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap">
+            <div style="font-family:'Lora',serif;font-size:2rem;color:#4020a0;line-height:1">~${myPred.val} cm</div>
+            <div style="font-size:.85rem;color:#5030b0">rang ${myPred.low}–${myPred.high} cm</div>
+          </div>
+          <div style="font-size:.76rem;color:#5030a0;margin-top:.4rem;line-height:1.6">
+            Percentil adult: <strong>${myPred.perc}</strong> · SDS vs TD: <strong>${myPred.sds>0?'+':''}${myPred.sds}</strong>
+          </div>
+        </div>
+        <div style="flex:2;min-width:240px;font-size:.76rem;color:#4030a0;line-height:1.7;padding:.7rem .9rem;background:rgba(255,255,255,.6);border-radius:10px">
+          <strong>🦴 Clau: edat òssia ${myPred.boneAgeNow}a</strong> (1 any endarrerida)<br>
+          Sara té el potencial de creixement d'una nena de ${myPred.boneAgeNow}a, no de ${Math.round((myPred.boneAgeNow+BONE_AGE_DELAY)*10)/10}a.<br>
+          Fi de creixement estimat: quan edat òssia arribi a ~15.5a → edat cronològica <strong>~16.5a</strong><br>
+          Altura ara estimada: <strong>~${myPred.estNow} cm</strong> · Creixement residual: <strong>+${myPred.residual} cm</strong><br>
+          <span style="color:#7050c0;font-size:.71rem">
+            Model: 2a×8cm + 2a×6cm + 2a×4cm + 1a×2.5cm = +${myPred.residual}cm
+          </span>
+        </div>
+      </div>
+      <div style="margin-top:.9rem">
+        <div style="display:flex;justify-content:space-between;font-size:.67rem;color:#7050a0;margin-bottom:3px">
+          <span>P3 (${pv18.P3.toFixed(0)}cm)</span>
+          <span>TD ${talDiana.val}cm</span>
+          <span>TD Tanner ${TD_TANNER}cm</span>
+          <span>P97 (${pv18.P97.toFixed(0)}cm)</span>
+        </div>
+        <div style="position:relative;height:12px;background:#e0d8f8;border-radius:6px;overflow:hidden">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${barPct(myPred.val)}%;background:linear-gradient(90deg,#9070d0,#4020a0);border-radius:6px;transition:width .5s"></div>
+          <!-- Marca endocrina -->
+          <div style="position:absolute;top:0;bottom:0;left:${barPct(withTreat.val)}%;width:2px;background:#2e6be6;opacity:.8"></div>
+          <!-- Marca TD -->
+          <div style="position:absolute;top:0;bottom:0;left:${barPct(talDiana.val)}%;width:2px;background:#0a9060;opacity:.8"></div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:.4rem;font-size:.69rem;flex-wrap:wrap">
+          <span style="color:#4020a0">🟣 Meva: ${myPred.val} cm</span>
+          <span style="color:#1040b0">🔵 Endocrina: ${withTreat.val} cm</span>
+          <span style="color:#0a7050">🟢 TD: ${talDiana.val} cm</span>
+          <span style="color:#808090">Diferència endocrina↔meva: ${myPred.val>withTreat.val?'+':''}${Math.round((myPred.val-withTreat.val)*10)/10} cm</span>
+        </div>
+      </div>
+    </div>`:''}
+
+    <div style="margin-top:.9rem;padding:.85rem 1.1rem;background:#f8f9fc;border-radius:8px;font-size:.74rem;color:var(--muted);line-height:1.7">
+      <strong>📋 Notes clíniques:</strong><br>
+      • <strong>Pares:</strong> Pare ${PARENTS.pare} cm · Mare ${PARENTS.mare} cm → TD Tanner = <strong>${TD_TANNER} cm</strong><br>
+      • L'endocrina aplica <strong>TD corregida de ${TD_MEDICA} cm</strong> (−${Math.round((TD_TANNER-TD_MEDICA)*10)/10} cm per edat òssia retardada).<br>
+      • <strong>🦴 Edat òssia 1 any endarrerida</strong> → Sara té ~7 anys de creixement per davant (vs. 6 sense endarreriment). Això explica per què la meva predicció és lleugerament superior a la de l'endocrina.<br>
+      • Les prediccions finals depenen de: evolució de l'edat òssia, durada i dosi GH, i inici de la pubertat. Per una estimació precisa cal Rx periòdiques d'edat òssia (Greulich-Pyle).
+    </div>
+  </div>`;
+}
+
+// =============================================
+// RENDER ALL
+// =============================================
+function renderAll(){
+  if(chartAlt){chartAlt.destroy();chartAlt=null;}
+  if(chartPes){chartPes.destroy();chartPes=null;}
+  chartAlt=buildChart('chartAltura','alt');
+  chartPes=buildChart('chartPes','pes');
+  buildStats('stats-altura','alt');
+  buildStats('stats-pes','pes');
+  buildLegend('legend-altura');
+  buildLegend('legend-pes');
+  buildVelocityChart();
+  updatePercGuide();
+  buildFinalHeightCards();
+  const pn=PERC_DATA[activePerc].name.split(' ')[0];
+  document.querySelectorAll('[id^=perc-label-]').forEach(el=>el.textContent=pn);
+}
+
+// =============================================
+// TABS & SELECTOR
+// =============================================
+function showTab(name,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function setPerc(name,btn){
+  activePerc=name;
+  document.querySelectorAll('.perc-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+// INIT
+window.addEventListener('DOMContentLoaded',()=>{
+  buildEditTable();
+  renderAll();
+});
+</script>
+
+<!-- ============================================================
+     PWA · Service Worker + Install Banner + Offline Detection
+     ============================================================ -->
+<script>
+(function(){
+  'use strict';
+
+  // ── 1. Registre Service Worker ───────────────────────────────
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js', {scope:'./'})
+        .then(reg => {
+          console.log('[PWA] SW registrat:', reg.scope);
+          // Detecta nova versió disponible
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            newSW.addEventListener('statechange', () => {
+              if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+                // Nova versió disponible — notifica subtilment
+                console.log('[PWA] Nova versió disponible');
+                showUpdateToast();
+              }
+            });
+          });
+        })
+        .catch(err => console.warn('[PWA] Error registrant SW:', err));
+
+      // Recarrega quan activi nou SW
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if(!refreshing){ refreshing = true; window.location.reload(); }
+      });
+    });
+  }
+
+  // ── 2. Banner d'instal·lació ─────────────────────────────────
+  let deferredPrompt = null;
+  const banner = document.getElementById('pwa-install-banner');
+  const DISMISS_KEY = 'sara-pwa-dismissed';
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Mostra el banner si no s'ha descartat
+    if(!sessionStorage.getItem(DISMISS_KEY)){
+      setTimeout(() => banner.classList.add('show'), 2500);
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    banner.classList.remove('show');
+    deferredPrompt = null;
+    console.log('[PWA] App instal·lada!');
+  });
+
+  window.pwInstall = async function(){
+    if(!deferredPrompt) return;
+    banner.classList.remove('show');
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('[PWA] Resultat instal·lació:', outcome);
+    deferredPrompt = null;
+  };
+
+  window.pwDismiss = function(){
+    banner.classList.remove('show');
+    sessionStorage.setItem(DISMISS_KEY, '1');
+  };
+
+  // ── 3. Detecció offline / online ─────────────────────────────
+  const toast   = document.getElementById('offline-toast');
+  const dot     = document.getElementById('pwa-status-dot');
+
+  function setOnlineStatus(online){
+    if(online){
+      dot.classList.remove('offline');
+      dot.title = 'Connectat';
+      toast.classList.remove('show');
+    } else {
+      dot.classList.add('offline');
+      dot.title = 'Sense connexió';
+      toast.classList.add('show');
+    }
+  }
+
+  setOnlineStatus(navigator.onLine);
+  window.addEventListener('online',  () => setOnlineStatus(true));
+  window.addEventListener('offline', () => setOnlineStatus(false));
+
+  // ── 4. Toast actualització disponible ────────────────────────
+  function showUpdateToast(){
+    const t = document.createElement('div');
+    t.style.cssText = `
+      position:fixed;top:1rem;right:1rem;background:#1a3560;color:#fff;
+      padding:.7rem 1.1rem;border-radius:10px;font-size:.82rem;
+      z-index:9999;box-shadow:0 2px 12px rgba(0,0,0,.3);
+      display:flex;align-items:center;gap:.8rem;max-width:280px;
+      border:1px solid rgba(255,255,255,.15);
+    `;
+    t.innerHTML = `
+      <span>🔄 Nova versió disponible</span>
+      <button onclick="window.location.reload()" style="
+        background:#2e6be6;color:#fff;border:none;border-radius:6px;
+        padding:.3rem .7rem;font-size:.8rem;cursor:pointer;white-space:nowrap
+      ">Actualitzar</button>
+      <button onclick="this.parentNode.remove()" style="
+        background:transparent;color:rgba(255,255,255,.5);border:none;
+        cursor:pointer;font-size:1rem;line-height:1
+      ">✕</button>
+    `;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 15000);
+  }
+
+})();
+</script>
+</body>
+</html>

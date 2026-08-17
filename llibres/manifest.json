@@ -1,0 +1,44 @@
+{
+  "name": "FiscalPro · Edicions L'Escletxa",
+  "short_name": "FiscalPro",
+  "description": "Gestió fiscal i editorial — Dario Jose Trives Blanca · NIF 48340985E",
+  "start_url": "/llibres/index.html?pwa=1",
+  "scope": "/llibres/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a1208",
+  "theme_color": "#1a1208",
+  "lang": "ca",
+  "dir": "ltr",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    { "src": "icon-192.png",        "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png",        "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png",        "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png",        "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "apple-touch-icon.png","sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova Reserva",   "short_name": "Reserva",
+      "url": "/llibres/index.html#reserves",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Emetre Factura", "short_name": "Factura",
+      "url": "/llibres/index.html#emetre",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Vendes KDP",     "short_name": "Vendes",
+      "url": "/llibres/index.html#vendes",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Assessor IA",    "short_name": "Assessor",
+      "url": "/llibres/index.html#ia",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

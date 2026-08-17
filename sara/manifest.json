@@ -1,0 +1,27 @@
+{
+  "name": "Seguiment Creixement · Sara",
+  "short_name": "Sara Creix",
+  "description": "App de seguiment de creixement i tractament hormonal de la Sara",
+  "start_url": "./sara_creixement.html",
+  "display": "standalone",
+  "background_color": "#0f1e38",
+  "theme_color": "#1a3560",
+  "orientation": "portrait-primary",
+  "lang": "ca",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical"],
+  "screenshots": []
+}

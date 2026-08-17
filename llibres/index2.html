@@ -1,0 +1,2701 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FiscalPro · Edicions L'Escletxa</title>
+<meta name="application-name" content="FiscalPro">
+<meta name="description" content="Gestió fiscal i editorial per a Edicions L'Escletxa">
+<meta name="theme-color" content="#1a1208">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FiscalPro">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --ink: #1a1208;
+    --paper: #f7f3ec;
+    --warm: #e8dfc8;
+    --gold: #c49a3a;
+    --gold-light: #f0d890;
+    --rust: #b84b2a;
+    --sage: #4a7060;
+    --mist: #d4cfc5;
+    --red-warn: #c0392b;
+    --green-ok: #27ae60;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 3px solid var(--gold);
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--gold-light);
+  }
+  header span { font-size: 0.8rem; opacity: 0.6; }
+  .badge-alta {
+    background: var(--sage);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* NAV TABS */
+  nav {
+    background: var(--warm);
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--mist);
+    overflow-x: auto;
+  }
+  nav button {
+    background: none; border: none; cursor: pointer;
+    padding: 0.9rem 1.4rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    opacity: 0.5;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  nav button.active {
+    opacity: 1;
+    border-bottom-color: var(--gold);
+    color: var(--gold);
+  }
+  nav button:hover { opacity: 0.8; }
+
+  /* MAIN */
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--mist);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label { font-size: 0.8rem; font-weight: 600; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input, .form-group select, .form-group textarea {
+    border: 1.5px solid var(--mist);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    background: var(--paper);
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--gold); }
+  .form-full { grid-column: 1/-1; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--gold); color: var(--ink); }
+  .btn-primary:hover { background: var(--gold-light); }
+  .btn-secondary { background: var(--ink); color: var(--paper); }
+  .btn-secondary:hover { background: #333; }
+  .btn-danger { background: var(--rust); color: white; }
+  .btn-ai { background: linear-gradient(135deg, var(--sage), #2d5a47); color: white; }
+  .btn-ai:hover { opacity: 0.9; }
+  .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { text-align: left; padding: 0.6rem 0.8rem; background: var(--warm); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 0.65rem 0.8rem; border-bottom: 1px solid var(--mist); }
+  tr:hover td { background: #faf8f4; }
+
+  /* DECLARACIÓ BOXES */
+  .decl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .decl-box {
+    border: 2px solid var(--mist);
+    border-radius: 10px;
+    padding: 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .decl-box:hover { border-color: var(--gold); background: #fdf9f0; }
+  .decl-box.urgent { border-color: var(--rust); background: #fdf3f1; }
+  .decl-num { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--gold); }
+  .decl-name { font-size: 0.8rem; font-weight: 600; margin-top: 0.2rem; }
+  .decl-date { font-size: 0.75rem; opacity: 0.6; margin-top: 0.3rem; }
+  .decl-status { font-size: 0.75rem; margin-top: 0.5rem; font-weight: 600; }
+  .status-pendent { color: var(--rust); }
+  .status-ok { color: var(--green-ok); }
+
+  /* RESULT BOX */
+  .result-box {
+    background: linear-gradient(135deg, #1a1208 0%, #2d2010 100%);
+    color: var(--gold-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+  .result-box h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 1rem; }
+  .result-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
+  .result-total { font-size: 1.2rem; font-weight: 700; color: var(--gold); margin-top: 0.5rem; }
+
+  /* AI CHAT */
+  .chat-area {
+    background: var(--paper);
+    border: 1.5px solid var(--mist);
+    border-radius: 10px;
+    height: 380px;
+    overflow-y: auto;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .msg { max-width: 82%; }
+  .msg-ai { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+  .msg-bubble {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .msg-ai .msg-bubble { background: var(--ink); color: var(--paper); border-bottom-left-radius: 3px; }
+  .msg-user .msg-bubble { background: var(--gold); color: var(--ink); border-bottom-right-radius: 3px; }
+  .msg-label { font-size: 0.7rem; opacity: 0.5; margin-bottom: 0.2rem; font-weight: 600; }
+  .chat-input-row { display: flex; gap: 0.75rem; }
+  .chat-input-row input {
+    flex: 1; border: 1.5px solid var(--mist); border-radius: 8px;
+    padding: 0.7rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    background: white;
+  }
+  .chat-input-row input:focus { outline: none; border-color: var(--gold); }
+  .typing { display: flex; gap: 4px; align-items: center; padding: 0.75rem 1rem; }
+  .dot { width: 7px; height: 7px; background: var(--gold); border-radius: 50%; animation: bounce 1s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+  /* CALENDAR */
+  .cal-item { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--mist); }
+  .cal-date {
+    min-width: 80px; background: var(--gold); color: var(--ink);
+    border-radius: 8px; padding: 0.4rem 0.6rem; text-align: center;
+    font-weight: 700; font-size: 0.85rem;
+  }
+  .cal-urgent { background: var(--rust); color: white; }
+  .cal-done { background: var(--sage); color: white; }
+  .cal-info { flex: 1; }
+  .cal-info strong { display: block; font-size: 0.9rem; }
+  .cal-info span { font-size: 0.78rem; opacity: 0.6; }
+
+  /* ALERTS */
+  .alert {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+  .alert-warn { background: #fef9e7; border-left: 4px solid var(--gold); }
+  .alert-info { background: #eaf4f0; border-left: 4px solid var(--sage); }
+  .alert-danger { background: #fdf3f1; border-left: 4px solid var(--rust); }
+
+  /* PILLS */
+  .pill {
+    display: inline-block; padding: 0.2rem 0.7rem;
+    border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  }
+  .pill-ingrés { background: #eaf4f0; color: var(--sage); }
+  .pill-despesa { background: #fdf3f1; color: var(--rust); }
+
+  /* VENDES */
+  .canal-card {
+    border: 1.5px solid var(--mist); border-radius: 10px;
+    padding: 1rem 1.2rem; background: white; margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .canal-icon { font-size: 1.8rem; min-width: 2.5rem; text-align: center; }
+  .canal-info { flex: 1; }
+  .canal-nom { font-weight: 600; }
+  .canal-det { font-size: 0.8rem; opacity: 0.6; }
+  .canal-total { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--sage); text-align: right; }
+  .venda-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--mist); font-size: 0.87rem; }
+  .venda-row:last-child { border: none; }
+  .chart-bar-wrap { background: var(--warm); border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
+  .chart-bar { height: 28px; display: flex; align-items: center; padding: 0 0.75rem; font-size: 0.78rem; font-weight: 600; color: white; transition: width 0.5s ease; min-width: 60px; }
+  .drop-zone {
+    border: 2px dashed var(--mist); border-radius: 10px;
+    padding: 2rem; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: white;
+  }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--gold); background: #fdf9f0; }
+  .drop-zone p { opacity: 0.5; font-size: 0.9rem; margin-top: 0.5rem; }
+
+  /* RESERVES */
+  .reserva-card {
+    border: 1.5px solid var(--mist);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+    background: white;
+  }
+  .reserva-card:hover { border-color: var(--gold); box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .reserva-card.urgent { border-left: 4px solid var(--rust); }
+  .reserva-card.confirmada { border-left: 4px solid var(--sage); }
+  .reserva-card.pendent { border-left: 4px solid var(--gold); }
+  .reserva-card.enviada { border-left: 4px solid #888; opacity: 0.7; }
+  .reserva-info { flex: 1; }
+  .reserva-nom { font-weight: 600; font-size: 0.95rem; }
+  .reserva-det { font-size: 0.8rem; opacity: 0.6; margin-top: 0.15rem; }
+  .reserva-accions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .tipus-badge {
+    display: inline-block; padding: 0.15rem 0.6rem;
+    border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .tipus-particular { background: #eaf4f0; color: var(--sage); }
+  .tipus-llibreria  { background: #fdf9e7; color: #a07020; }
+  .tipus-distribuidor { background: #f0eaff; color: #6040a0; }
+  .tipus-institucio { background: #eaf0ff; color: #2050a0; }
+  .estat-badge {
+    display: inline-block; padding: 0.15rem 0.6rem;
+    border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+  }
+  .estat-pendent    { background: #fef9e7; color: #a07020; }
+  .estat-confirmada { background: #eaf4f0; color: var(--sage); }
+  .estat-enviada    { background: #f0f0f0; color: #666; }
+  .estat-facturada  { background: #1a1208; color: var(--gold-light); }
+  .estat-cancel     { background: #fdf3f1; color: var(--rust); }
+
+  /* ESTOC */
+  .estoc-llibre {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem; border: 1.5px solid var(--mist);
+    border-radius: 10px; background: white; margin-bottom: 0.75rem;
+  }
+  .estoc-portada {
+    width: 50px; height: 70px; background: var(--ink);
+    border-radius: 4px; display: flex; align-items: center;
+    justify-content: center; color: var(--gold); font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .estoc-info { flex: 1; }
+  .estoc-nom { font-weight: 600; }
+  .estoc-det { font-size: 0.8rem; opacity: 0.6; }
+  .estoc-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; color: var(--gold);
+    text-align: center; min-width: 60px;
+  }
+  .estoc-num.baix { color: var(--rust); }
+  .estoc-num small { display: block; font-family: 'DM Sans', sans-serif; font-size: 0.65rem; opacity: 0.5; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 2rem; font-size: 0.75rem; opacity: 0.4; border-top: 1px solid var(--mist); margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash" style="
+  position:fixed;inset:0;z-index:9999;
+  background:#1a1208;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:0;
+  transition:opacity 0.6s ease, transform 0.6s ease;
+">
+  <!-- Llibre animat -->
+  <div style="position:relative;margin-bottom:2rem">
+    <svg width="90" height="110" viewBox="0 0 90 110" fill="none" xmlns="http://www.w3.org/2000/svg" id="splash-book">
+      <rect x="12" y="4" width="66" height="98" rx="6" fill="#f7f3ec"/>
+      <rect x="12" y="4" width="18" height="98" rx="4" fill="#c49a3a"/>
+      <rect x="36" y="22" width="34" height="5" rx="2.5" fill="#d4cfc5"/>
+      <rect x="36" y="34" width="28" height="5" rx="2.5" fill="#d4cfc5"/>
+      <rect x="36" y="46" width="34" height="5" rx="2.5" fill="#d4cfc5"/>
+      <rect x="36" y="58" width="22" height="5" rx="2.5" fill="#d4cfc5"/>
+      <rect x="36" y="70" width="30" height="5" rx="2.5" fill="#d4cfc5"/>
+      <circle cx="68" cy="16" r="12" fill="#c49a3a"/>
+      <text x="68" y="21" text-anchor="middle" fill="#1a1208" font-size="13" font-weight="700" font-family="Georgia,serif">€</text>
+    </svg>
+    <style>
+      @keyframes bookFloat {
+        0%,100%{transform:translateY(0) rotate(-2deg)}
+        50%{transform:translateY(-10px) rotate(2deg)}
+      }
+      @keyframes fadeInUp {
+        from{opacity:0;transform:translateY(20px)}
+        to{opacity:1;transform:translateY(0)}
+      }
+      #splash-book { animation: bookFloat 3s ease-in-out infinite; }
+      .splash-line { animation: fadeInUp 0.5s ease forwards; opacity:0; }
+      .splash-line:nth-child(1){animation-delay:0.1s}
+      .splash-line:nth-child(2){animation-delay:0.3s}
+      .splash-line:nth-child(3){animation-delay:0.5s}
+      .splash-line:nth-child(4){animation-delay:0.7s}
+      .splash-line:nth-child(5){animation-delay:0.9s}
+    </style>
+  </div>
+
+  <div style="text-align:center;display:flex;flex-direction:column;gap:0.4rem">
+    <div class="splash-line" style="font-family:'DM Serif Display',Georgia,serif;font-size:2rem;color:#f0d890;letter-spacing:0.02em">FiscalPro</div>
+    <div class="splash-line" style="font-size:0.8rem;color:#c49a3a;letter-spacing:0.15em;text-transform:uppercase">Edicions L'Escletxa</div>
+
+    <!-- Barra de càrrega -->
+    <div class="splash-line" style="margin-top:2rem;width:180px;height:3px;background:#2d2010;border-radius:3px;overflow:hidden">
+      <div id="splash-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#c49a3a,#f0d890);border-radius:3px;transition:width 0.1s linear"></div>
+    </div>
+    <div class="splash-line" id="splash-msg" style="font-size:0.72rem;color:#6b5a3a;margin-top:0.5rem;height:1rem">Carregant…</div>
+  </div>
+
+  <!-- Crèdit Akra Tech Studio -->
+  <div class="splash-line" style="
+    position:absolute;bottom:2.5rem;
+    text-align:center;
+  ">
+    <div style="font-size:0.62rem;color:#4a3a20;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem">Desenvolupat per</div>
+    <div style="font-family:'DM Serif Display',Georgia,serif;font-size:1rem;color:#c49a3a;letter-spacing:0.05em">Akra Tech Studio</div>
+    <div style="font-size:0.6rem;color:#3a2a10;margin-top:0.2rem">akratechstudio.es</div>
+  </div>
+</div>
+  <div>
+    <h1>📚 FiscalPro</h1>
+    <span>Dario Jose Trives Blanca · Edicions L'Escletxa · Alta 09/03/2026</span>
+  </div>
+  <span class="badge-alta">✓ IAE 864.2 + 476.1 · NIF 48340985E</span>
+  <button id="btn-install" onclick="installPWA()" style="display:none;align-items:center;gap:0.4rem;background:var(--gold);color:var(--ink);border:none;border-radius:8px;padding:0.4rem 0.9rem;font-weight:700;font-size:0.8rem;cursor:pointer">
+    📲 Instal·lar app
+  </button>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('dashboard')">🏠 Resum</button>
+  <button onclick="showTab('facturas')">📄 Factures</button>
+  <button onclick="showTab('emetre')">🧾 Emetre Factura</button>
+  <button onclick="showTab('vendes')">📈 Vendes Totals</button>
+  <button onclick="showTab('reserves')">📦 Reserves</button>
+  <button onclick="showTab('estoc')">📚 Estoc</button>
+  <button onclick="showTab('declaracions')">📊 IVA 303 / 390</button>
+  <button onclick="showTab('renda')">📋 Renda Anual</button>
+  <button onclick="showTab('calendari')">📅 Calendari</button>
+  <button onclick="showTab('ia')">🤖 Assessor IA</button>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+  <div class="alert alert-danger">
+    ⚠️ <strong>Termini proper:</strong> Model 303 · 1T 2026 → fins al <strong>20 d'abril 2026</strong>. Alta el 09/03/2026 — registra les despeses prèvies a la primera factura (deduïbles!)
+  </div>
+
+  <div class="decl-grid" style="margin-bottom:1.5rem">
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.78rem;opacity:0.6;font-weight:600;text-transform:uppercase">Ingressos any</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--sage)" id="total-ing">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.78rem;opacity:0.6;font-weight:600;text-transform:uppercase">Despeses any</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--rust)" id="total-desp">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.78rem;opacity:0.6;font-weight:600;text-transform:uppercase">Benefici net</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--gold)" id="total-ben">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.78rem;opacity:0.6;font-weight:600;text-transform:uppercase">IVA a pagar</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--ink)" id="total-iva">€0,00</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📌 Les teues dades fiscals oficials (Model 036 · 09/03/2026)</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem">
+      <div style="background:var(--warm);border-radius:8px;padding:0.85rem">
+        <div style="font-size:0.7rem;font-weight:700;opacity:0.6;text-transform:uppercase">Titular</div>
+        <div style="font-weight:600;margin-top:0.2rem">Dario Jose Trives Blanca</div>
+        <div style="font-size:0.8rem;opacity:0.7">NIF: 48340985E</div>
+      </div>
+      <div style="background:var(--warm);border-radius:8px;padding:0.85rem">
+        <div style="font-size:0.7rem;font-weight:700;opacity:0.6;text-transform:uppercase">Nom Comercial</div>
+        <div style="font-weight:600;margin-top:0.2rem">Edicions L'Escletxa</div>
+        <div style="font-size:0.8rem;opacity:0.7">C/ Enriqueta Ortega, 3 · 3B · 03005 Alacant</div>
+      </div>
+      <div style="background:var(--warm);border-radius:8px;padding:0.85rem">
+        <div style="font-size:0.7rem;font-weight:700;opacity:0.6;text-transform:uppercase">Activitat 1 · Epígraf 864.2</div>
+        <div style="font-weight:600;margin-top:0.2rem">Escriptors i Guionistes</div>
+        <div style="font-size:0.8rem;opacity:0.7">Secció 2 · Tipus: Professionals · Codi A05</div>
+      </div>
+      <div style="background:var(--warm);border-radius:8px;padding:0.85rem">
+        <div style="font-size:0.7rem;font-weight:700;opacity:0.6;text-transform:uppercase">Activitat 2 · Epígraf 476.1</div>
+        <div style="font-weight:600;margin-top:0.2rem">Edició de Llibres</div>
+        <div style="font-size:0.8rem;opacity:0.7">Secció 1 · Tipus: Resta Empresarials · Codi A03</div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">ℹ️ <strong>Règim IVA: General</strong> (casella 510 marcada). Presentes Model 303 trimestral i 390 anual.</div>
+    <div class="alert alert-info">ℹ️ <strong>IRPF: Estimació Directa Simplificada</strong> (casella 609 marcada). Obligat a pagaments fraccionats (casella 600). Has triat <strong>NO presentar Model 130</strong> per tenir retencions.</div>
+    <div class="alert alert-warn">💡 <strong>Retenció IRPF: 7%</strong> durant els primers 3 anys (alta 09/03/2026 → fins al 31/12/2028), després 15%. Aplica quan factures a empreses/autònoms per l'activitat 864.2.</div>
+    <div class="alert alert-warn">💡 <strong>IVA Llibres (476.1): 4%</strong> paper i digital. Serveis editorials/escriptura (864.2): <strong>21%</strong>.</div>
+    <div class="alert alert-danger">⚠️ <strong>Inici d'activitat (casella 504):</strong> Comunicat que les primeres entregues/prestacions seran <em>posteriors</em> a l'adquisició de béns/serveis. Pots deduir IVA de despeses prèvies a la primera factura.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 Pròxims terminis</div>
+    <div id="terminis-list"></div>
+  </div>
+</div>
+
+<!-- EMETRE FACTURA VERIFACTU -->
+<div id="emetre" class="section">
+  <div class="alert alert-info">
+    ℹ️ <strong>Verifactu (RD 1007/2023):</strong> Obligatori per a autònoms des de l'<strong>1 de juliol de 2026</strong>. Aquesta eina genera factures amb tots els camps legals, QR de verificació i hash d'encadenament. <strong>Important:</strong> Per al compliment total cal un programari homologat per l'AEAT que envïe registres en temps real. Aquesta app cobreix el 90% dels requisits visuals i de contingut.
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧾 Nova Factura · Edicions L'Escletxa</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Núm. Factura</label>
+        <input type="text" id="ef-num" value="2026/001">
+      </div>
+      <div class="form-group">
+        <label>Data d'emissió</label>
+        <input type="date" id="ef-data">
+      </div>
+      <div class="form-group">
+        <label>NIF Client</label>
+        <input type="text" id="ef-clientNif" placeholder="B12345678 / 12345678A">
+      </div>
+      <div class="form-group">
+        <label>Nom / Raó Social Client</label>
+        <input type="text" id="ef-clientNom" placeholder="Editorial Mediterrània SL">
+      </div>
+      <div class="form-group form-full">
+        <label>Adreça Client</label>
+        <input type="text" id="ef-clientAdr" placeholder="C/ Exemple 1, 46001 València">
+      </div>
+      <div class="form-group form-full">
+        <label>Concepte / Descripció</label>
+        <input type="text" id="ef-concepte" placeholder="Cessió de drets d'autor obra 'Arrels al vent'">
+      </div>
+      <div class="form-group">
+        <label>Base Imponible (€)</label>
+        <input type="number" id="ef-base" placeholder="0.00" step="0.01" oninput="calcEF()">
+      </div>
+      <div class="form-group">
+        <label>Tipus IVA</label>
+        <select id="ef-iva" oninput="calcEF()">
+          <option value="0">0% (exempt)</option>
+          <option value="4">4% (llibres)</option>
+          <option value="21" selected>21% (serveis)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Retenció IRPF</label>
+        <select id="ef-ret" oninput="calcEF()">
+          <option value="0">0%</option>
+          <option value="7" selected>7% (fins 31/12/2028)</option>
+          <option value="15">15%</option>
+          <option value="19">19%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Forma de pagament</label>
+        <select id="ef-pagament">
+          <option value="Transferència bancària">Transferència bancària</option>
+          <option value="Domiciliació bancària">Domiciliació bancària</option>
+          <option value="Efectiu">Efectiu</option>
+          <option value="Targeta">Targeta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>IBAN (opcional)</label>
+        <input type="text" id="ef-iban" placeholder="ES12 1234 5678 9012 3456 7890">
+      </div>
+      <div class="form-group">
+        <label>Data venciment</label>
+        <input type="date" id="ef-venc">
+      </div>
+    </div>
+
+    <!-- RESUM -->
+    <div id="ef-resum" style="display:none;margin-top:1rem" class="result-box">
+      <h3>Resum factura</h3>
+      <div class="result-row"><span>Base imponible</span><span id="ef-r-base">—</span></div>
+      <div class="result-row"><span id="ef-r-iva-label">IVA</span><span id="ef-r-iva">—</span></div>
+      <div class="result-row"><span id="ef-r-ret-label">Retenció IRPF</span><span id="ef-r-ret">—</span></div>
+      <div class="result-row result-total"><span>TOTAL A COBRAR</span><span id="ef-r-total">—</span></div>
+    </div>
+
+    <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="generarFacturaPDF()">📄 Generar Factura PDF</button>
+      <button class="btn btn-secondary" onclick="previsualitzar()">👁 Previsualitzar</button>
+    </div>
+  </div>
+
+  <!-- PREVISUALITZACIÓ -->
+  <div id="ef-preview" style="display:none" class="card">
+    <div class="card-title">👁 Previsualització · Factura Verifactu</div>
+    <div id="ef-preview-content" style="background:white;border:1px solid var(--mist);border-radius:8px;padding:2rem;font-family:'DM Sans',sans-serif;font-size:0.88rem;line-height:1.6"></div>
+    <div style="margin-top:1rem;font-size:0.78rem;opacity:0.6">
+      ⚠️ Per al compliment total de Verifactu cal un programari homologat AEAT que afegisca la firma digital SHA-256 i envïe el registre XML a Hisenda. Recomanem: <strong>Holded, Quipu, Contasimple o Billin</strong> (tots homologats, des de €10/mes).
+    </div>
+  </div>
+</div>
+<!-- VENDES TOTALS -->
+<div id="vendes" class="section">
+
+  <!-- KPIs -->
+  <div class="decl-grid" style="margin-bottom:1.5rem" id="vendes-kpis">
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.75rem;opacity:0.6;font-weight:600;text-transform:uppercase">Total vendes</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--sage)" id="vk-total">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.75rem;opacity:0.6;font-weight:600;text-transform:uppercase">Exemplars venuts</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--gold)" id="vk-units">0</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.75rem;opacity:0.6;font-weight:600;text-transform:uppercase">Royalties KDP</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink)" id="vk-kdp">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.75rem;opacity:0.6;font-weight:600;text-transform:uppercase">Venda directa</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--rust)" id="vk-directa">€0,00</div>
+    </div>
+  </div>
+
+  <!-- GRÀFIC PER CANAL -->
+  <div class="card">
+    <div class="card-title">📊 Vendes per canal</div>
+    <div id="vendes-chart"></div>
+  </div>
+
+  <!-- KDP IMPORT -->
+  <div class="card">
+    <div class="card-title">📥 Importar dades KDP</div>
+    <div class="alert alert-info" style="margin-bottom:1rem">
+      ℹ️ Amazon KDP <strong>no té API pública</strong>. Per importar les teues dades:
+      <ol style="margin-top:0.5rem;padding-left:1.2rem;font-size:0.85rem">
+        <li>Ves a <strong>kdpreports.amazon.com</strong> → Reports → Sales and Royalties</li>
+        <li>Selecciona el període i clica <strong>"Generate Report"</strong></li>
+        <li>Descarrega el <strong>CSV</strong> i arrossega'l aquí baix</li>
+      </ol>
+    </div>
+    <div class="drop-zone" id="kdp-drop" onclick="document.getElementById('kdp-file').click()"
+         ondragover="event.preventDefault();this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="handleKDPDrop(event)">
+      <div style="font-size:2rem">📂</div>
+      <strong>Arrossega el CSV de KDP aquí</strong>
+      <p>o fes clic per seleccionar el fitxer</p>
+    </div>
+    <input type="file" id="kdp-file" accept=".csv,.tsv,.txt" style="display:none" onchange="handleKDPFile(this)">
+
+    <div id="kdp-preview" style="display:none;margin-top:1rem"></div>
+
+    <!-- Entrada manual KDP -->
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--mist)">
+      <div style="font-weight:600;margin-bottom:0.75rem;font-size:0.9rem">O introdueix manualment el resum mensual KDP:</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mes / Any</label>
+          <input type="month" id="kdp-mes">
+        </div>
+        <div class="form-group">
+          <label>Títol del llibre</label>
+          <select id="kdp-llibre">
+            <option value="general">General (tots els títols)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Unitats venudes (paper)</label>
+          <input type="number" id="kdp-units-paper" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Royalties paper (€)</label>
+          <input type="number" id="kdp-roy-paper" value="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Unitats venudes (ebook)</label>
+          <input type="number" id="kdp-units-ebook" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Royalties ebook (€)</label>
+          <input type="number" id="kdp-roy-ebook" value="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Pàgines llegides KU (KENP)</label>
+          <input type="number" id="kdp-kenp" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Royalties KU (€)</label>
+          <input type="number" id="kdp-roy-ku" value="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Mercat principal</label>
+          <select id="kdp-mercat">
+            <option value="ES">Amazon.es (Espanya)</option>
+            <option value="COM">Amazon.com (USA)</option>
+            <option value="DE">Amazon.de (Alemanya)</option>
+            <option value="FR">Amazon.fr (França)</option>
+            <option value="UK">Amazon.co.uk (UK)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:0.75rem" onclick="afegirVendaKDP()">+ Afegir mes KDP</button>
+    </div>
+  </div>
+
+  <!-- LLIBRERIES / DISTRIBUÏDORS -->
+  <div class="card">
+    <div class="card-title">🏪 Vendes Llibreries / Distribuïdors / Institucions</div>
+    <div class="alert alert-info" style="margin-bottom:1rem">
+      ℹ️ Cada distribuïdor envia un informe mensual per email (Publidisa, Dilve, Círculo…). Registra les liquidacions quan les reps.
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Canal</label>
+        <select id="ll-canal">
+          <option value="llibreria">Llibreria independent</option>
+          <option value="cadena">Cadena (FNAC, Casa del Libro...)</option>
+          <option value="distribuidor">Distribuïdor (Publidisa, SDU...)</option>
+          <option value="institucio">Institució (biblioteca, col·legi...)</option>
+          <option value="fira">Fira del Llibre</option>
+          <option value="altre">Altre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nom del canal</label>
+        <input type="text" id="ll-nom-canal" placeholder="Librería Fnac Alicante">
+      </div>
+      <div class="form-group">
+        <label>Mes / Any</label>
+        <input type="month" id="ll-mes">
+      </div>
+      <div class="form-group">
+        <label>Títol</label>
+        <select id="ll-titol-v">
+          <option value="general">General</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Unitats venudes</label>
+        <input type="number" id="ll-units" value="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Import liquidat (€)</label>
+        <input type="number" id="ll-import" value="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Descompte aplicat (%)</label>
+        <input type="number" id="ll-desc-canal" value="0" min="0" max="70">
+      </div>
+      <div class="form-group">
+        <label>Estat liquidació</label>
+        <select id="ll-estat-liq">
+          <option value="pendent">Pendent de cobrament</option>
+          <option value="cobrat">Cobrat</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:0.75rem" onclick="afegirVendaLlibreria()">+ Afegir liquidació</button>
+  </div>
+
+  <!-- HISTORIAL VENDES -->
+  <div class="card">
+    <div class="card-title">📋 Historial de totes les vendes</div>
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <button class="btn btn-sm" style="background:var(--warm)" onclick="filtrarVendes('totes')">Totes</button>
+      <button class="btn btn-sm" style="background:#f0f8ff;color:#2050a0" onclick="filtrarVendes('kdp')">KDP</button>
+      <button class="btn btn-sm" style="background:#eaf4f0;color:var(--sage)" onclick="filtrarVendes('llibreria')">Llibreries</button>
+      <button class="btn btn-sm btn-primary" onclick="exportarVendesCSV()">⬇ Exportar CSV</button>
+    </div>
+    <div id="vendes-historial"></div>
+  </div>
+</div>
+
+<!-- RESERVES -->
+<div id="reserves" class="section">
+  <div class="card">
+    <div class="card-title">📦 Nova Reserva</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Tipus de client</label>
+        <select id="r-tipus">
+          <option value="particular">Particular</option>
+          <option value="llibreria">Llibreria</option>
+          <option value="distribuidor">Distribuïdor</option>
+          <option value="institucio">Institució</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data reserva</label>
+        <input type="date" id="r-data">
+      </div>
+      <div class="form-group">
+        <label>Nom / Raó Social</label>
+        <input type="text" id="r-nom" placeholder="Nom del client">
+      </div>
+      <div class="form-group">
+        <label>NIF / DNI (opcional)</label>
+        <input type="text" id="r-nif" placeholder="Per a la factura">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="r-email" placeholder="client@email.com">
+      </div>
+      <div class="form-group">
+        <label>Telèfon</label>
+        <input type="tel" id="r-tel" placeholder="666 123 456">
+      </div>
+      <div class="form-group form-full">
+        <label>Adreça d'enviament</label>
+        <input type="text" id="r-adreca" placeholder="C/ Exemple 1, 46001 València">
+      </div>
+      <div class="form-group">
+        <label>Llibre</label>
+        <select id="r-llibre" onchange="calcReserva()">
+          <option value="">— Selecciona un llibre —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantitat</label>
+        <input type="number" id="r-qty" value="1" min="1" oninput="calcReserva()">
+      </div>
+      <div class="form-group">
+        <label>Preu unitari (€ amb IVA)</label>
+        <input type="number" id="r-preu" placeholder="0.00" step="0.01" oninput="calcReserva()">
+      </div>
+      <div class="form-group">
+        <label>Descompte (%)</label>
+        <input type="number" id="r-desc-pct" value="0" min="0" max="100" oninput="calcReserva()">
+      </div>
+      <div class="form-group">
+        <label>Forma de pagament</label>
+        <select id="r-pagament">
+          <option value="Transferència">Transferència bancària</option>
+          <option value="Bizum">Bizum</option>
+          <option value="Efectiu">Efectiu</option>
+          <option value="Targeta">Targeta</option>
+          <option value="Contra reemborsament">Contra reemborsament</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Estat inicial</label>
+        <select id="r-estat">
+          <option value="pendent">Pendent confirmació</option>
+          <option value="confirmada">Confirmada</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Notes internes (dedicatòria, instruccions...)</label>
+        <input type="text" id="r-notes" placeholder="Ex: Dedicatòria personalitzada, enviament urgent...">
+      </div>
+    </div>
+    <div id="r-resum" style="display:none;margin-top:1rem" class="result-box">
+      <h3>Resum reserva</h3>
+      <div class="result-row"><span>Preu unitari (IVA incl.)</span><span id="rr-preu">—</span></div>
+      <div class="result-row"><span>Quantitat</span><span id="rr-qty">—</span></div>
+      <div class="result-row"><span>Descompte</span><span id="rr-desc">—</span></div>
+      <div class="result-row"><span>Base imponible (sense IVA 4%)</span><span id="rr-sub">—</span></div>
+      <div class="result-row result-total"><span>TOTAL A COBRAR (IVA 4% incl.)</span><span id="rr-total">—</span></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="afegirReserva()">+ Afegir reserva</button>
+    </div>
+  </div>
+
+  <div class="card" style="padding:0.85rem 1.2rem">
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+      <span style="font-size:0.8rem;font-weight:600;opacity:0.6">FILTRAR:</span>
+      <button class="btn btn-sm" style="background:var(--warm)" onclick="filtrarReserves('totes')">Totes</button>
+      <button class="btn btn-sm" style="background:#fef9e7;color:#a07020" onclick="filtrarReserves('pendent')">Pendents</button>
+      <button class="btn btn-sm" style="background:#eaf4f0;color:var(--sage)" onclick="filtrarReserves('confirmada')">Confirmades</button>
+      <button class="btn btn-sm" style="background:#f0f0f0" onclick="filtrarReserves('enviada')">Enviades</button>
+      <button class="btn btn-sm" style="background:#1a1208;color:var(--gold-light)" onclick="filtrarReserves('facturada')">Facturades</button>
+      <div style="margin-left:auto;font-size:0.82rem;opacity:0.6" id="reserves-count"></div>
+    </div>
+  </div>
+  <div id="reserves-list"></div>
+</div>
+
+<!-- ESTOC -->
+<div id="estoc" class="section">
+  <div class="card">
+    <div class="card-title">📚 Afegir Llibre al Catàleg</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Títol</label>
+        <input type="text" id="ll-titol" placeholder="Arrels al vent">
+      </div>
+      <div class="form-group">
+        <label>ISBN</label>
+        <input type="text" id="ll-isbn" placeholder="978-84-XXXXXX-XX-X">
+      </div>
+      <div class="form-group">
+        <label>Preu de venda PVP (€ amb IVA 4%)</label>
+        <input type="number" id="ll-preu" placeholder="14.95" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Estoc actual (exemplars)</label>
+        <input type="number" id="ll-estoc" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Cost impressió/exemplar (€)</label>
+        <input type="number" id="ll-cost" placeholder="3.50" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Alerta estoc baix (exemplars)</label>
+        <input type="number" id="ll-alerta" placeholder="5" min="0" value="5">
+      </div>
+      <div class="form-group">
+        <label>📦 Data arribada pròxima tirada</label>
+        <input type="date" id="ll-arribada">
+      </div>
+      <div class="form-group">
+        <label>Exemplars tirada pendent</label>
+        <input type="number" id="ll-tirada" placeholder="0" min="0" value="0">
+      </div>
+      <div class="form-group form-full">
+        <label>Descripció</label>
+        <input type="text" id="ll-desc" placeholder="Poemari en català, 120 pàgines...">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="afegirLlibre()">+ Afegir al catàleg</button>
+  </div>
+
+  <div id="estoc-list"></div>
+
+  <div class="card">
+    <div class="card-title">🔄 Ajust manual d'estoc</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Llibre</label>
+        <select id="adj-llibre"></select>
+      </div>
+      <div class="form-group">
+        <label>Moviment</label>
+        <select id="adj-tipus">
+          <option value="entrada">+ Entrada (nova tirada/impressió)</option>
+          <option value="sortida">− Sortida (venda directa, regal)</option>
+          <option value="correccio">= Correcció inventari</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantitat</label>
+        <input type="number" id="adj-qty" min="1" value="1">
+      </div>
+      <div class="form-group">
+        <label>Motiu</label>
+        <input type="text" id="adj-motiu" placeholder="Nova tirada KDP, regal premsa, etc.">
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:1rem" onclick="ajustarEstoc()">Aplicar moviment</button>
+  </div>
+</div>
+
+<div id="facturas" class="section">
+  <div class="card">
+    <div class="card-title">➕ Nova Factura / Ingrés</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="f-data">
+      </div>
+      <div class="form-group">
+        <label>Núm. Factura</label>
+        <input type="text" id="f-num" placeholder="2025/001">
+      </div>
+      <div class="form-group">
+        <label>Client / Origen</label>
+        <input type="text" id="f-client" placeholder="Editorial X / Amazon KDP...">
+      </div>
+      <div class="form-group">
+        <label>Concepte</label>
+        <select id="f-concepte">
+          <option value="drets">Drets d'autor cedits (editorial)</option>
+          <option value="venda-directa">Venda directa de llibres</option>
+          <option value="royalties-plataforma">Royalties plataforma (Amazon/KDP)</option>
+          <option value="serveis-editorials">Serveis editorials</option>
+          <option value="conferencia">Conferència / xerrada</option>
+          <option value="altre">Altre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Base Imponible (€)</label>
+        <input type="number" id="f-base" placeholder="0.00" step="0.01" oninput="calcFactura()">
+      </div>
+      <div class="form-group">
+        <label>Tipus IVA</label>
+        <select id="f-iva" oninput="calcFactura()">
+          <option value="0">0% (exempt / plataforma paga)</option>
+          <option value="4" selected>4% (llibres paper/digital)</option>
+          <option value="21">21% (serveis)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Retenció IRPF</label>
+        <select id="f-ret" oninput="calcFactura()">
+          <option value="0">0% (particular / exempt)</option>
+          <option value="7" selected>7% (primers 3 anys)</option>
+          <option value="15">15% (general)</option>
+          <option value="19">19% (drets autor &gt;40%)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Total a cobrar</label>
+        <input type="text" id="f-total" readonly placeholder="—" style="background:#f0f0f0;font-weight:700">
+      </div>
+    </div>
+    <div style="margin-top:1rem; display:flex; gap:0.75rem">
+      <button class="btn btn-primary" onclick="afegirFactura()">+ Afegir factura</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Registre de factures</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Núm</th><th>Client</th><th>Base</th><th>IVA</th><th>Retenció</th><th>Total</th><th></th></tr>
+        </thead>
+        <tbody id="factures-tbody">
+          <tr><td colspan="8" style="text-align:center;opacity:0.4;padding:2rem">Cap factura registrada</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DESPESES -->
+<div id="despeses" class="section">
+
+  <!-- KPIs despeses -->
+  <div class="decl-grid" style="margin-bottom:1.5rem">
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.72rem;opacity:0.6;font-weight:600;text-transform:uppercase">Total despeses (base)</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--rust)" id="dk-base">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.72rem;opacity:0.6;font-weight:600;text-transform:uppercase">IVA suportat deduïble</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--gold)" id="dk-iva">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.72rem;opacity:0.6;font-weight:600;text-transform:uppercase">Deduc. IRPF (5% EDS)</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--sage)" id="dk-eds">€0,00</div>
+    </div>
+    <div class="card" style="margin:0;text-align:center">
+      <div style="font-size:0.72rem;opacity:0.6;font-weight:600;text-transform:uppercase">Despeses enguany</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--ink)" id="dk-count">0</div>
+    </div>
+  </div>
+
+  <!-- Formulari -->
+  <div class="card">
+    <div class="card-title">➕ Nova Despesa Deduïble</div>
+    <div class="alert alert-info" style="font-size:0.82rem;margin-bottom:1rem">
+      💡 <strong>Pots deduir:</strong> quota autònom RETA, material oficina, ISBN, subscripcions (Canva, Adobe…), impressió de llibres, internet, telèfon (50% ús mixt), despatx a casa (% m²), viatges per feina, publicitat, assessoria, formació. El 5% addicional d'EDS no necessita factures (màx. €2.000/any).
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="d-data">
+      </div>
+      <div class="form-group">
+        <label>Proveïdor / Pagat a</label>
+        <input type="text" id="d-prov" placeholder="Amazon, Telefónica, TGSS...">
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="d-cat" onchange="autoIva()">
+          <option value="quota">💼 Quota autònom RETA</option>
+          <option value="isbn">📚 ISBN / Dipòsit legal</option>
+          <option value="impressio">🖨 Impressió / maquetació / KDP</option>
+          <option value="material">📎 Material oficina / papeleria</option>
+          <option value="tech">💻 Maquinari / programari</option>
+          <option value="subscripcions">🔄 Subscripcions digitals (Canva, Adobe…)</option>
+          <option value="internet">📡 Internet / telèfon</option>
+          <option value="publicitat">📢 Publicitat i màrqueting</option>
+          <option value="desplacaments">🚗 Desplaçaments / transport</option>
+          <option value="formacio">🎓 Formació / llibres professionals</option>
+          <option value="assessoria">⚖️ Assessoria / gestoria</option>
+          <option value="subministraments">💡 Subministraments (llum, gas) % despatx</option>
+          <option value="lloguer">🏠 Lloguer / hipoteca % despatx</option>
+          <option value="bancari">🏦 Comissions bancàries</option>
+          <option value="assegurances">🛡 Assegurances professionals</option>
+          <option value="correccio">✏️ Correcció / traducció / disseny</option>
+          <option value="fira">🎪 Fires i presentacions</option>
+          <option value="altre">📋 Altre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Descripció</label>
+        <input type="text" id="d-desc" placeholder="Detall de la despesa">
+      </div>
+      <div class="form-group">
+        <label>Import total amb IVA (€)</label>
+        <input type="number" id="d-import" placeholder="0.00" step="0.01" oninput="calcDespesa()">
+      </div>
+      <div class="form-group">
+        <label>IVA suportat (%)</label>
+        <select id="d-iva" onchange="calcDespesa()">
+          <option value="0">0% (quota RETA, ISBN...)</option>
+          <option value="4">4% (llibres)</option>
+          <option value="10">10%</option>
+          <option value="21" selected>21% (general)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>% Deducció IRPF</label>
+        <select id="d-pct">
+          <option value="100">100% (exclusivament professional)</option>
+          <option value="50">50% (ús mixt, ex: telèfon)</option>
+          <option value="30">30% (subministraments despatx)</option>
+          <option value="0">0% (no deduïble IRPF)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipus de justificant</label>
+        <select id="d-just">
+          <option value="factura">Factura completa</option>
+          <option value="simplificada">Factura simplificada (ticket NIF)</option>
+          <option value="rebut">Rebut / domiciliació</option>
+          <option value="extracte">Extracte bancari</option>
+          <option value="sense">Sense justificant (5% EDS)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Núm. factura / ref. (opcional)</label>
+        <input type="text" id="d-ref" placeholder="FAC-2026-001">
+      </div>
+      <div class="form-group">
+        <label>Trimestre</label>
+        <select id="d-trim">
+          <option value="1T">1T (gen–mar)</option>
+          <option value="2T">2T (abr–jun)</option>
+          <option value="3T">3T (jul–set)</option>
+          <option value="4T">4T (oct–des)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Resum càlcul -->
+    <div id="d-resum" style="display:none;margin-top:1rem" class="result-box">
+      <div class="result-row"><span>Import brut (amb IVA)</span><span id="dr-brut">—</span></div>
+      <div class="result-row"><span>Base imponible (sense IVA)</span><span id="dr-base">—</span></div>
+      <div class="result-row"><span>IVA suportat deduïble al 303</span><span id="dr-iva">—</span></div>
+      <div class="result-row result-total"><span>Deduïble IRPF (Renda)</span><span id="dr-irpf">—</span></div>
+    </div>
+
+    <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="afegirDespesa()">+ Afegir despesa</button>
+      <button class="btn btn-secondary" onclick="afegirDespesesFrequents()">⚡ Despeses freqüents</button>
+    </div>
+  </div>
+
+  <!-- Despeses freqüents predefinides -->
+  <div id="panel-freq" style="display:none" class="card">
+    <div class="card-title">⚡ Despeses freqüents — Edicions L'Escletxa</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.75rem" id="freq-list"></div>
+  </div>
+
+  <!-- Filtres i resum per categoria -->
+  <div class="card">
+    <div class="card-title">📊 Resum per categoria</div>
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <select id="d-filtre-trim" onchange="renderDespeses()" style="padding:0.4rem 0.6rem;border:1.5px solid var(--mist);border-radius:8px;font-size:0.82rem">
+        <option value="tot">Tots els trimestres</option>
+        <option value="1T">1T (gen–mar)</option>
+        <option value="2T">2T (abr–jun)</option>
+        <option value="3T">3T (jul–set)</option>
+        <option value="4T">4T (oct–des)</option>
+      </select>
+      <button class="btn btn-sm btn-primary" onclick="exportarDespesesCSV()">⬇ Exportar CSV</button>
+    </div>
+    <div id="d-chart-cats"></div>
+  </div>
+
+  <!-- Taula de despeses -->
+  <div class="card">
+    <div class="card-title">📋 Totes les despeses</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Categoria</th>
+            <th>Descripció / Proveïdor</th>
+            <th>Brut</th>
+            <th>Base (IRPF)</th>
+            <th>IVA deduïble</th>
+            <th>Just.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="despeses-tbody">
+          <tr><td colspan="8" style="text-align:center;opacity:0.4;padding:2rem">Cap despesa registrada</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DECLARACIONS -->
+<div id="declaracions" class="section">
+  <div class="card">
+    <div class="card-title">📊 Model 303 · IVA Trimestral</div>
+    <div class="alert alert-info">ℹ️ Presenta el 303 entre els dies 1 i 20 del mes següent al trimestre (4T: fins al 30 de gener). Si el resultat és negatiu, pots demanar compensació o devolució (aquesta última, sol·licita-la al 4T marcant "Devolució").</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Trimestre</label>
+        <select id="dec-trim">
+          <option value="1T">1T (gen-mar) → termini 20 abr</option>
+          <option value="2T">2T (abr-jun) → termini 20 jul</option>
+          <option value="3T">3T (jul-set) → termini 20 oct</option>
+          <option value="4T">4T (oct-des) → termini 30 gen</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Any</label>
+        <select id="dec-any">
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:1rem" onclick="calcularDeclaracio()">Calcular Model 303</button>
+    <div id="result-303" style="display:none; margin-top:1rem"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📄 Model 390 · Resum Anual IVA</div>
+    <div class="alert alert-info">ℹ️ Es presenta entre l'1 i el 30 de gener de l'any següent. Recull tot l'IVA de l'any. L'app ho calcula automàticament amb totes les factures i despeses.</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Any a resumir</label>
+        <select id="any-390">
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:1rem" onclick="calcular390()">Calcular Model 390</button>
+    <div id="result-390" style="display:none; margin-top:1rem"></div>
+  </div>
+</div>
+
+<!-- RENDA ANUAL -->
+<div id="renda" class="section">
+  <div class="card">
+    <div class="card-title">📋 Model 100 · Declaració de la Renda</div>
+    <div class="alert alert-info">ℹ️ La Renda anual es presenta entre l'1 d'abril i el 30 de juny de l'any següent. Tots els ingressos de l'activitat i les retencions practicades s'inclouen.</div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Situació personal</label>
+        <select id="r-situacio">
+          <option value="solter">Solter/a sense fills</option>
+          <option value="casatConjunt">Casat/da (tributació conjunta)</option>
+          <option value="casatIndividual">Casat/da (tributació individual)</option>
+          <option value="monoparental">Família monoparental</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Altre rendiment net (€)</label>
+        <input type="number" id="r-altreRend" placeholder="0.00" value="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Mínim personal i familiar (€)</label>
+        <input type="number" id="r-minim" value="5550" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Retencions ja practicades (€)</label>
+        <input type="number" id="r-retencions" placeholder="0.00" value="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Pagaments a compte Model 130 (€)</label>
+        <input type="number" id="r-pagamentCompte" placeholder="0.00" value="0" step="0.01">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="calcularRenda()">Calcular Renda estimada</button>
+    <div id="result-renda" style="display:none; margin-top:1rem"></div>
+  </div>
+</div>
+
+<!-- CALENDARI -->
+<div id="calendari" class="section">
+  <div class="card">
+    <div class="card-title">📅 Calendari Fiscal 2026 · Edicions L'Escletxa</div>
+    <div id="cal-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📅 Calendari Fiscal 2027</div>
+    <div id="cal-list-2026"></div>
+  </div>
+</div>
+
+<!-- IA -->
+<div id="ia" class="section">
+  <div class="card">
+    <div class="card-title">🤖 Assessor Fiscal IA</div>
+    <div class="alert alert-info">💬 Pregunta'm qualsevol dubte fiscal sobre la teua activitat com a editor/escriptor autònom. Puc buscar informació actualitzada sobre canvis normatius, deadlines, deduccions i molt més.</div>
+    <div class="chat-area" id="chat-area">
+      <div class="msg msg-ai">
+        <div class="msg-label">Assessor IA</div>
+        <div class="msg-bubble">Hola! Soc el teu assessor fiscal especialitzat en editors i escriptors autònoms. Et puc ajudar amb:
+<br><br>• Dubtes sobre models 130, 303, 390 i 100
+<br>• Deduccions específiques per a la teua activitat
+<br>• Canvis normatius recents
+<br>• Càlcul de retencions i IVA
+<br>• Diferència entre cedir drets a editorial vs. vendre directament
+<br><br>En què et puc ajudar avui?</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Escriu la teua pregunta fiscal..." onkeypress="if(event.key==='Enter')sendMsg()">
+      <button class="btn btn-ai" onclick="sendMsg()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer>FiscalPro · Per a ús orientatiu. Consulta sempre un assessor fiscal per a decisions importants. Dades guardades localment al navegador.</footer>
+
+<script>
+// ==================== DADES ====================
+let factures = JSON.parse(localStorage.getItem('fp_factures') || '[]');
+let despeses = JSON.parse(localStorage.getItem('fp_despeses') || '[]');
+
+function save() {
+  localStorage.setItem('fp_factures', JSON.stringify(factures));
+  localStorage.setItem('fp_despeses', JSON.stringify(despeses));
+  updateDashboard();
+}
+
+// ==================== TABS ====================
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const btns = document.querySelectorAll('nav button');
+  const map = ['dashboard','facturas','emetre','vendes','reserves','estoc','despeses','declaracions','renda','calendari','ia'];
+  btns[map.indexOf(id)]?.classList.add('active');
+  if(id==='calendari') renderCalendari();
+  if(id==='dashboard') updateDashboard();
+}
+
+// ==================== VENDES ====================
+let vendes = JSON.parse(localStorage.getItem('fp_vendes') || '[]');
+let filtreVendes = 'totes';
+
+function saveVendes() {
+  localStorage.setItem('fp_vendes', JSON.stringify(vendes));
+  updateSelectsVendes();
+  renderVendes();
+  updateKPIsVendes();
+}
+
+function updateSelectsVendes() {
+  const opts = '<option value="general">General (tots els títols)</option>' +
+    llibres.map(l=>`<option value="${l.id}">${l.titol}</option>`).join('');
+  ['kdp-llibre','ll-titol-v'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = opts;
+  });
+}
+
+function afegirVendaKDP() {
+  const mes = document.getElementById('kdp-mes').value;
+  if(!mes) { alert('Selecciona el mes'); return; }
+  const unPaper = parseInt(document.getElementById('kdp-units-paper').value)||0;
+  const royPaper = parseFloat(document.getElementById('kdp-roy-paper').value)||0;
+  const unEbook  = parseInt(document.getElementById('kdp-units-ebook').value)||0;
+  const royEbook = parseFloat(document.getElementById('kdp-roy-ebook').value)||0;
+  const kenp     = parseInt(document.getElementById('kdp-kenp').value)||0;
+  const royKU    = parseFloat(document.getElementById('kdp-roy-ku').value)||0;
+  const total    = royPaper + royEbook + royKU;
+  if(total === 0 && unPaper === 0 && unEbook === 0) { alert('Introdueix almenys una dada'); return; }
+
+  vendes.push({
+    id: Date.now(), tipus: 'kdp', mes,
+    canal: 'Amazon KDP',
+    llId: document.getElementById('kdp-llibre').value,
+    mercat: document.getElementById('kdp-mercat').value,
+    units: unPaper + unEbook,
+    unPaper, royPaper, unEbook, royEbook, kenp, royKU,
+    total, estat: 'cobrat',
+  });
+  saveVendes();
+  ['kdp-units-paper','kdp-roy-paper','kdp-units-ebook','kdp-roy-ebook','kdp-kenp','kdp-roy-ku'].forEach(id=>{
+    document.getElementById(id).value = '0';
+  });
+}
+
+function afegirVendaLlibreria() {
+  const mes = document.getElementById('ll-mes').value;
+  const nom = document.getElementById('ll-nom-canal').value.trim();
+  if(!mes || !nom) { alert('Omple el mes i el nom del canal'); return; }
+  const units  = parseInt(document.getElementById('ll-units').value)||0;
+  const import_ = parseFloat(document.getElementById('ll-import').value)||0;
+  vendes.push({
+    id: Date.now(),
+    tipus: document.getElementById('ll-canal').value,
+    mes, canal: nom,
+    llId: document.getElementById('ll-titol-v').value,
+    units, total: import_,
+    desc: parseFloat(document.getElementById('ll-desc-canal').value)||0,
+    estat: document.getElementById('ll-estat-liq').value,
+  });
+  saveVendes();
+  document.getElementById('ll-import').value = '0';
+  document.getElementById('ll-units').value = '0';
+  document.getElementById('ll-nom-canal').value = '';
+}
+
+function updateKPIsVendes() {
+  const totalV = vendes.reduce((s,v)=>s+v.total,0);
+  const totalU = vendes.reduce((s,v)=>s+(v.units||0),0);
+  const kdpV   = vendes.filter(v=>v.tipus==='kdp').reduce((s,v)=>s+v.total,0);
+  const dirV   = vendes.filter(v=>v.tipus!=='kdp').reduce((s,v)=>s+v.total,0);
+  const set = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('vk-total', '€'+totalV.toFixed(2));
+  set('vk-units', totalU);
+  set('vk-kdp',   '€'+kdpV.toFixed(2));
+  set('vk-directa','€'+dirV.toFixed(2));
+  renderChart();
+}
+
+function renderChart() {
+  const cont = document.getElementById('vendes-chart');
+  if(!cont) return;
+  const canals = {};
+  vendes.forEach(v => {
+    const k = v.tipus==='kdp' ? 'Amazon KDP' : v.canal;
+    canals[k] = (canals[k]||0) + v.total;
+  });
+  const maxVal = Math.max(...Object.values(canals), 1);
+  const colors = ['#4a7060','#c49a3a','#b84b2a','#2050a0','#6040a0','#a07020'];
+  if(!Object.keys(canals).length) { cont.innerHTML='<p style="opacity:0.4;text-align:center;padding:1rem">Cap venda registrada</p>'; return; }
+  cont.innerHTML = Object.entries(canals).map(([nom,val],i) => `
+    <div style="margin-bottom:0.6rem">
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.2rem">
+        <span>${nom}</span><strong>€${val.toFixed(2)}</strong>
+      </div>
+      <div style="background:var(--warm);border-radius:6px;overflow:hidden">
+        <div style="height:22px;width:${Math.max(5,(val/maxVal*100)).toFixed(0)}%;background:${colors[i%colors.length]};border-radius:6px;transition:width 0.5s"></div>
+      </div>
+    </div>`).join('');
+}
+
+function filtrarVendes(f) { filtreVendes=f; renderVendes(); }
+
+function renderVendes() {
+  const cont = document.getElementById('vendes-historial');
+  if(!cont) return;
+  const tipusIcon = { kdp:'📦', llibreria:'🏪', cadena:'🏬', distribuidor:'🚚', institucio:'🏛', fira:'🎪', altre:'📋' };
+  let llista = filtreVendes==='totes' ? vendes :
+    filtreVendes==='kdp' ? vendes.filter(v=>v.tipus==='kdp') :
+    vendes.filter(v=>v.tipus!=='kdp');
+  if(!llista.length) {
+    cont.innerHTML='<p style="opacity:0.4;text-align:center;padding:1.5rem">Cap venda en aquest filtre</p>';
+    return;
+  }
+  // Agrupar per mes
+  const perMes = {};
+  llista.slice().sort((a,b)=>b.mes.localeCompare(a.mes)).forEach(v => {
+    if(!perMes[v.mes]) perMes[v.mes]=[];
+    perMes[v.mes].push(v);
+  });
+  cont.innerHTML = Object.entries(perMes).map(([mes,vs]) => {
+    const totalMes = vs.reduce((s,v)=>s+v.total,0);
+    const unitsMes = vs.reduce((s,v)=>s+(v.units||0),0);
+    return `<div style="margin-bottom:1rem">
+      <div style="font-weight:700;font-size:0.85rem;padding:0.4rem 0.75rem;background:var(--warm);border-radius:6px;display:flex;justify-content:space-between">
+        <span>${mes}</span>
+        <span>${unitsMes} ex. · €${totalMes.toFixed(2)}</span>
+      </div>
+      ${vs.map(v=>`
+        <div class="venda-row">
+          <span style="font-size:1.1rem">${tipusIcon[v.tipus]||'📋'}</span>
+          <span style="flex:1"><strong>${v.canal}</strong>${v.mercat?' ('+v.mercat+')':''}</span>
+          <span style="opacity:0.6">${v.units||0} ex.</span>
+          ${v.tipus==='kdp'&&v.unPaper>0?`<span style="font-size:0.75rem;opacity:0.5">📄${v.unPaper} paper</span>`:''}
+          ${v.tipus==='kdp'&&v.unEbook>0?`<span style="font-size:0.75rem;opacity:0.5">📱${v.unEbook} ebook</span>`:''}
+          ${v.tipus==='kdp'&&v.kenp>0?`<span style="font-size:0.75rem;opacity:0.5">KU:${v.kenp}p</span>`:''}
+          <strong style="color:var(--sage)">€${v.total.toFixed(2)}</strong>
+          <span class="estat-badge estat-${v.estat==='cobrat'?'confirmada':'pendent'}">${v.estat==='cobrat'?'Cobrat':'Pendent'}</span>
+          <button class="btn btn-danger btn-sm" onclick="eliminarVenda(${v.id})">×</button>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function eliminarVenda(id) {
+  if(!confirm('Eliminar aquesta venda?')) return;
+  vendes = vendes.filter(v=>v.id!==id);
+  saveVendes();
+}
+
+// Importar CSV de KDP
+function handleKDPDrop(e) {
+  e.preventDefault();
+  document.getElementById('kdp-drop').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) processarCSVKDP(file);
+}
+function handleKDPFile(input) {
+  const file = input.files[0];
+  if(file) processarCSVKDP(file);
+}
+function processarCSVKDP(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split('\n').filter(l=>l.trim());
+    if(lines.length < 2) { alert('Fitxer buit o format incorrecte'); return; }
+
+    // Detectar separador
+    const sep = text.includes('\t') ? '\t' : ',';
+    const headers = lines[0].split(sep).map(h=>h.trim().replace(/"/g,'').toLowerCase());
+
+    let importats = 0;
+    const preview = [];
+
+    lines.slice(1).forEach(line => {
+      const cols = line.split(sep).map(c=>c.trim().replace(/"/g,''));
+      const row = {};
+      headers.forEach((h,i) => row[h] = cols[i]||'');
+
+      // KDP té columnes: title, author, marketplace, units sold, royalties
+      const units = parseInt(row['units sold']||row['net units sold']||row['units']||0);
+      const roy   = parseFloat(row['royalty']||row['royalties (usd)']||row['net royalties']||0);
+      const mes   = row['month']||row['reporting date']||row['period']||'';
+
+      if(units > 0 || roy > 0) {
+        const mesFormat = mes ? mes.substring(0,7) : new Date().toISOString().substring(0,7);
+        vendes.push({
+          id: Date.now()+importats,
+          tipus: 'kdp',
+          mes: mesFormat,
+          canal: 'Amazon KDP (CSV)',
+          llId: 'general',
+          mercat: row['marketplace']||'ES',
+          units, total: Math.abs(roy),
+          unPaper: units, royPaper: Math.abs(roy),
+          estat: 'cobrat',
+        });
+        preview.push(`${mesFormat} · ${units} ex. · €${Math.abs(roy).toFixed(2)}`);
+        importats++;
+      }
+    });
+
+    if(importats > 0) {
+      saveVendes();
+      document.getElementById('kdp-preview').style.display = 'block';
+      document.getElementById('kdp-preview').innerHTML = `
+        <div class="alert alert-info">
+          ✅ <strong>${importats} registres importats del CSV de KDP:</strong>
+          <ul style="margin-top:0.5rem;padding-left:1.2rem;font-size:0.82rem">
+            ${preview.slice(0,5).map(p=>`<li>${p}</li>`).join('')}
+            ${preview.length>5?`<li>...i ${preview.length-5} més</li>`:''}
+          </ul>
+        </div>`;
+    } else {
+      document.getElementById('kdp-preview').style.display = 'block';
+      document.getElementById('kdp-preview').innerHTML = `
+        <div class="alert alert-danger">⚠️ No s'han pogut llegir dades del CSV. Verifica que és el format correcte de KDP (Sales and Royalties Report).</div>`;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function exportarVendesCSV() {
+  if(!vendes.length) { alert('Cap venda per exportar'); return; }
+  const cap = 'Mes,Canal,Tipus,Unitats,Total EUR,Estat\n';
+  const files = vendes.map(v=>`${v.mes},"${v.canal}",${v.tipus},${v.units||0},${v.total.toFixed(2)},${v.estat}`).join('\n');
+  const blob = new Blob([cap+files], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url;
+  a.download=`vendes_escletxa_${new Date().getFullYear()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ==================== LLIBRES / ESTOC ====================
+let llibres = JSON.parse(localStorage.getItem('fp_llibres') || '[]');
+let moviments = JSON.parse(localStorage.getItem('fp_moviments') || '[]');
+let reserves = JSON.parse(localStorage.getItem('fp_reserves') || '[]');
+
+function saveAll() {
+  localStorage.setItem('fp_llibres', JSON.stringify(llibres));
+  localStorage.setItem('fp_moviments', JSON.stringify(moviments));
+  localStorage.setItem('fp_reserves', JSON.stringify(reserves));
+  save();
+  updateSelectsLlibres();
+}
+
+function updateSelectsLlibres() {
+  const opts = llibres.length
+    ? '<option value="">— Selecciona un llibre —</option>' + llibres.map(l=>`<option value="${l.id}">${l.titol} (€${l.preu} · ${l.estoc} ex.)</option>`).join('')
+    : '<option value="">— Cap llibre al catàleg —</option>';
+  ['r-llibre','adj-llibre'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = opts;
+  });
+}
+
+function afegirLlibre() {
+  const titol = document.getElementById('ll-titol').value.trim();
+  const preu  = parseFloat(document.getElementById('ll-preu').value)||0;
+  const estoc = parseInt(document.getElementById('ll-estoc').value)||0;
+  if(!titol || !preu) { alert('Omple el títol i el preu'); return; }
+  const ll = {
+    id: Date.now(),
+    titol,
+    isbn:    document.getElementById('ll-isbn').value,
+    preu,
+    estoc,
+    cost:    parseFloat(document.getElementById('ll-cost').value)||0,
+    alerta:  parseInt(document.getElementById('ll-alerta').value)||5,
+    desc:    document.getElementById('ll-desc').value,
+    arribada: document.getElementById('ll-arribada').value || null,
+    tiradaPendent: parseInt(document.getElementById('ll-tirada').value)||0,
+  };
+  llibres.push(ll);
+  saveAll();
+  renderEstoc();
+  ['ll-titol','ll-isbn','ll-preu','ll-estoc','ll-cost','ll-desc','ll-arribada'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('ll-alerta').value = '5';
+  document.getElementById('ll-tirada').value = '0';
+}
+
+function ajustarEstoc() {
+  const id    = parseInt(document.getElementById('adj-llibre').value);
+  const tipus = document.getElementById('adj-tipus').value;
+  const qty   = parseInt(document.getElementById('adj-qty').value)||0;
+  const motiu = document.getElementById('adj-motiu').value;
+  const ll = llibres.find(l=>l.id===id);
+  if(!ll || !qty) { alert('Selecciona un llibre i una quantitat'); return; }
+  if(tipus==='entrada') ll.estoc += qty;
+  else if(tipus==='sortida') ll.estoc = Math.max(0, ll.estoc - qty);
+  else ll.estoc = qty;
+  moviments.push({ data: new Date().toISOString().split('T')[0], llibreId: id, tipus, qty, motiu });
+  saveAll();
+  renderEstoc();
+  document.getElementById('adj-qty').value = '1';
+  document.getElementById('adj-motiu').value = '';
+}
+
+function renderEstoc() {
+  const cont = document.getElementById('estoc-list');
+  if(!cont) return;
+  if(!llibres.length) {
+    cont.innerHTML = '<div class="card" style="text-align:center;opacity:0.4;padding:2rem">Cap llibre al catàleg encara</div>';
+    return;
+  }
+  const avui = new Date(); avui.setHours(0,0,0,0);
+  cont.innerHTML = llibres.map(ll => {
+    const baix = ll.estoc <= ll.alerta;
+    const marge = ll.cost > 0 ? ((ll.preu/1.04 - ll.cost)/ll.cost*100).toFixed(0) : null;
+
+    // Càlcul dies per a l'arribada
+    let arribadaHtml = '';
+    if(ll.arribada) {
+      const dArr = new Date(ll.arribada); dArr.setHours(0,0,0,0);
+      const dies = Math.ceil((dArr-avui)/(1000*60*60*24));
+      const color = dies <= 0 ? 'var(--sage)' : dies <= 7 ? 'var(--rust)' : 'var(--gold)';
+      const label = dies <= 0 ? '✅ Ja hauria d\'arribar!' : dies === 1 ? '⏰ Arriba demà!' : `📦 Arriba en ${dies} dies (${ll.arribada})`;
+      arribadaHtml = `<div style="color:${color};font-size:0.78rem;font-weight:700;margin-top:0.25rem">${label}
+        ${ll.tiradaPendent > 0 ? `<span style="opacity:0.7;font-weight:400"> · +${ll.tiradaPendent} ex. pendents</span>` : ''}
+      </div>`;
+    }
+
+    return `<div class="estoc-llibre">
+      <div class="estoc-portada">📖</div>
+      <div class="estoc-info">
+        <div class="estoc-nom">${ll.titol}</div>
+        <div class="estoc-det">
+          ${ll.isbn ? `ISBN: ${ll.isbn} · ` : ''}
+          PVP: €${ll.preu.toFixed(2)} · Cost: €${ll.cost.toFixed(2)}/ex.
+          ${marge ? ` · Marge: <strong>${marge}%</strong>` : ''}
+        </div>
+        ${ll.desc ? `<div class="estoc-det">${ll.desc}</div>` : ''}
+        ${baix && !ll.arribada ? `<div style="color:var(--rust);font-size:0.75rem;font-weight:700;margin-top:0.2rem">⚠️ Estoc baix — alerta en ${ll.alerta} ex.</div>` : ''}
+        ${arribadaHtml}
+      </div>
+      <div class="estoc-num ${baix?'baix':''}">
+        ${ll.estoc}
+        <small>exemplars</small>
+        ${ll.tiradaPendent > 0 && ll.arribada ? `<div style="font-size:0.7rem;color:var(--gold);font-family:'DM Sans',sans-serif">+${ll.tiradaPendent} pendent</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.3rem">
+        <button class="btn btn-sm btn-primary" onclick="editarArribada(${ll.id})">📅</button>
+        <button class="btn btn-sm btn-secondary" onclick="editarPreuLlibre(${ll.id})">€</button>
+        <button class="btn btn-sm btn-danger" onclick="eliminarLlibre(${ll.id})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editarArribada(id) {
+  const ll = llibres.find(l=>l.id===id);
+  const data = prompt(`Data d'arribada tirada per "${ll.titol}" (YYYY-MM-DD):`, ll.arribada||'');
+  if(data === null) return;
+  ll.arribada = data || null;
+  if(data) {
+    const qty = prompt(`Quants exemplars arriben?`, ll.tiradaPendent||0);
+    ll.tiradaPendent = parseInt(qty)||0;
+  } else {
+    ll.tiradaPendent = 0;
+  }
+  saveAll(); renderEstoc();
+}
+
+function editarPreuLlibre(id) {
+  const ll = llibres.find(l=>l.id===id);
+  const nou = prompt(`Nou PVP per a "${ll.titol}" (actual: €${ll.preu}):`, ll.preu);
+  if(nou && !isNaN(nou)) { ll.preu = parseFloat(nou); saveAll(); renderEstoc(); }
+}
+
+function eliminarLlibre(id) {
+  if(!confirm('Eliminar aquest llibre del catàleg?')) return;
+  llibres = llibres.filter(l=>l.id!==id);
+  saveAll(); renderEstoc();
+}
+
+// ==================== RESERVES ====================
+function calcReserva() {
+  const preu = parseFloat(document.getElementById('r-preu').value)||0;
+  const qty  = parseInt(document.getElementById('r-qty').value)||1;
+  const desc = parseFloat(document.getElementById('r-desc-pct').value)||0;
+  if(!preu) return;
+  const subtotalBrut = preu * qty;
+  const descompteAmt = subtotalBrut * desc/100;
+  const totalIvaIncl = subtotalBrut - descompteAmt;
+  const base = totalIvaIncl / 1.04;
+  document.getElementById('r-resum').style.display = 'block';
+  document.getElementById('rr-preu').textContent = '€'+preu.toFixed(2);
+  document.getElementById('rr-qty').textContent  = qty+' ex.';
+  document.getElementById('rr-desc').textContent = desc > 0 ? `-${desc}% (-€${descompteAmt.toFixed(2)})` : '—';
+  document.getElementById('rr-sub').textContent  = '€'+base.toFixed(2);
+  document.getElementById('rr-total').textContent = '€'+totalIvaIncl.toFixed(2);
+
+  // Omplir preu automàticament des del catàleg
+  const llId = document.getElementById('r-llibre').value;
+  if(llId) {
+    const ll = llibres.find(l=>l.id===parseInt(llId));
+    if(ll && !document.getElementById('r-preu').value) {
+      document.getElementById('r-preu').value = ll.preu;
+      calcReserva();
+    }
+  }
+}
+
+// Omplir preu quan es selecciona el llibre
+document.addEventListener('change', function(e) {
+  if(e.target.id === 'r-llibre') {
+    const ll = llibres.find(l=>l.id===parseInt(e.target.value));
+    if(ll) { document.getElementById('r-preu').value = ll.preu; calcReserva(); }
+  }
+});
+
+function afegirReserva() {
+  const nom = document.getElementById('r-nom').value.trim();
+  const preu = parseFloat(document.getElementById('r-preu').value)||0;
+  if(!nom || !preu) { alert('Omple el nom del client i el preu'); return; }
+  const qty  = parseInt(document.getElementById('r-qty').value)||1;
+  const desc = parseFloat(document.getElementById('r-desc-pct').value)||0;
+  const total = preu * qty * (1 - desc/100);
+  const llId = parseInt(document.getElementById('r-llibre').value)||null;
+  const ll   = llId ? llibres.find(l=>l.id===llId) : null;
+
+  const r = {
+    id: Date.now(),
+    data:     document.getElementById('r-data').value,
+    tipus:    document.getElementById('r-tipus').value,
+    nom,
+    nif:      document.getElementById('r-nif').value,
+    email:    document.getElementById('r-email').value,
+    tel:      document.getElementById('r-tel').value,
+    adreca:   document.getElementById('r-adreca').value,
+    llId, llTitol: ll ? ll.titol : '—',
+    qty, preu, desc, total,
+    pagament: document.getElementById('r-pagament').value,
+    estat:    document.getElementById('r-estat').value,
+    notes:    document.getElementById('r-notes').value,
+    numAlbara: null, numFactura: null,
+  };
+  reserves.push(r);
+  // No descomptem estoc fins que s'envia
+  saveAll();
+  renderReserves();
+  ['r-nom','r-nif','r-email','r-tel','r-adreca','r-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('r-qty').value='1';
+  document.getElementById('r-desc-pct').value='0';
+  document.getElementById('r-resum').style.display='none';
+}
+
+let filtreActual = 'totes';
+function filtrarReserves(f) { filtreActual = f; renderReserves(); }
+
+function renderReserves() {
+  const cont = document.getElementById('reserves-list');
+  if(!cont) return;
+  const tipusLabel = { particular:'Particular', llibreria:'Llibreria', distribuidor:'Distribuïdor', institucio:'Institució' };
+  const tipusCls   = { particular:'particular', llibreria:'llibreria', distribuidor:'distribuidor', institucio:'institucio' };
+  const estatLabel = { pendent:'Pendent', confirmada:'Confirmada', enviada:'Enviada', facturada:'Facturada', cancel:'Cancel·lada' };
+  const estatCls   = { pendent:'pendent', confirmada:'confirmada', enviada:'enviada', facturada:'facturada', cancel:'cancel' };
+
+  let llista = filtreActual==='totes' ? reserves : reserves.filter(r=>r.estat===filtreActual);
+  const cnt = document.getElementById('reserves-count');
+  if(cnt) cnt.textContent = `${llista.length} reserves`;
+
+  if(!llista.length) {
+    cont.innerHTML = '<div class="card" style="text-align:center;opacity:0.4;padding:2rem">Cap reserva en aquest filtre</div>';
+    return;
+  }
+
+  cont.innerHTML = llista.slice().reverse().map(r => `
+    <div class="reserva-card ${r.estat}">
+      <div>
+        <span class="tipus-badge tipus-${tipusCls[r.tipus]||'particular'}">${tipusLabel[r.tipus]||r.tipus}</span>
+        <span class="estat-badge estat-${estatCls[r.estat]||'pendent'}" style="margin-left:0.3rem">${estatLabel[r.estat]||r.estat}</span>
+      </div>
+      <div class="reserva-info">
+        <div class="reserva-nom">${r.nom} ${r.nif?`<span style="opacity:0.5;font-weight:400;font-size:0.82rem">· ${r.nif}</span>`:''}</div>
+        <div class="reserva-det">
+          ${r.data} · ${r.llTitol} · ${r.qty} ex. · <strong>€${r.total.toFixed(2)}</strong>
+          ${r.pagament ? `· ${r.pagament}` : ''}
+          ${r.notes ? `<br>📝 ${r.notes}` : ''}
+          ${r.numAlbara ? `<br>📋 Albarà: ${r.numAlbara}` : ''}
+          ${r.numFactura ? `<br>🧾 Factura: ${r.numFactura}` : ''}
+        </div>
+      </div>
+      <div class="reserva-accions">
+        ${r.estat==='pendent' ? `<button class="btn btn-sm btn-secondary" onclick="canviarEstat(${r.id},'confirmada')">✓ Confirmar</button>` : ''}
+        ${r.estat==='confirmada' ? `<button class="btn btn-sm btn-secondary" onclick="generarAlbara(${r.id})">📋 Albarà</button>` : ''}
+        ${(r.estat==='confirmada'||r.estat==='enviada') && !r.numFactura ? `<button class="btn btn-sm btn-primary" onclick="passarAFactura(${r.id})">🧾 Facturar</button>` : ''}
+        ${r.estat==='confirmada' ? `<button class="btn btn-sm" style="background:var(--sage);color:white" onclick="canviarEstat(${r.id},'enviada')">🚚 Enviada</button>` : ''}
+        ${r.estat!=='cancel' && r.estat!=='facturada' ? `<button class="btn btn-sm btn-danger" onclick="canviarEstat(${r.id},'cancel')">✕</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function canviarEstat(id, nouEstat) {
+  const r = reserves.find(x=>x.id===id);
+  if(!r) return;
+  // Descomptar estoc quan s'envia
+  if(nouEstat==='enviada' && r.estat!=='enviada' && r.llId) {
+    const ll = llibres.find(l=>l.id===r.llId);
+    if(ll) {
+      if(ll.estoc < r.qty) {
+        if(!confirm(`Atenció: sols tens ${ll.estoc} exemplars i la reserva necessita ${r.qty}. Continuar igualment?`)) return;
+      }
+      ll.estoc = Math.max(0, ll.estoc - r.qty);
+      moviments.push({ data: new Date().toISOString().split('T')[0], llibreId: r.llId, tipus:'sortida', qty: r.qty, motiu:`Reserva #${id} - ${r.nom}` });
+    }
+  }
+  r.estat = nouEstat;
+  saveAll();
+  renderReserves();
+  renderEstoc();
+}
+
+function generarAlbara(id) {
+  const r = reserves.find(x=>x.id===id);
+  if(!r) return;
+  const num = 'ALB-' + new Date().getFullYear() + '-' + String(reserves.filter(x=>x.numAlbara).length+1).padStart(3,'0');
+  r.numAlbara = num;
+  saveAll();
+  renderReserves();
+
+  // Obrir albarà imprimible
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Albarà ${num}</title>
+  <style>body{font-family:sans-serif;margin:2cm;font-size:11pt}h1{font-size:1.4rem}table{width:100%;border-collapse:collapse}th{background:#1a1208;color:#f0d890;padding:0.5rem}td{padding:0.4rem;border-bottom:1px solid #ddd}.total{font-weight:700;font-size:1.1rem}.header{display:flex;justify-content:space-between;margin-bottom:1.5rem}</style>
+  </head><body>
+  <div class="header">
+    <div><strong style="font-size:1.2rem">Edicions L'Escletxa</strong><br>Dario Jose Trives Blanca · NIF: 48340985E<br>C/ Enriqueta Ortega 3, 3B · 03005 Alacant</div>
+    <div style="text-align:right"><strong>ALBARÀ DE LLIURAMENT</strong><br>Núm: ${num}<br>Data: ${r.data}</div>
+  </div>
+  <p><strong>Client:</strong> ${r.nom}${r.nif?' · NIF: '+r.nif:''}<br>${r.adreca||''}</p>
+  <table><thead><tr><th>Títol</th><th>Quantitat</th><th>Preu unit.</th><th>Descompte</th><th>Total</th></tr></thead>
+  <tbody><tr><td>${r.llTitol}</td><td>${r.qty}</td><td>€${r.preu.toFixed(2)}</td><td>${r.desc}%</td><td>€${r.total.toFixed(2)}</td></tr></tbody>
+  <tfoot><tr><td colspan="4" class="total">TOTAL (IVA 4% inclòs)</td><td class="total">€${r.total.toFixed(2)}</td></tr></tfoot></table>
+  ${r.notes?`<p style="margin-top:1rem"><em>Notes: ${r.notes}</em></p>`:''}
+  <p style="margin-top:2rem;font-size:0.8rem;opacity:0.5">Document no té validesa fiscal. Sol·licita la factura si la necessites.</p>
+  <button onclick="window.print()" style="margin-top:1rem;padding:0.5rem 1.5rem;background:#c49a3a;border:none;border-radius:6px;cursor:pointer;font-weight:600">🖨 Imprimir</button>
+  </body></html>`);
+  w.document.close();
+}
+
+function passarAFactura(id) {
+  const r = reserves.find(x=>x.id===id);
+  if(!r) return;
+  if(!r.nif) {
+    const nif = prompt(`NIF del client per a la factura (${r.nom}):`);
+    if(!nif) return;
+    r.nif = nif;
+  }
+
+  // Numeració automàtica factura
+  const any = new Date().getFullYear();
+  const numFacts = factures.length+1;
+  const numFact = `${any}/${String(numFacts).padStart(3,'0')}`;
+  r.numFactura = numFact;
+  r.estat = 'facturada';
+
+  // Afegir a factures automàticament
+  const base = r.total / 1.04;
+  factures.push({
+    id: Date.now(), data: r.data,
+    num: numFact, client: r.nom,
+    concepte: 'venda-directa',
+    base: parseFloat(base.toFixed(2)),
+    iva: 4, ret: 0,
+  });
+
+  // Omplir formulari de factura Verifactu
+  document.getElementById('ef-num').value      = numFact;
+  document.getElementById('ef-data').value     = r.data;
+  document.getElementById('ef-clientNif').value = r.nif;
+  document.getElementById('ef-clientNom').value = r.nom;
+  document.getElementById('ef-clientAdr').value = r.adreca||'';
+  document.getElementById('ef-concepte').value  = `Venda de ${r.qty} ex. "${r.llTitol}"`;
+  document.getElementById('ef-base').value      = base.toFixed(2);
+  document.getElementById('ef-iva').value       = '4';
+  document.getElementById('ef-ret').value       = '0';
+  document.getElementById('ef-pagament').value  = r.pagament||'Transferència';
+
+  saveAll();
+  renderReserves();
+  // Anar a la pestanya d'emetre factura
+  showTab('emetre');
+  calcEF();
+  setTimeout(()=>{ document.getElementById('ef-preview')&&(document.getElementById('ef-preview').style.display='none'); }, 100);
+  alert(`✓ Factura ${numFact} preparada! Revisa les dades i genera el PDF.`);
+}
+
+// ==================== FACTURES ====================
+function calcFactura() {
+  const base = parseFloat(document.getElementById('f-base').value)||0;
+  const iva = parseFloat(document.getElementById('f-iva').value)||0;
+  const ret = parseFloat(document.getElementById('f-ret').value)||0;
+  const total = base + (base*iva/100) - (base*ret/100);
+  document.getElementById('f-total').value = '€' + total.toFixed(2);
+}
+
+function afegirFactura() {
+  const data = document.getElementById('f-data').value;
+  const num = document.getElementById('f-num').value;
+  const client = document.getElementById('f-client').value;
+  const concepte = document.getElementById('f-concepte').value;
+  const base = parseFloat(document.getElementById('f-base').value)||0;
+  const iva = parseFloat(document.getElementById('f-iva').value)||0;
+  const ret = parseFloat(document.getElementById('f-ret').value)||0;
+  if(!data || !base) { alert('Omple la data i la base imponible'); return; }
+  const f = { id: Date.now(), data, num, client, concepte, base, iva, ret };
+  factures.push(f);
+  save();
+  renderFactures();
+  document.getElementById('f-base').value='';
+  document.getElementById('f-total').value='';
+  // Auto-increment
+  const parts = num.split('/');
+  if(parts.length===2) {
+    const next = parseInt(parts[1])+1;
+    document.getElementById('f-num').value = parts[0]+'/'+String(next).padStart(3,'0');
+  }
+}
+
+function renderFactures() {
+  const tbody = document.getElementById('factures-tbody');
+  if(!factures.length) { tbody.innerHTML='<tr><td colspan="8" style="text-align:center;opacity:0.4;padding:2rem">Cap factura registrada</td></tr>'; return; }
+  tbody.innerHTML = factures.map(f => {
+    const ivaAmt = (f.base*f.iva/100).toFixed(2);
+    const retAmt = (f.base*f.ret/100).toFixed(2);
+    const total = (f.base + f.base*f.iva/100 - f.base*f.ret/100).toFixed(2);
+    return `<tr>
+      <td>${f.data}</td>
+      <td>${f.num||'—'}</td>
+      <td>${f.client}</td>
+      <td>€${f.base.toFixed(2)}</td>
+      <td>${f.iva}% (€${ivaAmt})</td>
+      <td>${f.ret}% (€${retAmt})</td>
+      <td><strong>€${total}</strong></td>
+      <td><button class="btn btn-danger btn-sm" onclick="eliminarFactura(${f.id})">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function eliminarFactura(id) {
+  if(!confirm('Eliminar factura?')) return;
+  factures = factures.filter(f=>f.id!==id);
+  save(); renderFactures();
+}
+
+// ==================== DESPESES ====================
+
+const CATS_DESPESA = {
+  quota:          { label:'Quota autònom RETA',         icon:'💼', ivaDefault:0,  pctDefault:100 },
+  isbn:           { label:'ISBN / Dipòsit legal',        icon:'📚', ivaDefault:0,  pctDefault:100 },
+  impressio:      { label:'Impressió / maquetació',      icon:'🖨', ivaDefault:4,  pctDefault:100 },
+  material:       { label:'Material oficina',            icon:'📎', ivaDefault:21, pctDefault:100 },
+  tech:           { label:'Maquinari / programari',      icon:'💻', ivaDefault:21, pctDefault:100 },
+  subscripcions:  { label:'Subscripcions digitals',      icon:'🔄', ivaDefault:21, pctDefault:100 },
+  internet:       { label:'Internet / telèfon',          icon:'📡', ivaDefault:21, pctDefault:50  },
+  publicitat:     { label:'Publicitat i màrqueting',     icon:'📢', ivaDefault:21, pctDefault:100 },
+  desplacaments:  { label:'Desplaçaments / transport',   icon:'🚗', ivaDefault:21, pctDefault:100 },
+  formacio:       { label:'Formació / llibres prof.',    icon:'🎓', ivaDefault:21, pctDefault:100 },
+  assessoria:     { label:'Assessoria / gestoria',       icon:'⚖️', ivaDefault:21, pctDefault:100 },
+  subministraments:{ label:'Subministraments % despatx', icon:'💡', ivaDefault:21, pctDefault:30  },
+  lloguer:        { label:'Lloguer % despatx',           icon:'🏠', ivaDefault:0,  pctDefault:30  },
+  bancari:        { label:'Comissions bancàries',        icon:'🏦', ivaDefault:0,  pctDefault:100 },
+  assegurances:   { label:'Assegurances professionals',  icon:'🛡', ivaDefault:0,  pctDefault:100 },
+  correccio:      { label:'Correcció / disseny',         icon:'✏️', ivaDefault:21, pctDefault:100 },
+  fira:           { label:'Fires i presentacions',       icon:'🎪', ivaDefault:21, pctDefault:100 },
+  altre:          { label:'Altre',                       icon:'📋', ivaDefault:21, pctDefault:100 },
+};
+
+const FREQ_DESPESES = [
+  { cat:'quota',        prov:'TGSS',         desc:'Quota autònom RETA mensual',     import:230,    iva:0,  pct:100, just:'rebut' },
+  { cat:'isbn',         prov:'Agència ISBN',  desc:'Registre ISBN',                  import:45,     iva:0,  pct:100, just:'factura' },
+  { cat:'impressio',    prov:'Amazon KDP',    desc:'Còpies prova "Arrels al vent"',  import:10.14,  iva:4,  pct:100, just:'simplificada' },
+  { cat:'subscripcions',prov:'Canva',         desc:'Subscripció Canva Pro',           import:14.99,  iva:21, pct:100, just:'factura' },
+  { cat:'internet',     prov:'Telefónica',    desc:'Internet + telèfon (50%)',        import:30,     iva:21, pct:50,  just:'rebut' },
+  { cat:'publicitat',   prov:'Meta Ads',      desc:'Publicitat Instagram/Facebook',   import:50,     iva:21, pct:100, just:'factura' },
+  { cat:'tech',         prov:'Apple/Google',  desc:'Emmagatzematge núvol',           import:2.99,   iva:21, pct:100, just:'rebut' },
+];
+
+function autoIva() {
+  const cat = document.getElementById('d-cat').value;
+  const info = CATS_DESPESA[cat];
+  if(info) {
+    document.getElementById('d-iva').value = info.ivaDefault;
+    document.getElementById('d-pct').value = info.pctDefault;
+    calcDespesa();
+  }
+}
+
+function calcDespesa() {
+  const brut = parseFloat(document.getElementById('d-import').value)||0;
+  const iva  = parseFloat(document.getElementById('d-iva').value)||0;
+  const pct  = parseFloat(document.getElementById('d-pct').value)||100;
+  if(!brut) { document.getElementById('d-resum').style.display='none'; return; }
+  const base    = brut / (1 + iva/100);
+  const ivaAmt  = brut - base;
+  const irpf    = base * pct / 100;
+  document.getElementById('d-resum').style.display = 'block';
+  document.getElementById('dr-brut').textContent  = '€'+brut.toFixed(2);
+  document.getElementById('dr-base').textContent  = '€'+base.toFixed(2);
+  document.getElementById('dr-iva').textContent   = iva > 0 ? '€'+ivaAmt.toFixed(2) : '—';
+  document.getElementById('dr-irpf').textContent  = '€'+irpf.toFixed(2) + (pct<100?` (${pct}%)` : '');
+}
+
+function trimestreDeData(data) {
+  if(!data) return '1T';
+  const m = parseInt(data.split('-')[1]);
+  if(m<=3) return '1T'; if(m<=6) return '2T'; if(m<=9) return '3T'; return '4T';
+}
+
+function afegirDespesa(predef) {
+  const data    = predef ? new Date().toISOString().split('T')[0] : document.getElementById('d-data').value;
+  const prov    = predef ? predef.prov    : document.getElementById('d-prov').value;
+  const cat     = predef ? predef.cat     : document.getElementById('d-cat').value;
+  const desc    = predef ? predef.desc    : document.getElementById('d-desc').value;
+  const import_ = predef ? predef.import  : parseFloat(document.getElementById('d-import').value)||0;
+  const iva     = predef ? predef.iva     : parseFloat(document.getElementById('d-iva').value)||0;
+  const pct     = predef ? predef.pct     : parseFloat(document.getElementById('d-pct').value)||100;
+  const just    = predef ? predef.just    : document.getElementById('d-just').value;
+  const ref     = predef ? ''             : document.getElementById('d-ref').value;
+  const trim    = predef ? trimestreDeData(data) : document.getElementById('d-trim').value;
+
+  if(!data || !import_) { if(!predef) alert('Omple la data i l\'import'); return; }
+
+  despeses.push({ id: Date.now(), data, prov, cat, desc, import: import_, iva, pct, just, ref, trim });
+  save();
+  renderDespeses();
+  updateKPIsDespeses();
+  if(!predef) {
+    ['d-import','d-desc','d-prov','d-ref'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('d-resum').style.display='none';
+  }
+}
+
+function afegirDespesesFrequents() {
+  const panel = document.getElementById('panel-freq');
+  panel.style.display = panel.style.display==='none' ? 'block' : 'none';
+  const cont = document.getElementById('freq-list');
+  cont.innerHTML = FREQ_DESPESES.map((f,i) => {
+    const info = CATS_DESPESA[f.cat];
+    return `<div style="border:1.5px solid var(--mist);border-radius:10px;padding:0.85rem;background:white">
+      <div style="font-weight:600;font-size:0.9rem">${info.icon} ${f.desc}</div>
+      <div style="font-size:0.78rem;opacity:0.6;margin:0.2rem 0">${f.prov} · €${f.import.toFixed(2)} · IVA ${f.iva}% · ${f.pct}% deduïble</div>
+      <button class="btn btn-sm btn-primary" style="margin-top:0.5rem" onclick='afegirDespesa(${JSON.stringify(f)})'>+ Afegir</button>
+    </div>`;
+  }).join('');
+}
+
+function updateKPIsDespeses() {
+  const any = new Date().getFullYear().toString();
+  const filtre = document.getElementById('d-filtre-trim')?.value || 'tot';
+  const llista = despeses.filter(d => {
+    const anyD = d.data ? d.data.substring(0,4) : '';
+    const ok = anyD === any || !anyD;
+    const trimOk = filtre==='tot' || d.trim===filtre || trimestreDeData(d.data)===filtre;
+    return ok && trimOk;
+  });
+  const base     = llista.reduce((s,d)=>s+(d.import/(1+d.iva/100)),0);
+  const ivaAmt   = llista.reduce((s,d)=>s+(d.import-d.import/(1+d.iva/100)),0);
+  const irpfDed  = llista.reduce((s,d)=>s+(d.import/(1+d.iva/100))*(d.pct||100)/100,0);
+  const eds      = Math.min(irpfDed*0.05, 2000);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('dk-base',  '€'+base.toFixed(2));
+  set('dk-iva',   '€'+ivaAmt.toFixed(2));
+  set('dk-eds',   '€'+eds.toFixed(2));
+  set('dk-count', llista.length);
+  renderChartCats(llista);
+}
+
+function renderChartCats(llista) {
+  const cont = document.getElementById('d-chart-cats');
+  if(!cont) return;
+  const perCat = {};
+  llista.forEach(d=>{
+    const k = d.cat||'altre';
+    perCat[k] = (perCat[k]||0) + (d.import/(1+d.iva/100));
+  });
+  if(!Object.keys(perCat).length) { cont.innerHTML='<p style="opacity:0.4;text-align:center;padding:1rem">Cap despesa</p>'; return; }
+  const maxV = Math.max(...Object.values(perCat));
+  const colors = ['#4a7060','#c49a3a','#b84b2a','#2050a0','#6040a0','#a07020','#1a6060','#805030'];
+  cont.innerHTML = Object.entries(perCat)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([cat,val],i)=>{
+      const info = CATS_DESPESA[cat]||{icon:'📋',label:cat};
+      return `<div style="margin-bottom:0.5rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.2rem">
+          <span>${info.icon} ${info.label}</span><strong>€${val.toFixed(2)}</strong>
+        </div>
+        <div style="background:var(--warm);border-radius:6px;overflow:hidden">
+          <div style="height:20px;width:${Math.max(4,(val/maxV*100)).toFixed(0)}%;background:${colors[i%colors.length]};border-radius:6px"></div>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function renderDespeses() {
+  updateKPIsDespeses();
+  const filtre = document.getElementById('d-filtre-trim')?.value || 'tot';
+  const any = new Date().getFullYear().toString();
+  let llista = despeses.filter(d=>{
+    const anyD = d.data?d.data.substring(0,4):'';
+    const trimOk = filtre==='tot' || d.trim===filtre || trimestreDeData(d.data)===filtre;
+    return trimOk;
+  }).slice().sort((a,b)=>b.data.localeCompare(a.data));
+
+  const tbody = document.getElementById('despeses-tbody');
+  if(!tbody) return;
+  if(!llista.length) {
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;opacity:0.4;padding:2rem">Cap despesa en aquest filtre</td></tr>';
+    return;
+  }
+  const justIcon = { factura:'🧾', simplificada:'📄', rebut:'📑', extracte:'🏦', sense:'—' };
+  tbody.innerHTML = llista.map(d=>{
+    const info  = CATS_DESPESA[d.cat]||{icon:'📋',label:d.cat};
+    const base  = d.import/(1+(d.iva||0)/100);
+    const ivaAmt= d.import-base;
+    const irpf  = base*(d.pct||100)/100;
+    const basePct = d.pct&&d.pct<100 ? `<br><span style="font-size:0.72rem;opacity:0.5">${d.pct}% de €${base.toFixed(2)}</span>` : '';
+    return `<tr>
+      <td style="font-size:0.82rem">${d.data}<br><span style="opacity:0.4;font-size:0.7rem">${d.trim||trimestreDeData(d.data)}</span></td>
+      <td><span style="font-size:0.75rem;background:var(--warm);padding:0.15rem 0.5rem;border-radius:20px;white-space:nowrap">${info.icon} ${info.label}</span></td>
+      <td style="font-size:0.85rem"><strong>${d.desc||''}</strong>${d.prov?`<br><span style="opacity:0.5;font-size:0.75rem">${d.prov}</span>`:''}</td>
+      <td style="font-weight:600">€${d.import.toFixed(2)}</td>
+      <td style="color:var(--sage)">€${irpf.toFixed(2)}${basePct}</td>
+      <td style="color:var(--gold)">${d.iva>0?'€'+ivaAmt.toFixed(2):'—'}</td>
+      <td style="font-size:1rem;text-align:center" title="${d.just||''}">${justIcon[d.just]||'📋'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="eliminarDespesa(${d.id})">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function eliminarDespesa(id) {
+  if(!confirm('Eliminar despesa?')) return;
+  despeses = despeses.filter(d=>d.id!==id);
+  save(); renderDespeses();
+}
+
+function exportarDespesesCSV() {
+  if(!despeses.length) { alert('Cap despesa per exportar'); return; }
+  const cap = 'Data,Trimestre,Categoria,Descripció,Proveïdor,Import brut,IVA%,Base,IVA deduïble,Deducció IRPF,Justificant,Ref\n';
+  const files = despeses.map(d=>{
+    const base = d.import/(1+(d.iva||0)/100);
+    const ivaAmt = d.import-base;
+    const irpf = base*(d.pct||100)/100;
+    return `${d.data},${d.trim||trimestreDeData(d.data)},"${CATS_DESPESA[d.cat]?.label||d.cat}","${d.desc}","${d.prov}",${d.import.toFixed(2)},${d.iva||0},${base.toFixed(2)},${ivaAmt.toFixed(2)},${irpf.toFixed(2)},${d.just||''},${d.ref||''}`;
+  }).join('\n');
+  const blob = new Blob(['\uFEFF'+cap+files],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`despeses_escletxa_${new Date().getFullYear()}.csv`; a.click();
+}
+
+// ==================== DASHBOARD ====================
+function updateDashboard() {
+  const totalIng = factures.reduce((s,f)=>s+f.base,0);
+  const totalDesp = despeses.reduce((s,d)=>s+(d.import/(1+d.iva/100)),0);
+  const ben = totalIng - totalDesp;
+  const ivaRepercutit = factures.reduce((s,f)=>s+(f.base*f.iva/100),0);
+  const ivaSuportat = despeses.reduce((s,d)=>s+(d.import-d.import/(1+d.iva/100)),0);
+  const ivaPagar = Math.max(0, ivaRepercutit - ivaSuportat);
+
+  document.getElementById('total-ing').textContent = '€'+totalIng.toFixed(2);
+  document.getElementById('total-desp').textContent = '€'+totalDesp.toFixed(2);
+  document.getElementById('total-ben').textContent = '€'+ben.toFixed(2);
+  document.getElementById('total-iva').textContent = '€'+ivaPagar.toFixed(2);
+
+  renderTerminis();
+}
+
+// ==================== DECLARACIONS ====================
+function calcularDeclaracio() {
+  const trim = document.getElementById('dec-trim').value;
+  const any = document.getElementById('dec-any').value;
+  const mesos = { '1T':[1,2,3], '2T':[4,5,6], '3T':[7,8,9], '4T':[10,11,12] };
+  const ms = mesos[trim];
+
+  const facsTrim = factures.filter(f => {
+    const m = parseInt(f.data.split('-')[1]);
+    const y = f.data.split('-')[0];
+    return y === any && ms.includes(m);
+  });
+  const despTrim = despeses.filter(d => {
+    const m = parseInt(d.data.split('-')[1]);
+    const y = d.data.split('-')[0];
+    return y === any && ms.includes(m);
+  });
+
+  const ivaRep4 = facsTrim.filter(f=>f.iva===4||f.iva==='4').reduce((s,f)=>s+(f.base*0.04),0);
+  const ivaRep21 = facsTrim.filter(f=>f.iva===21||f.iva==='21').reduce((s,f)=>s+(f.base*0.21),0);
+  const baseRep4 = facsTrim.filter(f=>f.iva===4||f.iva==='4').reduce((s,f)=>s+f.base,0);
+  const baseRep21 = facsTrim.filter(f=>f.iva===21||f.iva==='21').reduce((s,f)=>s+f.base,0);
+  const ivaRepTotal = ivaRep4 + ivaRep21;
+
+  const ivaSuportat = despTrim.reduce((s,d)=>s+(d.import-d.import/(1+d.iva/100)),0);
+  const baseDesp = despTrim.reduce((s,d)=>s+(d.import/(1+d.iva/100)),0);
+  const cuota303 = ivaRepTotal - ivaSuportat;
+
+  const terminis = { '1T':'20 d\'abril', '2T':'20 de juliol', '3T':'20 d\'octubre', '4T':'30 de gener' };
+  const anyFi = trim==='4T' ? String(parseInt(any)+1) : any;
+
+  document.getElementById('result-303').style.display='block';
+  document.getElementById('result-303').innerHTML = `
+    <div class="result-box">
+      <h3>Model 303 · ${trim} ${any} — IVA repercutit</h3>
+      <div class="result-row"><span>Base 4% (llibres)</span><span>€${baseRep4.toFixed(2)}</span></div>
+      <div class="result-row"><span>IVA repercutit 4%</span><span>€${ivaRep4.toFixed(2)}</span></div>
+      <div class="result-row"><span>Base 21% (serveis)</span><span>€${baseRep21.toFixed(2)}</span></div>
+      <div class="result-row"><span>IVA repercutit 21%</span><span>€${ivaRep21.toFixed(2)}</span></div>
+      <div class="result-row"><span style="font-weight:600">Total IVA repercutit</span><span>€${ivaRepTotal.toFixed(2)}</span></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.3);margin:0.5rem 0"></div>
+      <div class="result-row"><span>IVA suportat (despeses) [casella 28]</span><span>-€${ivaSuportat.toFixed(2)}</span></div>
+      <div class="result-row result-total">
+        <span>${cuota303>0?'A INGRESSAR [casella 69]':'A COMPENSAR/RETORNAR'}</span>
+        <span style="color:${cuota303>0?'#f0a090':'#90d8a0'}">€${Math.abs(cuota303).toFixed(2)}</span>
+      </div>
+      <div style="font-size:0.75rem;opacity:0.6;margin-top:0.75rem">Termini presentació: fins al ${terminis[trim]} de ${anyFi}</div>
+    </div>`;
+}
+
+function calcular390() {
+  const any = document.getElementById('any-390').value;
+  const facsAny = factures.filter(f => f.data.split('-')[0] === any);
+  const despAny = despeses.filter(d => d.data.split('-')[0] === any);
+
+  const ivaRep4 = facsAny.filter(f=>f.iva==4).reduce((s,f)=>s+(f.base*0.04),0);
+  const ivaRep21 = facsAny.filter(f=>f.iva==21).reduce((s,f)=>s+(f.base*0.21),0);
+  const base4 = facsAny.filter(f=>f.iva==4).reduce((s,f)=>s+f.base,0);
+  const base21 = facsAny.filter(f=>f.iva==21).reduce((s,f)=>s+f.base,0);
+  const ivaSuportat = despAny.reduce((s,d)=>s+(d.import-d.import/(1+d.iva/100)),0);
+  const baseSuportat = despAny.reduce((s,d)=>s+(d.import/(1+d.iva/100)),0);
+  const resultat = ivaRep4 + ivaRep21 - ivaSuportat;
+
+  document.getElementById('result-390').style.display='block';
+  document.getElementById('result-390').innerHTML = `
+    <div class="result-box">
+      <h3>Model 390 · Resum IVA ${any}</h3>
+      <div style="opacity:0.7;font-size:0.8rem;margin-bottom:0.75rem">Presentació: 1-30 de gener ${parseInt(any)+1}</div>
+      <div class="result-row"><span>Base imposable 4% (llibres)</span><span>€${base4.toFixed(2)}</span></div>
+      <div class="result-row"><span>IVA repercutit 4%</span><span>€${ivaRep4.toFixed(2)}</span></div>
+      <div class="result-row"><span>Base imposable 21% (serveis)</span><span>€${base21.toFixed(2)}</span></div>
+      <div class="result-row"><span>IVA repercutit 21%</span><span>€${ivaRep21.toFixed(2)}</span></div>
+      <div class="result-row"><span style="font-weight:600">Total IVA reportat [casella 27]</span><span>€${(ivaRep4+ivaRep21).toFixed(2)}</span></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.3);margin:0.5rem 0"></div>
+      <div class="result-row"><span>Base despeses deduïbles [casella 28]</span><span>€${baseSuportat.toFixed(2)}</span></div>
+      <div class="result-row"><span>IVA suportat deduïble [casella 29]</span><span>€${ivaSuportat.toFixed(2)}</span></div>
+      <div class="result-row result-total">
+        <span>RESULTAT ANUAL [casella 69]</span>
+        <span style="color:${resultat>0?'#f0a090':'#90d8a0'}">€${Math.abs(resultat).toFixed(2)} ${resultat>0?'a pagar':'a compensar'}</span>
+      </div>
+      <div style="font-size:0.75rem;opacity:0.6;margin-top:0.75rem">⚠️ Recorda: el 390 ha de coincidir amb la suma dels 4 models 303 presentats.</div>
+    </div>`;
+}
+
+// ==================== RENDA ====================
+function calcularRenda() {
+  const ingActivity = factures.reduce((s,f)=>s+f.base,0);
+  const desp = despeses.reduce((s,d)=>s+(d.import/(1+d.iva/100)),0);
+  const altreRend = parseFloat(document.getElementById('r-altreRend').value)||0;
+  const minim = parseFloat(document.getElementById('r-minim').value)||5550;
+  const retencions = parseFloat(document.getElementById('r-retencions').value)||0;
+  const pagCompte = parseFloat(document.getElementById('r-pagamentCompte').value)||0;
+
+  const rendNet = ingActivity - desp;
+  const baseImposable = Math.max(0, rendNet + altreRend - minim);
+
+  // Escala IRPF 2025 simplificada
+  let quota = 0;
+  const trams = [[12450,0.19],[7750,0.24],[15000,0.30],[20200,0.37],[99999,0.45]];
+  let rest = baseImposable;
+  for(const [limit, rate] of trams) {
+    const aplicar = Math.min(rest, limit);
+    quota += aplicar * rate;
+    rest -= aplicar;
+    if(rest<=0) break;
+  }
+
+  const aPagar = quota - retencions - pagCompte;
+  document.getElementById('result-renda').style.display='block';
+  document.getElementById('result-renda').innerHTML = `
+    <div class="result-box">
+      <h3>Renda estimada · Model 100</h3>
+      <div class="result-row"><span>Ingressos activitat</span><span>€${ingActivity.toFixed(2)}</span></div>
+      <div class="result-row"><span>Despeses deduïbles</span><span>-€${desp.toFixed(2)}</span></div>
+      <div class="result-row"><span>Rendiment net activitat</span><span>€${rendNet.toFixed(2)}</span></div>
+      <div class="result-row"><span>Altres rendiments</span><span>+€${altreRend.toFixed(2)}</span></div>
+      <div class="result-row"><span>Mínim personal/familiar</span><span>-€${minim.toFixed(2)}</span></div>
+      <div class="result-row"><span>Base liquidable</span><span>€${baseImposable.toFixed(2)}</span></div>
+      <div class="result-row"><span>Quota íntegra (escala IRPF)</span><span>€${quota.toFixed(2)}</span></div>
+      <div class="result-row"><span>Retencions i ingressos a compte</span><span>-€${(retencions+pagCompte).toFixed(2)}</span></div>
+      <div class="result-row result-total"><span>${aPagar>=0?'A INGRESSAR':'A RETORNAR'}</span><span style="color:${aPagar>=0?'#f0d890':'#90d8a0'}">€${Math.abs(aPagar).toFixed(2)}</span></div>
+      <div style="font-size:0.75rem;opacity:0.6;margin-top:0.75rem">⚠️ Estimació orientativa. L'escala de trams és la general estatal 2025. Pot variar amb trams autonòmics de la Comunitat Valenciana.</div>
+    </div>`;
+}
+
+// ==================== CALENDARI ====================
+const terminis2025 = [
+  { data:'20 abr', model:'M-303', desc:'1T 2026 (gen-mar) · PRIMERA declaració!', urgent: true },
+  { data:'20 jul', model:'M-303', desc:'2T 2026 (abr-jun)', urgent: false },
+  { data:'20 oct', model:'M-303', desc:'3T 2026 (jul-set)', urgent: false },
+  { data:'30 gen 2027', model:'M-303 + M-390', desc:'4T 2026 + Resum anual IVA 2026', urgent: false },
+  { data:'30 jun', model:'M-100', desc:'Renda 2025 (si correspon per altres ingressos)', urgent: false },
+];
+const terminis2026 = [
+  { data:'20 abr', model:'M-303', desc:'1T 2027 (gen-mar)' },
+  { data:'30 jun', model:'M-100', desc:'Declaració de la Renda 2026 (primer any complet)' },
+  { data:'20 jul', model:'M-303', desc:'2T 2027 (abr-jun)' },
+  { data:'20 oct', model:'M-303', desc:'3T 2027 (jul-set)' },
+  { data:'30 gen 2028', model:'M-303 + M-390', desc:'4T 2027 + Resum anual IVA 2027' },
+  { data:'31 des 2028', model:'Canvi retenció', desc:'⚠️ A partir d\'1/1/2029 retenció puja a 15%' },
+];
+
+function renderCalendari() {
+  document.getElementById('cal-list').innerHTML = terminis2025.map(t=>`
+    <div class="cal-item">
+      <div class="cal-date ${t.urgent?'cal-urgent':''} ${t.done?'cal-done':''}">${t.data}</div>
+      <div class="cal-info"><strong>${t.model}</strong><span>${t.desc}</span></div>
+      ${t.urgent?'<span style="color:var(--rust);font-weight:700;font-size:0.8rem">⚠️ PROPER</span>':''}
+      ${t.done?'<span style="color:var(--sage);font-weight:700;font-size:0.8rem">✓ PASSAT</span>':''}
+    </div>`).join('');
+  document.getElementById('cal-list-2026').innerHTML = terminis2026.map(t=>`
+    <div class="cal-item">
+      <div class="cal-date">${t.data}</div>
+      <div class="cal-info"><strong>${t.model}</strong><span>${t.desc}</span></div>
+    </div>`).join('');
+}
+
+function renderTerminis() {
+  document.getElementById('terminis-list').innerHTML = `
+    <div class="cal-item">
+      <div class="cal-date cal-urgent">20 abr</div>
+      <div class="cal-info"><strong>Model 303 · 1T 2026</strong><span>Primera declaració IVA (mar 2026) · Termini 20 d'abril 2026</span></div>
+      <span style="color:var(--rust);font-weight:700;font-size:0.8rem">⚠️ PRÒXIM</span>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">30 jun</div>
+      <div class="cal-info"><strong>Model 100 · Renda 2025</strong><span>Si tens altres ingressos el 2025 a declarar</span></div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">20 jul</div>
+      <div class="cal-info"><strong>Model 303 · 2T 2026</strong><span>(abr-jun 2026)</span></div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">20 oct</div>
+      <div class="cal-info"><strong>Model 303 · 3T 2026</strong><span>(jul-set 2026)</span></div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">30 gen 2027</div>
+      <div class="cal-info"><strong>Model 303 4T + Model 390</strong><span>4T 2026 + Resum anual IVA 2026</span></div>
+    </div>`;
+}
+
+// ==================== IA ASSESSOR ====================
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+
+  const area = document.getElementById('chat-area');
+  area.innerHTML += `<div class="msg msg-user"><div class="msg-label">Tu</div><div class="msg-bubble">${msg}</div></div>`;
+
+  // Typing
+  const typingId = 'typing-'+Date.now();
+  area.innerHTML += `<div class="msg msg-ai" id="${typingId}"><div class="msg-label">Assessor IA</div><div class="msg-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>`;
+  area.scrollTop = area.scrollHeight;
+
+  // Dades del perfil per context
+  const totalIng = factures.reduce((s,f)=>s+f.base,0);
+  const totalDesp = despeses.reduce((s,d)=>s+(d.import/(1+d.iva/100)),0);
+
+  const systemPrompt = `Ets un assessor fiscal expert en autònoms espanyols, especialitzat en editors i escriptors. 
+Dades oficials de l'usuari (extrets del Model 036 presentat el 09/03/2026):
+- Nom: Dario Jose Trives Blanca · NIF: 48340985E
+- Nom comercial: Edicions L'Escletxa
+- Adreça: C/ Enriqueta Ortega 3, 3B · 03005 Alacant
+- Activitat 1: Escriptors i Guionistes · Epígraf IAE 864.2 · Secció 2 (Professional) · Codi A05
+- Activitat 2: Edició de Llibres · Epígraf IAE 476.1 · Secció 1 (Empresarial) · Codi A03
+- Règim IVA: General (casella 510 marcada al 036)
+- IRPF: Estimació Directa Simplificada (casella 609). Obligat pagaments fraccionats (casella 600 marcada).
+- Inici activitat: 09/03/2026 (casella 504 — primeres entregues posteriors a adquisicions)
+- Models que presenta: 303 (trimestral), 390 (anual), 100 (Renda). NO presenta 130.
+- Retenció IRPF: 7% fins 31/12/2028 (primers 3 anys), després 15%
+- IVA: Llibres 4%, Serveis editorials/escriptura 21%
+Dades actuals: Ingressos: €${totalIng.toFixed(2)}, Despeses: €${totalDesp.toFixed(2)}.
+Respons sempre en CATALÀ. Sigues concís i pràctic, cita models i lleis quan sigui rellevant.
+Important: com que va marcar la casella 504 (inici posterior a adquisicions), pot deduir l'IVA de les despeses fetes ABANS de la primera factura.
+Si l'usuari pregunta sobre canvis normatius recents, usa web_search per buscar informació actualitzada de l'AEAT.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: msg }]
+      })
+    });
+    const data = await resp.json();
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n') || 'No he pogut obtenir resposta.';
+    document.getElementById(typingId).innerHTML = `<div class="msg-label">Assessor IA</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  } catch(e) {
+    document.getElementById(typingId).innerHTML = `<div class="msg-label">Assessor IA</div><div class="msg-bubble">⚠️ Error de connexió. Comprova la teua connexió a internet.</div>`;
+  }
+  area.scrollTop = area.scrollHeight;
+}
+
+// ==================== VERIFACTU FACTURA ====================
+function calcEF() {
+  const base = parseFloat(document.getElementById('ef-base').value)||0;
+  const iva = parseFloat(document.getElementById('ef-iva').value)||0;
+  const ret = parseFloat(document.getElementById('ef-ret').value)||0;
+  const ivaAmt = base*iva/100;
+  const retAmt = base*ret/100;
+  const total = base + ivaAmt - retAmt;
+  document.getElementById('ef-resum').style.display = 'block';
+  document.getElementById('ef-r-base').textContent = '€'+base.toFixed(2);
+  document.getElementById('ef-r-iva-label').textContent = `IVA ${iva}%`;
+  document.getElementById('ef-r-iva').textContent = iva>0 ? '+€'+ivaAmt.toFixed(2) : '—';
+  document.getElementById('ef-r-ret-label').textContent = `Retenció IRPF ${ret}%`;
+  document.getElementById('ef-r-ret').textContent = ret>0 ? '-€'+retAmt.toFixed(2) : '—';
+  document.getElementById('ef-r-total').textContent = '€'+total.toFixed(2);
+}
+
+function getFacturaData() {
+  const base = parseFloat(document.getElementById('ef-base').value)||0;
+  const iva = parseFloat(document.getElementById('ef-iva').value)||0;
+  const ret = parseFloat(document.getElementById('ef-ret').value)||0;
+  return {
+    num: document.getElementById('ef-num').value || '2026/001',
+    data: document.getElementById('ef-data').value,
+    clientNif: document.getElementById('ef-clientNif').value,
+    clientNom: document.getElementById('ef-clientNom').value,
+    clientAdr: document.getElementById('ef-clientAdr').value,
+    concepte: document.getElementById('ef-concepte').value,
+    base, iva, ret,
+    ivaAmt: base*iva/100,
+    retAmt: base*ret/100,
+    total: base + base*iva/100 - base*ret/100,
+    pagament: document.getElementById('ef-pagament').value,
+    iban: document.getElementById('ef-iban').value,
+    venc: document.getElementById('ef-venc').value,
+    hash: generarHash(),
+    timestamp: new Date().toISOString()
+  };
+}
+
+function generarHash() {
+  // Hash simplificat (SHA-256 real requereix backend homologat)
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return Array.from({length:32}, ()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+function generarQRUrl(f) {
+  // URL verificació AEAT amb dades de la factura
+  const nif = '48340985E';
+  const params = `nif=${nif}&num=${f.num}&fecha=${f.data}&importe=${f.total.toFixed(2)}`;
+  return `https://www2.agenciatributaria.gob.es/wlpl/TIKE-CONT/ValidarQR?${encodeURIComponent(params)}`;
+}
+
+function previsualitzar() {
+  const f = getFacturaData();
+  if(!f.base || !f.clientNom) { alert('Omple almenys la base i el nom del client'); return; }
+  calcEF();
+
+  const qrUrl = generarQRUrl(f);
+  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrUrl)}`;
+
+  const ivaText = f.iva > 0 ? `
+    <tr><td style="padding:0.3rem 0.5rem">IVA ${f.iva}%</td><td></td><td style="text-align:right;padding:0.3rem 0.5rem">€${f.ivaAmt.toFixed(2)}</td></tr>` : '';
+  const retText = f.ret > 0 ? `
+    <tr style="color:#b84b2a"><td style="padding:0.3rem 0.5rem">Retenció IRPF ${f.ret}% (a deduir)</td><td></td><td style="text-align:right;padding:0.3rem 0.5rem">-€${f.retAmt.toFixed(2)}</td></tr>` : '';
+  const ibanText = f.iban ? `<br><strong>IBAN:</strong> ${f.iban}` : '';
+  const vencText = f.venc ? `<br><strong>Venciment:</strong> ${f.venc}` : '';
+
+  document.getElementById('ef-preview-content').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:3px solid #1a1208">
+      <div>
+        <div style="font-size:1.4rem;font-weight:700;font-family:'DM Serif Display',serif">Edicions L'Escletxa</div>
+        <div style="font-size:0.85rem;opacity:0.7">Dario Jose Trives Blanca · NIF: 48340985E</div>
+        <div style="font-size:0.85rem;opacity:0.7">C/ Enriqueta Ortega 3, 3B · 03005 Alacant</div>
+        <div style="font-size:0.85rem;opacity:0.7">IAE 476.1 + 864.2</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:1.1rem;font-weight:700;color:#c49a3a">FACTURA</div>
+        <div style="font-size:0.9rem"><strong>Núm:</strong> ${f.num}</div>
+        <div style="font-size:0.9rem"><strong>Data:</strong> ${f.data}</div>
+      </div>
+    </div>
+
+    <div style="background:#f7f3ec;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1.5rem">
+      <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;opacity:0.5;margin-bottom:0.3rem">Client / Destinatari</div>
+      <div style="font-weight:600">${f.clientNom}</div>
+      <div style="font-size:0.85rem;opacity:0.7">NIF: ${f.clientNif}</div>
+      <div style="font-size:0.85rem;opacity:0.7">${f.clientAdr}</div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
+      <thead>
+        <tr style="background:#1a1208;color:#f0d890">
+          <th style="padding:0.5rem;text-align:left;font-size:0.8rem">Descripció</th>
+          <th style="padding:0.5rem;text-align:right;font-size:0.8rem">Uds.</th>
+          <th style="padding:0.5rem;text-align:right;font-size:0.8rem">Import</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #e0d8c8">
+          <td style="padding:0.5rem">${f.concepte}</td>
+          <td style="text-align:right;padding:0.5rem">1</td>
+          <td style="text-align:right;padding:0.5rem">€${f.base.toFixed(2)}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr style="border-top:1px solid #ccc"><td style="padding:0.3rem 0.5rem">Base imponible</td><td></td><td style="text-align:right;padding:0.3rem 0.5rem">€${f.base.toFixed(2)}</td></tr>
+        ${ivaText}${retText}
+        <tr style="background:#1a1208;color:#f0d890;font-weight:700">
+          <td style="padding:0.5rem">TOTAL A COBRAR</td><td></td>
+          <td style="text-align:right;padding:0.5rem">€${f.total.toFixed(2)}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:1rem;padding-top:1rem;border-top:1px solid #e0d8c8">
+      <div style="font-size:0.82rem">
+        <strong>Forma de pagament:</strong> ${f.pagament}${ibanText}${vencText}
+        <br><br>
+        <div style="font-size:0.72rem;opacity:0.5;max-width:300px">
+          <strong>VERI*FACTU</strong> · Hash: ${f.hash.substring(0,16)}...<br>
+          Factura verificable a la seu electrònica de l'AEAT.<br>
+          Sistema: Edicions L'Escletxa SIF v1.0 · ${f.timestamp}
+        </div>
+      </div>
+      <div style="text-align:center">
+        <img src="${qrImgUrl}" width="90" height="90" style="border:3px solid #1a1208;border-radius:4px" onerror="this.style.display='none'">
+        <div style="font-size:0.65rem;opacity:0.5;margin-top:0.2rem">QR Verificació AEAT</div>
+      </div>
+    </div>`;
+
+  document.getElementById('ef-preview').style.display='block';
+  document.getElementById('ef-preview').scrollIntoView({behavior:'smooth'});
+}
+
+function generarFacturaPDF() {
+  const f = getFacturaData();
+  if(!f.base || !f.clientNom) { alert('Omple almenys la base i el nom del client'); return; }
+  previsualitzar();
+  setTimeout(() => {
+    const content = document.getElementById('ef-preview-content');
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head>
+      <meta charset="UTF-8">
+      <title>Factura ${f.num} · Edicions L'Escletxa</title>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+      <style>
+        body{font-family:'DM Sans',sans-serif;margin:2cm;color:#1a1208;font-size:11pt}
+        @media print{body{margin:1.5cm}}
+        .no-print{display:none}
+      </style>
+    </head><body>
+      ${content.innerHTML}
+      <div style="margin-top:2rem;text-align:center">
+        <button onclick="window.print()" style="padding:0.75rem 2rem;background:#c49a3a;border:none;border-radius:8px;font-size:1rem;cursor:pointer;font-weight:600">🖨 Imprimir / Guardar PDF</button>
+      </div>
+    </body></html>`);
+    w.document.close();
+    // Auto register to facturas
+    const numParts = f.num.split('/');
+    if(numParts.length===2) {
+      const next = parseInt(numParts[1])+1;
+      document.getElementById('ef-num').value = numParts[0]+'/'+String(next).padStart(3,'0');
+    }
+  }, 500);
+}
+renderFactures();
+renderDespeses();
+renderEstoc();
+renderReserves();
+renderVendes();
+updateKPIsVendes();
+updateSelectsLlibres();
+updateSelectsVendes();
+updateDashboard();
+// Set today's date
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('f-data').value = today;
+document.getElementById('d-data').value = today;
+document.getElementById('r-data').value = today;
+document.getElementById('f-num').value = '2026/001';
+const mesActual = today.substring(0,7);
+if(document.getElementById('kdp-mes')) document.getElementById('kdp-mes').value = mesActual;
+if(document.getElementById('ll-mes')) document.getElementById('ll-mes').value = mesActual;
+if(document.getElementById('d-data')) document.getElementById('d-data').value = today;
+if(document.getElementById('d-trim')) document.getElementById('d-trim').value = trimestreDeData(today);
+document.getElementById('ef-data').value = today;
+document.getElementById('ef-venc').value = today;
+
+// ── SPLASH SCREEN ──
+const splashMsgs = ['Carregant dades…','Preparant factures…','Sincronitzant estoc…','Llest!'];
+let splashPct = 0;
+const splashBar = document.getElementById('splash-bar');
+const splashMsg = document.getElementById('splash-msg');
+const splashEl  = document.getElementById('splash');
+
+const splashInterval = setInterval(() => {
+  splashPct = Math.min(splashPct + Math.random()*18 + 8, 100);
+  if(splashBar) splashBar.style.width = splashPct + '%';
+  const idx = Math.floor((splashPct/100) * (splashMsgs.length-1));
+  if(splashMsg) splashMsg.textContent = splashMsgs[idx] || 'Llest!';
+  if(splashPct >= 100) {
+    clearInterval(splashInterval);
+    if(splashMsg) splashMsg.textContent = '✓ Llest!';
+    setTimeout(() => {
+      if(splashEl) {
+        splashEl.style.opacity = '0';
+        splashEl.style.transform = 'scale(1.03)';
+        setTimeout(() => splashEl.style.display = 'none', 650);
+      }
+    }, 400);
+  }
+}, 120);
+
+// ── PWA: registrar Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW OK:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e;
+  const btn = document.getElementById('btn-install');
+  if(btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('btn-install');
+  if(btn) btn.style.display = 'none';
+  deferredPrompt = null;
+});
+function installPWA() {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(()=>{ deferredPrompt = null; });
+}
+</script>
+</body>
+</html>
