@@ -1,0 +1,96 @@
+{
+  "name": "RedAmigos",
+  "short_name": "RedAmigos",
+  "description": "La teva xarxa social privada. Connectem persones, creem somriures.",
+  "start_url": "/amigos/timeline.php",
+  "scope": "/amigos/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#4A90E2",
+  "theme_color": "#4A90E2",
+  "lang": "ca",
+  "categories": ["social", "lifestyle"],
+  "icons": [
+    {
+      "src": "/amigos/assets/img/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/amigos/assets/img/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/amigos/assets/img/splash-750x1334.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Inici",
+      "short_name": "Inici",
+      "description": "Veure el timeline",
+      "url": "/amigos/timeline.php",
+      "icons": [{ "src": "/amigos/assets/img/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Missatges",
+      "short_name": "Xat",
+      "description": "Veure missatges",
+      "url": "/amigos/mensajes.php",
+      "icons": [{ "src": "/amigos/assets/img/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Descobrir amics",
+      "short_name": "Amics",
+      "description": "Trobar persones afins",
+      "url": "/amigos/feed.php",
+      "icons": [{ "src": "/amigos/assets/img/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
