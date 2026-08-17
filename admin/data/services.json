@@ -1,0 +1,118 @@
+[
+    {
+        "id": 1,
+        "slug": "disseny-web",
+        "order": 1,
+        "active": true,
+        "icon_svg": "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\"\/><line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"\/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"\/><\/svg>",
+        "title": {
+            "ca": "Disseny Web Professional",
+            "es": "Diseño Web Profesional",
+            "en": "Professional Web Design"
+        },
+        "desc_short": {
+            "ca": "Webs modernes, ràpides i optimitzades per convertir visitants en clients. SEO-first des del primer dia.",
+            "es": "Webs modernas, rápidas y optimizadas para convertir visitantes en clientes. SEO-first desde el primer día.",
+            "en": "Modern, fast websites optimized to convert visitors into clients."
+        },
+        "highlight": {
+            "ca": "Més demanat",
+            "es": "Más solicitado",
+            "en": "Most requested"
+        }
+    },
+    {
+        "id": 2,
+        "slug": "seo-local",
+        "order": 2,
+        "active": true,
+        "icon_svg": "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"11\" cy=\"11\" r=\"8\"\/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"\/><\/svg>",
+        "title": {
+            "ca": "SEO Local a Alacant",
+            "es": "SEO Local en Alicante",
+            "en": "Local SEO in Alicante"
+        },
+        "desc_short": {
+            "ca": "Apareix el primer a Google quan els teus clients busquen el que ofereixes.",
+            "es": "Aparece primero en Google cuando tus clientes buscan lo que ofreces.",
+            "en": "Appear first on Google when your clients search."
+        },
+        "highlight": {
+            "ca": "Resultats visibles",
+            "es": "Resultados visibles",
+            "en": "Visible results"
+        }
+    },
+    {
+        "id": 3,
+        "slug": "marketing-digital",
+        "order": 3,
+        "active": true,
+        "icon_svg": "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><polyline points=\"22 12 18 12 15 21 9 3 6 12 2 12\"\/><\/svg>",
+        "title": {
+            "ca": "Màrqueting Digital",
+            "es": "Marketing Digital",
+            "en": "Digital Marketing"
+        },
+        "desc_short": {
+            "ca": "Google Ads, Meta Ads i email màrqueting orientats a resultats mesurables.",
+            "es": "Google Ads, Meta Ads y email marketing orientados a resultados medibles.",
+            "en": "Google Ads, Meta Ads and email marketing focused on measurable results."
+        },
+        "highlight": null
+    },
+    {
+        "id": 4,
+        "slug": "disseny-grafic",
+        "order": 4,
+        "active": true,
+        "icon_svg": "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"\/><circle cx=\"12\" cy=\"12\" r=\"4\"\/><\/svg>",
+        "title": {
+            "ca": "Disseny Gràfic i Branding",
+            "es": "Diseño Gráfico y Branding",
+            "en": "Graphic Design & Branding"
+        },
+        "desc_short": {
+            "ca": "Identitat visual que fa destacar la teua marca al mercat.",
+            "es": "Identidad visual que hace destacar tu marca en el mercado.",
+            "en": "Visual identity that makes your brand stand out."
+        },
+        "highlight": null
+    },
+    {
+        "id": 5,
+        "slug": "xarxes-socials",
+        "order": 5,
+        "active": true,
+        "icon_svg": "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2\"\/><circle cx=\"9\" cy=\"7\" r=\"4\"\/><\/svg>",
+        "title": {
+            "ca": "Xarxes Socials",
+            "es": "Redes Sociales",
+            "en": "Social Media"
+        },
+        "desc_short": {
+            "ca": "Gestió professional de xarxes que connecta amb la teua audiència.",
+            "es": "Gestión profesional de redes que conecta con tu audiencia.",
+            "en": "Professional social media management."
+        },
+        "highlight": null
+    },
+    {
+        "id": 6,
+        "slug": "ecommerce",
+        "order": 6,
+        "active": true,
+        "icon_svg": "<svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"9\" cy=\"21\" r=\"1\"\/><circle cx=\"20\" cy=\"21\" r=\"1\"\/><path d=\"M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6\"\/><\/svg>",
+        "title": {
+            "ca": "E-commerce",
+            "es": "E-commerce",
+            "en": "E-commerce"
+        },
+        "desc_short": {
+            "ca": "Botigues online que venen les 24h. WooCommerce, Shopify o solució a mida.",
+            "es": "Tiendas online que venden 24h. WooCommerce, Shopify o solución a medida.",
+            "en": "Online stores that sell 24\/7. WooCommerce, Shopify or custom solution."
+        },
+        "highlight": null
+    }
+]

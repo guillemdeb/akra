@@ -1,0 +1,34 @@
+[
+    {
+        "id": "1772068381_7365c8cc",
+        "active": true,
+        "name": {
+            "ca": "Maria García",
+            "es": "Maria García"
+        },
+        "company": {
+            "ca": "Clínica Dental Alacant",
+            "es": "Clínica Dental Alicante"
+        },
+        "text": {
+            "ca": "Des que AKRA ens va redissenyar la web i va optimitzar el SEO local, hem triplicat les trucades mensuals.",
+            "es": "Desde que AKRA nos rediseñó la web y optimizó el SEO local, hemos triplicado las llamadas mensuales."
+        }
+    },
+    {
+        "id": "1772068381_a5f63ff3",
+        "active": true,
+        "name": {
+            "ca": "Joan Martínez",
+            "es": "Juan Martínez"
+        },
+        "company": {
+            "ca": "Restaurant Sa Cuina · Benidorm",
+            "es": "Restaurante Sa Cuina · Benidorm"
+        },
+        "text": {
+            "ca": "La nostra botiga online va facturar 40.000€ el primer any. AKRA no és una agència, és un soci de negoci.",
+            "es": "Nuestra tienda online facturó 40.000€ el primer año. AKRA no es una agencia, es un socio de negocio."
+        }
+    }
+]

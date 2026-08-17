@@ -1,0 +1,142 @@
+{
+    "index": {
+        "title": {
+            "ca": "Akra Tech Studio · Agència web a Alacant",
+            "es": "Akra Tech Studio · Agencia web en Alicante",
+            "en": "Akra Tech Studio · Web Agency in Alicante, Spain"
+        },
+        "description": {
+            "ca": "Akra Tech Studio, agència web a Alacant. Disseny web, SEO local, botigues online i màrqueting digital per a negocis amb èxit a la Costa Blanca.",
+            "es": "Akra Tech Studio, agencia web en Alicante. Diseño web, SEO local, tiendas online y marketing digital para negocios con éxito en la Costa Blanca.",
+            "en": "Akra Tech Studio, web agency in Alicante. Web design, local SEO, e-commerce and digital marketing for successful businesses on the Costa Blanca."
+        },
+        "keywords": {
+            "ca": "agència web alacant, disseny web alacant, SEO local alacant, botiga online costa blanca, màrqueting digital alacant",
+            "es": "web agency alicante, web design costa blanca, local seo spain, e-commerce alicante, digital marketing costa blanca",
+            "en": "web agency alicante, web design costa blanca, local seo spain, e-commerce alicante, digital marketing costa blanca"
+        },
+        "og_image": "assets\/img\/og-home-akratech.jpg",
+        "canonical": "https:\/\/akratechstudio.es",
+        "noindex": false
+    },
+    "serveis": {
+        "title": {
+            "ca": "Serveis Web · Disseny, SEO i Màrqueting a Alacant | Akra Tech Studio",
+            "es": "Servicios Web · Diseño, SEO y Marketing en Alicante | Akra Tech Studio",
+            "en": "Web Services · Design, SEO &amp; Marketing in Alicante | Akra Tech Studio"
+        },
+        "description": {
+            "ca": "Descobreix tots els serveis web d&#039;Akra Tech Studio a Alacant: disseny web, botigues online, SEO local, màrqueting digital i consultoria per a negocis.",
+            "es": "Descubre todos los servicios web de Akra Tech Studio en Alicante: diseño web, tiendas online, SEO local, marketing digital y consultoría para negocios.",
+            "en": "Discover all web services from Akra Tech Studio in Alicante: web design, e-commerce, local SEO, digital marketing and consulting for businesses."
+        },
+        "keywords": {
+            "ca": "serveis web alacant, disseny web alacant, botiga online alacant, SEO alacant, màrqueting digital costa blanca, consultoria web alacant",
+            "es": "servicios web alicante, diseño web alicante, tienda online alicante, SEO alicante, marketing digital costa blanca, consultoría web alicante",
+            "en": "web services alicante, web design alicante, e-commerce alicante, SEO alicante, digital marketing costa blanca, web consulting alicante"
+        },
+        "og_image": "assets\/img\/og-serveis-akratech.jpg",
+        "canonical": "",
+        "noindex": false
+    },
+    "projectes": {
+        "title": {
+            "ca": "Projectes · Portfolio Web i Casos d&#039;Èxit a Alacant | Akra Tech Studio",
+            "es": "Proyectos · Portfolio Web y Casos de Éxito en Alicante | Akra Tech",
+            "en": "Projects · Web Portfolio &amp; Success Stories in Alicante | Akra Tech Stu"
+        },
+        "description": {
+            "ca": "Explora els nostres projectes web a Alacant. Cases d&#039;èxit en disseny web, botigues online, SEO i màrqueting digital per a clients de la Costa Blanca.",
+            "es": "Explora nuestros proyectos web en Alicante. Casos de éxito en diseño web, tiendas online, SEO y marketing digital para clientes de la Costa Blanca.",
+            "en": "Explore our web projects in Alicante. Success stories in web design, e-commerce, SEO and digital marketing for clients on the Costa Blanca."
+        },
+        "keywords": {
+            "ca": "projectes web alacant, portfolio web alacant, casos d&#039;èxit alacant, disseny web casos, botigues online exemples, SEO projectes alacant",
+            "es": "proyectos web alicante, portfolio web alicante, casos de éxito alicante, diseño web ejemplos, tiendas online ejemplos, SEO proyectos alicante",
+            "en": "web projects alicante, web portfolio alicante, success stories alicante, web design examples, e-commerce examples, SEO projects alicante"
+        },
+        "og_image": "assets\/img\/og-projectes-akratech.jpg",
+        "canonical": "",
+        "noindex": false
+    },
+    "nosaltres": {
+        "title": {
+            "ca": "Sobre Nosaltres · Agència Web a Alacant | Akra Tech Studio",
+            "es": "Sobre Nosotros · Agencia Web en Alicante | Akra Tech Studio",
+            "en": "About Us · Web Agency in Alicante, Spain | Akra Tech Studio"
+        },
+        "description": {
+            "ca": "Coneix l&#039;equip d&#039;Akra Tech Studio, agència web a Alacant. Experts en disseny web, SEO i màrqueting digital per a negocis de la Costa Blanca.",
+            "es": "Conoce al equipo de Akra Tech Studio, agencia web en Alicante. Expertos en diseño web, SEO y marketing digital para negocios de la Costa Blanca.",
+            "en": "Meet the team at Akra Tech Studio, a web agency in Alicante, Spain. Experts in web design, SEO and digital marketing for businesses on the Costa Blanca."
+        },
+        "keywords": {
+            "ca": "agència web alacant, equip disseny web, sobre nosaltres alacant, expertes web alacant, agència màrqueting alacant, desenvolupadors web alacant",
+            "es": "agencia web alicante, equipo diseño web, sobre nosotros alicante, expertos web alicante, agencia marketing alicante, desarrolladores web alicant",
+            "en": "web agency alicante, web design team, about us alicante, web experts alicante, marketing agency alicante, web developers alicante"
+        },
+        "og_image": "assets\/img\/og-nosaltres-akratech.jpg",
+        "canonical": "",
+        "noindex": false
+    },
+    "proces": {
+        "title": {
+            "ca": "Procés de Treball · Metodologia Web a Alacant | Akra Tech Studio",
+            "es": "Proceso de Trabajo · Metodología Web en Alicante | Akra Tech Studio",
+            "en": "Work Process · Web Methodology in Alicante | Akra Tech Studi"
+        },
+        "description": {
+            "ca": "Descobreix el nostre procés de treball a Akra Tech Studio: des de l&#039;estratègia inicial fins al llançament i suport continu. Metodologia transparent a Alacant.",
+            "es": "Descubre nuestro proceso de trabajo en Akra Tech Studio: desde la estrategia inicial hasta el lanzamiento y soporte continuo. Metodología transparente en Alicante.",
+            "en": "Discover our work process at Akra Tech Studio: from initial strategy to launch and ongoing support. Transparent methodology in Alicante, Spain."
+        },
+        "keywords": {
+            "ca": "procés de treball web, metodologia disseny web, procés desenvolupament web, com treballem alacant, fases projecte web, agència web transparent alacant",
+            "es": "proceso de trabajo web, metodología diseño web, proceso desarrollo web, cómo trabajamos alicante, fases proyecto web, agencia web transparente alicante",
+            "en": "web work process, web design methodology, web development process, how we work alicante, web project phases, transparent web agency alicante"
+        },
+        "og_image": "assets\/img\/og-proces-akratech.jp",
+        "canonical": "",
+        "noindex": false
+    },
+    "contacte": {
+        "title": {
+            "ca": "Contacte · Parlem del teu projecte web a Alacant | Akra Tech Studi",
+            "es": "Contacto · Hablemos de tu proyecto web en Alicante | Akra Tech Studio",
+            "en": "Contact · Let&#039;s talk about your web project in Alicante | Akra Tech St"
+        },
+        "description": {
+            "ca": "Posa&#039;t en contacte amb Akra Tech Studio, agència web a Alacant. Expliqua&#039;ns el teu projecte i rebràs una proposta personalitzada en 24-48h.",
+            "es": "Ponte en contacto con Akra Tech Studio, agencia web en Alicante. Cuéntanos tu proyecto y recibirás una propuesta personalizada en 24-48h.",
+            "en": "Get in touch with Akra Tech Studio, web agency in Alicante. Tell us about your project and receive a personalized proposal within 24-48h."
+        },
+        "keywords": {
+            "ca": "contacte agència web alacant, pressupost web alacant, contractar disseny web alacant, consultoria web gratis alacant, parlem projecte digital alacant",
+            "es": "contacto agencia web alicante, presupuesto web alicante, contratar diseño web alicante, consultoría web gratis alicante, hablemos proyecto digital alicante",
+            "en": "contact web agency alicante, web project budget alicante, hire web designer alicante, free web consultation alicante, talk digital project spain"
+        },
+        "og_image": "assets\/img\/og-contacte-akratech.jpg",
+        "canonical": "",
+        "noindex": false
+    },
+    "bloc": {
+        "title": {
+            "ca": "",
+            "es": "",
+            "en": ""
+        },
+        "description": {
+            "ca": "",
+            "es": "",
+            "en": ""
+        },
+        "keywords": {
+            "ca": "",
+            "es": "",
+            "en": ""
+        },
+        "og_image": "",
+        "canonical": "",
+        "noindex": false
+    }
+}

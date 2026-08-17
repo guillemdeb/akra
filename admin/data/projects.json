@@ -1,0 +1,240 @@
+[
+    {
+        "id": "1",
+        "slug": "el-portic-revista-cultural",
+        "category": "web",
+        "status": "active",
+        "featured": true,
+        "active": true,
+        "title": {
+            "ca": "El Pòrtic — Revista Cultural Digital",
+            "es": "El Pòrtic — Revista Cultural Digital",
+            "en": "El Pòrtic — Digital Cultural Magazine"
+        },
+        "description": {
+            "ca": "Revista cultural digital independent editada a Alacant. Plataforma editorial completa amb gestió d'articles, categories, pàgines d'autor, newsletter, RSS, gestió de cookies RGPD i panell d'administració. ISSN 3101-5492.",
+            "es": "Revista cultural digital independiente editada en Alicante. Plataforma editorial completa con gestión de artículos, categorías, páginas de autor, newsletter, RSS, cookies RGPD y panel de administración. ISSN 3101-5492.",
+            "en": "Independent digital cultural magazine from Alicante. Full editorial platform: article CMS, categories, author pages, newsletter, RSS, GDPR cookies, admin panel. Monthly. ISSN 3101-5492."
+        },
+        "results": {
+            "ca": "CMS editorial a mida · 6 seccions · ISSN 3101-5492",
+            "es": "CMS editorial a medida · 6 secciones · ISSN 3101-5492"
+        },
+        "client": {
+            "ca": "Premsa Cultural · Alacant",
+            "es": "Prensa Cultural · Alicante"
+        },
+        "thumbnail": "assets\/img\/projects\/elportic.jpg",
+        "gallery": [],
+        "url": "https:\/\/www.elportic.cat",
+        "demo_url": "",
+        "video": null,
+        "tech": [
+            "PHP",
+            "MySQL",
+            "CMS propi",
+            "Newsletter",
+            "RSS",
+            "RGPD",
+            "SEO"
+        ],
+        "date": "2026-01"
+    },
+    {
+        "id": "2",
+        "slug": "alicante-ingenieria-web-corporativa",
+        "category": "web",
+        "status": "active",
+        "featured": false,
+        "active": false,
+        "title": {
+            "ca": "Alicante Ingeniería — Web Corporativa B2B",
+            "es": "Alicante Ingeniería — Web Corporativa B2B",
+            "en": "Alicante Engineering — Corporate B2B Website"
+        },
+        "description": {
+            "ca": "Web corporativa professional per a empresa d&amp;#039;enginyeria industrial i obra civil a Alacant. Disseny B2B amb presentació de serveis tècnics, projectes realitzats, formulari de pressupost i SEO local.",
+            "es": "Web corporativa profesional para empresa de ingeniería industrial y obra civil en Alicante. Diseño B2B con presentación de servicios técnicos, proyectos realizados, formulario de presupuesto y SEO local.",
+            "en": "Professional B2B corporate website for an industrial engineering and civil works firm in Alicante. Technical services, project portfolio, quote form and local SEO."
+        },
+        "results": {
+            "ca": "Web B2B · SEO industrial · Sector enginyeria Alacant",
+            "es": "Web B2B · SEO industrial · Sector ingeniería Alicante",
+            "en": ""
+        },
+        "client": {
+            "ca": "",
+            "es": ""
+        },
+        "thumbnail": "assets\/img\/projects\/alicanteingenieria.jpg",
+        "gallery": [],
+        "url": "https:\/\/www.alicanteingenieria.es",
+        "demo_url": "",
+        "video": "",
+        "tech": [
+            "PHP",
+            "HTML5",
+            "CSS3",
+            "SEO Local",
+            "B2B",
+            "Formulari pressupost"
+        ],
+        "date": "2025-09"
+    },
+    {
+        "id": "3",
+        "slug": "kmysetas-ecommerce-samarretes",
+        "category": "ecommerce",
+        "status": "active",
+        "featured": true,
+        "active": true,
+        "title": {
+            "ca": "Kmysetas — E-commerce de Samarretes Personalitzades",
+            "es": "Kmysetas — E-commerce de Camisetas Personalizadas",
+            "en": "Kmysetas — Custom T-shirt E-commerce"
+        },
+        "description": {
+            "ca": "Botiga online completa de samarretes, sudadores i accessoris personalitzats amb dissenyador gràfic integrat. Catàleg amb talles XS–XXXL, carret, pasarela de pagament segura, gestió de comandes i 5 idiomes. Actiu des de 2005.",
+            "es": "Tienda online completa de camisetas, sudaderas y accesorios personalizados con diseñador gráfico integrado. Catálogo con tallas XS–XXXL, carrito, pasarela de pago segura y 5 idiomas. Activo desde 2005.",
+            "en": "Full custom apparel e-commerce with integrated online designer. Sizes XS–XXXL, cart, secure payment, orders, affiliate programme and volume discounts. 5 languages. Active since 2005."
+        },
+        "results": {
+            "ca": "E-commerce · Dissenyador online · 5 idiomes · Des de 2005",
+            "es": "E-commerce · Diseñador online · 5 idiomas · Desde 2005"
+        },
+        "client": {
+            "ca": "E-commerce Moda · Alacant",
+            "es": "E-commerce Moda · Alicante"
+        },
+        "thumbnail": "assets\/img\/projects\/kmysetas.jpg",
+        "gallery": [],
+        "url": "https:\/\/www.kmysetas.com",
+        "demo_url": "",
+        "video": null,
+        "tech": [
+            "PHP",
+            "MySQL",
+            "JavaScript",
+            "E-commerce",
+            "Dissenyador online",
+            "Pasarela pagament",
+            "5 idiomes"
+        ],
+        "date": "2024-11"
+    },
+    {
+        "id": "1772206189_0dcd1cd8",
+        "slug": "cartell-de-halloween-per-al-ceip-azorin-d-alacant",
+        "category": "design",
+        "status": "active",
+        "featured": false,
+        "active": true,
+        "title": {
+            "ca": "Cartell de Halloween per al CEIP AZORIN d&#039;Alacant",
+            "es": "Cartel de Halloween CEIP AZORIN Alicante",
+            "en": "Halloween party&#039;s Poster CEIP Azorin Alacant"
+        },
+        "description": {
+            "ca": "Cartell per a la festa de Halloween del CEIP Azorin d&#039;Alacant per l&#039;AMPA amb joc de colors i temàtica de por i infantil",
+            "es": "Cartel para la fiesta de Halloween del CEIP Azorin de Alicante organizada por  el AMPA con juego de colores y temática de miedo e infantil",
+            "en": "Poster for the Halloween party at CEIP Azorin in Alicante, organized by the Parents&#039; Association, featuring a play of colors and a scary, child-friendly theme."
+        },
+        "results": {
+            "ca": "",
+            "es": "",
+            "en": ""
+        },
+        "client": {
+            "ca": "",
+            "es": ""
+        },
+        "thumbnail": "",
+        "gallery": [],
+        "url": "",
+        "demo_url": "",
+        "video": "",
+        "tech": [
+            "Illustrator",
+            "Photoshop"
+        ],
+        "date": "2025-09"
+    },
+    {
+        "id": "1773407882_80094076",
+        "slug": "Barris",
+        "category": "app",
+        "status": "active",
+        "featured": true,
+        "active": true,
+        "title": {
+            "ca": "Barris. Recursos urbans",
+            "es": "Barrios. recursos Urbanos",
+            "en": ""
+        },
+        "description": {
+            "ca": "App per notificar  mancances als barris d&#039;Alacant",
+            "es": "App para notificar  carencias en los barrios de Alicante",
+            "en": ""
+        },
+        "results": {
+            "ca": "",
+            "es": "",
+            "en": ""
+        },
+        "client": {
+            "ca": "",
+            "es": ""
+        },
+        "thumbnail": "admin\/uploads\/projects\/1773407882_a3d84c14.png",
+        "gallery": [],
+        "url": "https:\/\/akratechstudio.es\/barris",
+        "demo_url": "",
+        "video": "",
+        "tech": [
+            "Html",
+            "css",
+            "js",
+            "python"
+        ],
+        "date": "2026-03"
+    },
+    {
+        "id": "1777530879_5bb7c646",
+        "slug": "Dari Trives",
+        "category": "web",
+        "status": "active",
+        "featured": true,
+        "active": true,
+        "title": {
+            "ca": "Pàgina oficial de Dari Trives. poeta valencià",
+            "es": "Página oficial de Dari Trives. poeta valencià",
+            "en": ""
+        },
+        "description": {
+            "ca": "pàgina oficial del poeta Dari Trives on es pot comprar la seua obra a més de conéixer l&amp;amp;#039;autor.",
+            "es": "pàgina oficial del poeta Dari Trives donde se puede comprar  su obra además  de conocer al autor.",
+            "en": ""
+        },
+        "results": {
+            "ca": "",
+            "es": "",
+            "en": ""
+        },
+        "client": {
+            "ca": "",
+            "es": ""
+        },
+        "thumbnail": "admin\/uploads\/projects\/1779268232_036499fe.png",
+        "gallery": [],
+        "url": "https:\/\/www.daritrives.cat",
+        "demo_url": "",
+        "video": "",
+        "tech": [
+            "PHP",
+            "JS",
+            "html",
+            "Mysql"
+        ],
+        "date": "2026-03"
+    }
+]

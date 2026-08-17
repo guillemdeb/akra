@@ -1,0 +1,56 @@
+[
+    {
+        "id": "1785487894_3f50ff45",
+        "number": "AKRA-2026-001",
+        "client_id": "1785487662_92cc8e49",
+        "status": "paid",
+        "date": "2026-07-31",
+        "due_date": "2026-08-30",
+        "lines": [
+            {
+                "desc": "desarrollo web",
+                "qty": 1,
+                "price": 2066.11
+            }
+        ],
+        "tax_pct": 21,
+        "irpf_pct": 0,
+        "subtotal": 2066.11,
+        "tax": 433.88,
+        "irpf": 0,
+        "total": 2499.99,
+        "notes": "",
+        "payment_info": "",
+        "recurring": false,
+        "recurring_freq": "monthly",
+        "recurring_next": null,
+        "due_days": 30
+    },
+    {
+        "id": "1785488094_7020b94f",
+        "number": "AKRA-2026-002",
+        "client_id": "1785488003_111834b3",
+        "status": "draft",
+        "date": "2026-07-31",
+        "due_date": "2026-08-30",
+        "lines": [
+            {
+                "desc": "desarrollo web",
+                "qty": 1,
+                "price": 2066.11
+            }
+        ],
+        "tax_pct": 21,
+        "irpf_pct": 0,
+        "subtotal": 2066.11,
+        "tax": 433.88,
+        "irpf": 0,
+        "total": 2499.99,
+        "notes": "",
+        "payment_info": "",
+        "recurring": false,
+        "recurring_freq": "monthly",
+        "recurring_next": null,
+        "due_days": 30
+    }
+]

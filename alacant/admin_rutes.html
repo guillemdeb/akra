@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Descobreix Alacant</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3250;--accent:#4f7fff;--gold:#f0b429;--red:#ef4444;--green:#22c55e;--text:#e8eaf0;--text2:#8b92b3;--radius:10px;--shadow:0 4px 24px rgba(0,0,0,.4)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    #authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+    #appShell{display:none;flex-direction:column;height:100vh;overflow:hidden}
+    .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:10px}
+    .topbar-logo{font-family:'Playfair Display',serif;font-size:1rem}
+    .tabs{display:flex;gap:2px}
+    .tab-btn{background:transparent;border:none;color:var(--text2);padding:6px 16px;border-radius:7px;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .18s}
+    .tab-btn:hover{background:var(--surface2);color:var(--text)}
+    .tab-btn.active{background:var(--accent);color:#fff}
+    .btn-back{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-back:hover{color:var(--text);background:rgba(255,255,255,.1)}
+    .tab-view{display:none;flex:1;min-height:0;overflow:hidden}
+    .tab-view.active{display:flex}
+
+    /* RUTES */
+    .workspace{flex:1;display:grid;grid-template-columns:290px 1fr 320px;min-height:0;overflow:hidden}
+    .panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .panel-header{padding:13px 15px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .panel-header h2{font-size:.87rem;font-weight:700}
+    .panel-body{flex:1;overflow-y:auto;padding:9px}
+    .panel-body::-webkit-scrollbar{width:4px}
+    .panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .route-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:all .18s;margin-bottom:3px;border:1px solid transparent}
+    .route-item:hover{background:var(--surface2)}
+    .route-item.selected{background:var(--surface2);border-color:var(--accent)}
+    .route-color{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .route-info{flex:1;min-width:0}
+    .route-name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .route-meta{font-size:.71rem;color:var(--text2);margin-top:1px}
+    .route-actions{display:flex;gap:3px;opacity:0;transition:opacity .18s}
+    .route-item:hover .route-actions,.route-item.selected .route-actions{opacity:1}
+    .icon-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);width:25px;height:25px;border-radius:5px;cursor:pointer;font-size:.77rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .icon-btn:hover{background:rgba(255,255,255,.14);color:var(--text)}
+    .icon-btn.danger:hover{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
+    .map-wrapper{position:relative;flex:1;overflow:hidden}
+    #admin-map,#clients-map{width:100%;height:100%;background:#111}
+    .map-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(15,17,23,.9);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:18px;font-size:.76rem;font-weight:600;z-index:400;pointer-events:none;white-space:nowrap}
+    .map-mode-bar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:400}
+    .mode-btn{background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:6px 13px;border-radius:7px;font-size:.79rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .mode-btn:hover{border-color:var(--accent);color:var(--text)}
+    .mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .editor-panel{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .editor-header{padding:13px 15px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .editor-header h2{font-size:.87rem;font-weight:700}
+    .editor-body{flex:1;overflow-y:auto;padding:11px 13px}
+    .editor-body::-webkit-scrollbar{width:4px}
+    .editor-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+    /* ── AUTH SCREEN ── */
+    #authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
+    .auth-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:340px;text-align:center}
+    .auth-logo{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:4px}
+    .auth-sub{color:var(--text2);font-size:.82rem;margin-bottom:24px}
+    .auth-box input{text-align:center;font-size:1rem;letter-spacing:.12em;margin-bottom:12px}
+    .admin-lang-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:3px 10px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+    .admin-lang-btn.sel,.admin-lang-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+    .auth-err{color:var(--red);font-size:.78rem;min-height:18px;margin-bottom:8px}
+    #appShell{display:none;flex-direction:column;height:100vh;overflow:hidden}
+
+    /* ── BIBLIOTECA TAB ── */
+    .library-layout{flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0;overflow:hidden}
+    .library-panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .place-card{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .18s;display:flex;gap:10px;align-items:flex-start}
+    .place-card:hover{border-color:rgba(79,127,255,.4)}
+    .place-card.selected{border-color:var(--accent)}
+    .place-card-emoji{font-size:1.6rem;flex-shrink:0;margin-top:2px}
+    .place-card-info{flex:1;min-width:0}
+    .place-card-name{font-size:.88rem;font-weight:700;margin-bottom:2px}
+    .place-card-meta{font-size:.72rem;color:var(--text2)}
+    .place-usage-badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;background:rgba(79,127,255,.12);color:var(--accent);border:1px solid rgba(79,127,255,.25);border-radius:6px;padding:2px 7px;margin-top:4px}
+    .place-detail{flex:1;background:var(--surface);overflow-y:auto;padding:20px}
+    .place-detail::-webkit-scrollbar{width:4px}
+    .place-detail::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .place-detail-img{width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:16px;background:var(--surface2)}
+    .place-detail-placeholder{width:100%;height:180px;border-radius:10px;margin-bottom:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:4rem}
+    .place-detail-title{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:4px}
+    .place-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+    .place-detail-item{background:var(--surface2);border-radius:8px;padding:9px 11px}
+    .place-detail-item .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);font-weight:700;display:block;margin-bottom:2px}
+    .place-detail-item .val{font-size:.82rem;font-weight:600}
+    .usage-list{margin-top:14px}
+    .usage-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:7px;margin-bottom:5px;font-size:.82rem}
+    .usage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+    /* ── AUTOREGISTRE TAB ── */
+    .reg-layout{flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0;overflow:hidden}
+    .reg-list{overflow-y:auto;padding:16px}
+    .reg-list::-webkit-scrollbar{width:4px}
+    .reg-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .reg-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:all .18s}
+    .reg-card:hover{border-color:rgba(79,127,255,.3)}
+    .reg-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+    .reg-emoji{font-size:1.8rem;flex-shrink:0}
+    .reg-name{font-size:.92rem;font-weight:700}
+    .reg-type{font-size:.74rem;color:var(--text2)}
+    .reg-status{display:inline-flex;align-items:center;gap:5px;font-size:.71rem;font-weight:700;padding:3px 9px;border-radius:8px;border:1px solid}
+    .reg-status.pending{background:rgba(240,180,41,.1);border-color:rgba(240,180,41,.3);color:var(--gold)}
+    .reg-status.approved{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--green)}
+    .reg-status.rejected{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red)}
+    .reg-actions{display:flex;gap:6px;margin-top:10px}
+    .reg-detail{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;padding:20px}
+    .reg-preview-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px}
+    .stats-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
+    .stat-card .num{font-size:1.4rem;font-weight:800;font-family:'Playfair Display',serif}
+    .stat-card .lbl{font-size:.7rem;color:var(--text2);margin-top:2px}
+    .ed-tabs{display:flex;gap:2px;margin-bottom:12px;background:var(--bg);border-radius:8px;padding:3px}
+    .ed-tab{flex:1;text-align:center;padding:6px 8px;border-radius:6px;font-size:.75rem;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .18s}
+    .ed-tab:hover{color:var(--text)}
+    .ed-tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+    .ed-tab.global.active{color:var(--accent)}
+    .ed-tab.ruta.active{color:var(--gold)}
+    .ed-panel{display:none}
+    .ed-panel.active{display:block}
+    .place-link-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(79,127,255,.12);border:1px solid rgba(79,127,255,.3);color:var(--accent);font-size:.71rem;font-weight:700;padding:3px 9px;border-radius:8px;margin-bottom:10px;cursor:pointer;transition:all .18s}
+    .place-link-badge:hover{background:rgba(79,127,255,.22)}
+    .place-link-badge.unlinked{background:rgba(255,255,255,.05);border-color:var(--border);color:var(--text2)}
+    .ruta-context-box{background:rgba(240,180,41,.07);border:1px solid rgba(240,180,41,.25);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:.76rem;color:var(--gold)}
+    .ruta-context-box strong{display:block;font-size:.78rem;margin-bottom:2px}
+    .clients-layout{flex:1;display:grid;grid-template-columns:350px 1fr;min-height:0;overflow:hidden}
+    .clients-panel{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .stats-bar{display:flex;gap:8px;padding:10px 13px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
+    .stat-pill{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:.74rem;display:flex;align-items:center;gap:5px}
+    .stat-pill strong{font-size:.83rem}
+    .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .client-card{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px;margin-bottom:7px;cursor:pointer;transition:all .18s}
+    .client-card:hover{border-color:rgba(79,127,255,.4)}
+    .client-card.selected{border-color:var(--gold);background:rgba(240,180,41,.05)}
+    .client-card.inactive{opacity:.55}
+    .client-top{display:flex;align-items:flex-start;gap:9px;margin-bottom:5px}
+    .client-emoji{font-size:1.5rem;line-height:1;flex-shrink:0;margin-top:2px}
+    .client-info{flex:1;min-width:0}
+    .client-name{font-size:.88rem;font-weight:700;margin-bottom:1px}
+    .client-type{font-size:.72rem;color:var(--text2)}
+    .badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:8px;border:1px solid}
+    .badge-green{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green)}
+    .badge-red{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red)}
+    .badge-blue{background:rgba(79,127,255,.12);border-color:rgba(79,127,255,.3);color:var(--accent)}
+    .badge-gold{background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.3);color:var(--gold)}
+    .ad-preview{font-size:.76rem;color:var(--text2);border-left:2px solid var(--border);padding-left:7px;margin-top:5px;line-height:1.4}
+    .card-actions{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+
+    /* FORMS */
+    .fs{margin-bottom:16px}
+    .fs-title{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+    label{display:block;font-size:.77rem;font-weight:600;color:var(--text2);margin-bottom:3px}
+    input[type=text],input[type=number],input[type=email],input[type=url],input[type=color],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 9px;font-size:.85rem;font-family:inherit;transition:border-color .2s;margin-bottom:8px}
+    input[type=color]{padding:3px 5px;height:31px;cursor:pointer}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+    textarea{resize:vertical;min-height:60px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+    .row2 input,.row2 select{margin-bottom:0}
+    .emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-bottom:8px}
+    .emoji-opt{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.95rem;border-radius:5px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);transition:all .15s}
+    .emoji-opt:hover{border-color:var(--accent)}
+    .emoji-opt.sel{border-color:var(--gold);background:rgba(240,180,41,.1)}
+    .point-list{display:flex;flex-direction:column;gap:4px;margin-bottom:9px}
+    .point-row{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;cursor:grab;transition:border-color .15s;font-size:.82rem}
+    .point-row:active{cursor:grabbing}
+    .point-row.dragging{opacity:.4;border-style:dashed}
+    .point-row.drag-over{border-color:var(--accent)}
+    .point-row.editing{border-color:var(--gold);background:rgba(240,180,41,.07)}
+    .point-num{width:20px;height:20px;border-radius:50%;color:#fff;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .point-name{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .drag-handle{color:var(--text2);font-size:.76rem;cursor:grab;padding:0 1px;flex-shrink:0}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#3d6ef0}
+    .btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#16a34a}
+    .btn-gold{background:var(--gold);color:#1a1a1a}.btn-gold:hover{background:#d4a017}
+    .btn-danger{background:transparent;color:var(--red);border:1px solid var(--red)}.btn-danger:hover{background:rgba(239,68,68,.12)}
+    .btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{background:rgba(255,255,255,.12);color:var(--text)}
+    .btn-sm{padding:4px 9px;font-size:.74rem}
+    .btn-full{width:100%}
+    .tags-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+    .tag-chip{padding:3px 8px;border-radius:10px;font-size:.71rem;font-weight:600;cursor:pointer;background:var(--surface2);border:1px solid var(--border);color:var(--text2);transition:all .15s}
+    .tag-chip:hover,.tag-chip.sel{background:rgba(79,127,255,.18);border-color:var(--accent);color:var(--accent)}
+    input[type=range]{-webkit-appearance:none;width:100%;height:5px;background:var(--border);border-radius:3px;outline:none;margin-bottom:8px;cursor:pointer}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .toggle-label{font-size:.8rem;font-weight:600;color:var(--text2)}
+    .toggle{position:relative;width:36px;height:20px;cursor:pointer}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:10px;transition:.3s}
+    .toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+    .toggle input:checked+.toggle-slider{background:var(--green)}
+    .toggle input:checked+.toggle-slider:before{transform:translateX(16px)}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:20px;width:460px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.5);transform:scale(.95);transition:transform .2s;max-height:88vh;overflow-y:auto}
+    .modal-overlay.open .modal{transform:scale(1)}
+    .modal h3{font-size:.95rem;font-weight:700;margin-bottom:13px}
+    .modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:13px}
+    .modal::-webkit-scrollbar{width:4px}
+    .modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    #status{position:fixed;bottom:16px;right:16px;z-index:9999;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 15px;border-radius:8px;font-size:.82rem;font-weight:600;box-shadow:var(--shadow);transform:translateY(60px);opacity:0;transition:all .3s}
+    #status.show{transform:translateY(0);opacity:1}
+    #status.ok{border-color:var(--green);color:var(--green)}
+    #status.err{border-color:var(--red);color:var(--red)}
+    #status.warn{border-color:var(--gold);color:var(--gold)}
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--text2);text-align:center;gap:6px}
+    .empty-state .big{font-size:2rem}
+    .empty-state p{font-size:.8rem}
+    *{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+    @media(max-width:900px){
+      body{overflow:auto;height:auto}
+      .workspace,.clients-layout{grid-template-columns:1fr;grid-template-rows:auto 55vh auto}
+      .panel,.clients-panel{border-right:none;border-bottom:1px solid var(--border);max-height:200px}
+      .editor-panel{border-left:none;border-top:1px solid var(--border)}
+      .tab-view{overflow:auto}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ AUTH ══ -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">🏛️ Descobreix Alacant</div>
+    <div class="auth-sub" id="authSubtitle">Panell de gestió</div>
+    <div style="display:flex;gap:5px;justify-content:center;margin-bottom:16px;flex-wrap:wrap">
+      <button class="admin-lang-btn" data-lang="ca" onclick="setAdminLang('ca')">CA</button>
+      <button class="admin-lang-btn" data-lang="es" onclick="setAdminLang('es')">ES</button>
+      <button class="admin-lang-btn" data-lang="en" onclick="setAdminLang('en')">EN</button>
+      <button class="admin-lang-btn" data-lang="fr" onclick="setAdminLang('fr')">FR</button>
+      <button class="admin-lang-btn" data-lang="it" onclick="setAdminLang('it')">IT</button>
+      <button class="admin-lang-btn" data-lang="ar" onclick="setAdminLang('ar')">عر</button>
+      <button class="admin-lang-btn" data-lang="uk" onclick="setAdminLang('uk')">UK</button>
+    </div>
+    <input type="password" id="authPwd" placeholder="Contrasenya" onkeydown="if(event.key==='Enter')tryLogin()"/>
+    <div class="auth-err" id="authErr"></div>
+    <button class="btn btn-primary btn-full" id="authLoginBtn" onclick="tryLogin()">Entrar →</button>
+    <div style="margin-top:18px;display:flex;flex-direction:column;gap:5px;font-size:.71rem;color:var(--text2);border-top:1px solid var(--border);padding-top:14px">
+      <div>🔑 <strong>Admin:</strong> <code>admin123</code></div>
+      <div>✏️ <strong>Col·laborador:</strong> <code>colab123</code></div>
+      <div>🤝 <strong>Patrocinador:</strong> <code>sponsor123</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="appShell">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">Descobreix Alacant</span>
+    <span style="color:var(--border)">/</span>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-rutes"     onclick="switchTab('rutes')">🗺️ Rutes</button>
+      <button class="tab-btn admin-only" id="tab-clients"   onclick="switchTab('clients')">🍽️ Clients</button>
+      <button class="tab-btn admin-only" id="tab-library"   onclick="switchTab('library')">📚 Llocs</button>
+      <button class="tab-btn admin-only" id="tab-registres" onclick="switchTab('registres')">📬 Sol·licituds</button>
+      <button class="tab-btn admin-only" id="tab-sponsors"  onclick="switchTab('sponsors')">🤝 Patrocinadors</button>
+      <button class="tab-btn admin-only" id="tab-analytics" onclick="switchTab('analytics')">📊 Analítica</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <!-- Selector idioma admin (persistent) -->
+    <div style="display:flex;gap:3px;align-items:center">
+      <button class="admin-lang-btn" data-lang="ca" onclick="setAdminLang('ca')" title="Català">CA</button>
+      <button class="admin-lang-btn" data-lang="es" onclick="setAdminLang('es')" title="Español">ES</button>
+      <button class="admin-lang-btn" data-lang="en" onclick="setAdminLang('en')" title="English">EN</button>
+      <button class="admin-lang-btn" data-lang="fr" onclick="setAdminLang('fr')" title="Français">FR</button>
+      <button class="admin-lang-btn" data-lang="it" onclick="setAdminLang('it')" title="Italiano">IT</button>
+      <button class="admin-lang-btn" data-lang="ar" onclick="setAdminLang('ar')" title="العربية">عر</button>
+      <button class="admin-lang-btn" data-lang="uk" onclick="setAdminLang('uk')" title="Українська">UK</button>
+    </div>
+    <span id="roleBadge" style="font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(79,127,255,.15);color:var(--accent)"></span>
+    <a class="btn-back" id="topbarBackBtn" href="descobreix_alacant.html">← Web pública</a>
+    <button class="btn-back" id="topbarLogoutBtn" onclick="logout()" style="border-color:var(--red);color:var(--red)">Sortir</button>
+  </div>
+</div>
+
+<!-- ══ TAB RUTES ══ -->
+<div class="tab-view active" id="view-rutes">
+  <div class="workspace">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Rutes <span id="routeCount" style="color:var(--text2);font-weight:400"></span></h2>
+        <button class="btn btn-primary btn-sm" onclick="openNewRouteModal()">+ Nova</button>
+      </div>
+      <div class="panel-body" id="routeList"><div class="empty-state"><div class="big">🗺️</div><p>Carregant…</p></div></div>
+    </div>
+    <div class="map-wrapper">
+      <div class="map-hint" id="mapHint">Selecciona una ruta</div>
+      <div id="admin-map"></div>
+      <div class="map-mode-bar">
+        <button class="mode-btn active" id="modeView" onclick="setMode('view')">👁 Veure</button>
+        <button class="mode-btn" id="modeAdd" onclick="setMode('add')">📍 Afegir</button>
+        <button class="mode-btn" id="modeDrag" onclick="setMode('drag')">✋ Moure</button>
+      </div>
+    </div>
+    <div class="editor-panel">
+      <div class="editor-header"><h2 id="editorTitle">Editor</h2></div>
+      <div class="editor-body" id="editorBody"><div class="empty-state"><div class="big">✏️</div><p>Selecciona una ruta</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB CLIENTS ══ -->
+<div class="tab-view" id="view-clients">
+  <div class="clients-layout">
+    <div class="clients-panel">
+      <div class="panel-header">
+        <h2>Clients <span id="clientCount" style="color:var(--text2);font-weight:400"></span></h2>
+        <button class="btn btn-gold btn-sm" onclick="openClientModal(null)">+ Nou client</button>
+      </div>
+      <div class="stats-bar" id="statsBar"></div>
+      <div class="panel-body" id="clientList"><div class="empty-state"><div class="big">🍽️</div><p>Carregant…</p></div></div>
+    </div>
+    <div class="map-wrapper">
+      <div class="map-hint" id="clientMapHint">Mapa de clients · els cercles indiquen el radi d'anunci</div>
+      <div id="clients-map"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ruta -->
+<div class="modal-overlay" id="routeModal">
+  <div class="modal">
+    <h3 id="rModalTitle">Nova ruta</h3>
+    <label>Nom (Català/Valencià) <span style="color:var(--red)">*</span></label><input type="text" id="mRName" placeholder="Ex: Ruta dels Jardins"/>
+    <label>Descripció</label><textarea id="mRDesc" placeholder="Descripció…"></textarea>
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:.8rem;font-weight:700;color:var(--text2);margin-bottom:8px">🌍 Traduccions del nom (opcional)</summary>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div><label style="font-size:.72rem">🇪🇸 Español</label><input type="text" id="mRNameEs" placeholder="Ruta Histórica"/></div>
+        <div><label style="font-size:.72rem">🇬🇧 English</label><input type="text" id="mRNameEn" placeholder="Historic Route"/></div>
+        <div><label style="font-size:.72rem">🇫🇷 Français</label><input type="text" id="mRNameFr" placeholder="Route Historique"/></div>
+        <div><label style="font-size:.72rem">🇮🇹 Italiano</label><input type="text" id="mRNameIt" placeholder="Percorso Storico"/></div>
+        <div><label style="font-size:.72rem">🇸🇦 العربية</label><input type="text" id="mRNameAr" placeholder="المسار التاريخي" dir="rtl"/></div>
+        <div><label style="font-size:.72rem">🇺🇦 Українська</label><input type="text" id="mRNameUk" placeholder="Маршрут"/></div>
+      </div>
+    </details>
+    <div class="row2">
+      <div><label>Color</label><input type="color" id="mRColor" value="#4f7fff"/></div>
+      <div><label>Icona</label><input type="text" id="mRIcon" placeholder="🗺️" style="font-size:1.1rem;text-align:center"/></div>
+    </div>
+    <label>Categoria</label>
+    <div class="tags-row" id="mRTags">
+      <span class="tag-chip" onclick="toggleRTag(this,'historia')">Història</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'gastronomia')">Gastronomia</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'familiar')">Familiar</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'museus')">Museus</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'natura')">Natura</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'guerra')">Guerra Civil</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'religiosa')">Religiosa</span>
+      <span class="tag-chip" onclick="toggleRTag(this,'maritima')">Marítima</span>
+    </div>
+    <label><input type="checkbox" id="mRPmr" style="width:auto;margin-right:6px;margin-bottom:0">Accessible PMR</label>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('routeModal')">Cancel·lar</button>
+      <button class="btn btn-success" onclick="saveRouteModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: client -->
+<div class="modal-overlay" id="clientModal">
+  <div class="modal">
+    <h3 id="cModalTitle">Nou client</h3>
+    <div class="fs"><div class="fs-title">Informació del negoci</div>
+      <label>Nom</label><input type="text" id="cName" placeholder="Restaurant El Port"/>
+      <div class="row2">
+        <div><label>Tipus</label>
+          <select id="cType" onchange="autoEmojiFromType(this.value)">
+            <option value="restaurant">🍽️ Restaurant</option>
+            <option value="bar">🍺 Bar / Taverna</option>
+            <option value="cafeteria">☕ Cafeteria</option>
+            <option value="pastisseria">🥐 Pastisseria</option>
+            <option value="gelateria">🍦 Gelateria</option>
+            <option value="mercat">🛒 Mercat</option>
+            <option value="hotel">🏨 Hotel</option>
+            <option value="oci">🎭 Oci / Entreteniment</option>
+            <optgroup label="──── Botigues & Serveis ────">
+            <option value="turisme">🧳 Botiga de Turisme</option>
+            <option value="botiga">🛍️ Botiga / Moda</option>
+            <option value="souvenir">🎁 Souvenirs</option>
+            <option value="farmacia">💊 Farmàcia</option>
+            <option value="supermercat">🏪 Supermercat</option>
+            <option value="art">🎨 Art / Galeria</option>
+            <option value="musica">🎵 Música / Concerts</option>
+            <option value="esport">⚽ Esports</option>
+            <option value="transport">🚌 Transport</option>
+            </optgroup>
+          </select>
+        </div>
+        <div><label>Emoji</label><input type="text" id="cEmoji" placeholder="🍽️" style="font-size:1.1rem;text-align:center"/></div>
+      </div>
+      <label>Telèfon</label><input type="text" id="cPhone" placeholder="+34 965 000 000"/>
+      <label>Web (opcional)</label><input type="url" id="cWeb" placeholder="https://…"/>
+    </div>
+    <div class="fs"><div class="fs-title">Ubicació</div>
+      <div class="row2">
+        <div><label>Latitud</label><input type="number" id="cLat" placeholder="38.3449" step="0.000001"/></div>
+        <div><label>Longitud</label><input type="number" id="cLng" placeholder="-0.4830" step="0.000001"/></div>
+      </div>
+      <label>Adreça</label><input type="text" id="cAddress" placeholder="Carrer de la Mar, 12"/>
+    </div>
+    <div class="fs"><div class="fs-title">Anunci publicitari</div>
+      <label>Títol de l'anunci</label><input type="text" id="cAdTitle" placeholder="🍤 Tapes fresques cada dia!"/>
+      <label>Text de l'anunci</label><textarea id="cAdText" placeholder="Missatge que veurà l'usuari quan estigui a prop…"></textarea>
+      <label>Oferta especial (opcional)</label><input type="text" id="cAdOffer" placeholder="10% de descompte per als visitants"/>
+      <label>Radi d'activació: <strong id="radVal">300</strong>m</label>
+      <input type="range" id="cRadius" min="50" max="1000" value="300" step="50" oninput="document.getElementById('radVal').textContent=this.value"/>
+    </div>
+    <div class="fs"><div class="fs-title">Estat</div>
+      <div class="toggle-row"><span class="toggle-label">Client actiu (anuncis visibles)</span><label class="toggle"><input type="checkbox" id="cActive" checked><span class="toggle-slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">Destacat (apareix primer)</span><label class="toggle"><input type="checkbox" id="cFeatured"><span class="toggle-slider"></span></label></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('clientModal')">Cancel·lar</button>
+      <button class="btn btn-gold" onclick="saveClient()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="status"></div>
+
+<!-- ══ TAB BIBLIOTECA ══ -->
+<div class="tab-view" id="view-library">
+  <div class="library-layout">
+    <div class="library-panel">
+      <div class="panel-header">
+        <h2>📚 Biblioteca de llocs</h2>
+        <span id="placeCount" style="font-size:.78rem;color:var(--text2)"></span>
+      </div>
+      <div class="panel-body" id="libraryList"><div class="empty-state"><div class="big">📚</div><p>Carregant…</p></div></div>
+    </div>
+    <div class="place-detail" id="libraryDetail">
+      <div class="empty-state" style="margin-top:80px"><div class="big">📍</div><p>Selecciona un lloc</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB SOL·LICITUDS ══ -->
+<div class="tab-view" id="view-registres">
+  <div style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+    <div class="stats-cards">
+      <div class="stat-card"><div class="num" id="regStatPending" style="color:var(--gold)">0</div><div class="lbl">Pendents</div></div>
+      <div class="stat-card"><div class="num" id="regStatApproved" style="color:var(--green)">0</div><div class="lbl">Aprovades</div></div>
+      <div class="stat-card"><div class="num" id="regStatRejected" style="color:var(--red)">0</div><div class="lbl">Rebutjades</div></div>
+      <div class="stat-card"><div class="num" id="regStatTotal">0</div><div class="lbl">Total</div></div>
+    </div>
+    <div class="reg-layout">
+      <div class="reg-list" id="regListWrap"></div>
+      <div class="reg-detail" id="regDetail"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB: PATROCINADORS ═══════════════ -->
+<div class="tab-view" id="view-sponsors">
+  <div style="flex:1;overflow-y:auto;padding:20px;max-width:860px;margin:0 auto;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div>
+        <h2 style="font-size:1.05rem;font-weight:700">🤝 Patrocinadors</h2>
+        <p style="font-size:.78rem;color:var(--text2);margin-top:3px">
+          Apareixen com a logo a la pàgina d'inici i com a baner a les rutes que patrocinen.
+        </p>
+      </div>
+      <button class="btn btn-success" onclick="openSponsorModal()">＋ Nou patrocinador</button>
+    </div>
+
+    <!-- Stats ràpides -->
+    <div class="stats-cards" style="margin-bottom:18px">
+      <div class="stat-card"><div class="num" id="spStatActive" style="color:var(--green)">0</div><div class="lbl">Actius</div></div>
+      <div class="stat-card"><div class="num" id="spStatExpired" style="color:var(--red)">0</div><div class="lbl">Caducats</div></div>
+      <div class="stat-card"><div class="num" id="spStatTotal">0</div><div class="lbl">Total</div></div>
+    </div>
+
+    <div id="sponsorList" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+</div>
+
+<!-- Modal patrocinador -->
+<div class="modal-overlay" id="sponsorModal">
+  <div class="modal" style="width:520px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 id="sponsorModalTitle" style="font-size:.95rem;font-weight:700">Nou patrocinador</h3>
+      <button class="icon-btn" onclick="closeModal('sponsorModal')">✕</button>
+    </div>
+    <div class="row2">
+      <div><label>Nom de l'entitat *</label><input type="text" id="spName" placeholder="Diputació d'Alacant"/></div>
+      <div><label>Web</label><input type="text" id="spWeb" placeholder="https://…"/></div>
+    </div>
+    <label>Logo (URL imatge)</label>
+    <input type="text" id="spLogo" placeholder="https://… .png" oninput="previewSpLogo()"/>
+    <img id="spLogoPreview" src="" style="display:none;height:60px;object-fit:contain;border-radius:6px;background:var(--surface2);padding:8px;margin-bottom:4px" onerror="this.style.display='none'"/>
+    <div class="row2">
+      <div><label>Data inici</label><input type="date" id="spDateStart"/></div>
+      <div><label>Data fi</label><input type="date" id="spDateEnd"/></div>
+    </div>
+    <label>Rutes que patrocina</label>
+    <div id="spRoutePicker" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--surface2);border-radius:7px;min-height:36px;margin-bottom:4px"></div>
+    <label>Nota interna (aportació, contacte…)</label>
+    <textarea id="spNote" style="min-height:55px" placeholder="Ex: 2.500€/any · Contacte: Joan Martí · joan@diputacio.es"></textarea>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:16px">
+      <input type="checkbox" id="spActive" checked style="width:auto;margin:0"/>
+      Patrocinador actiu (visible a la web)
+    </label>
+    <div class="modal-footer">
+      <button class="btn btn-success" onclick="saveSponsor()">💾 Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('sponsorModal')">Cancel·lar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: ANALÍTICA ═══ -->
+<div class="tab-view" id="view-analytics">
+  <div style="flex:1;overflow-y:auto;padding:20px;max-width:960px;margin:0 auto;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div>
+        <h2 style="font-size:1.05rem;font-weight:700">📊 Analítica de la plataforma</h2>
+        <p style="font-size:.78rem;color:var(--text2);margin-top:3px">Impressions, clics i comportament dels visitants.</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="exportAnalyticsCsv()">⬇️ Exportar CSV</button>
+        <button class="btn btn-danger" onclick="clearAnalytics()">🗑️ Esborrar dades</button>
+      </div>
+    </div>
+
+    <!-- Resum global -->
+    <div class="stats-cards" style="margin-bottom:20px">
+      <div class="stat-card"><div class="num" id="anStatImpressions" style="color:var(--accent)">0</div><div class="lbl">Impressions</div></div>
+      <div class="stat-card"><div class="num" id="anStatClics" style="color:var(--gold)">0</div><div class="lbl">Obertures cards</div></div>
+      <div class="stat-card"><div class="num" id="anStatTel" style="color:var(--green)">0</div><div class="lbl">Clics telèfon</div></div>
+      <div class="stat-card"><div class="num" id="anStatWeb" style="color:#a855f7">0</div><div class="lbl">Clics web</div></div>
+    </div>
+
+    <!-- Taula per monument -->
+    <h3 style="font-size:.85rem;font-weight:700;margin-bottom:10px;color:var(--text2)">Monuments — rànquing per obertures</h3>
+    <div id="analyticsTable" style="display:flex;flex-direction:column;gap:6px;margin-bottom:24px"></div>
+
+    <!-- Mapa de calor horari -->
+    <h3 style="font-size:.85rem;font-weight:700;margin-bottom:10px;color:var(--text2)">Activitat per hora del dia</h3>
+    <div id="analyticsHeatmap" style="display:flex;gap:4px;align-items:flex-end;height:80px;padding:8px;background:var(--surface2);border-radius:10px;overflow-x:auto"></div>
+    <div style="display:flex;gap:4px;margin-top:4px;padding:0 8px" id="analyticsHeatmapLabels"></div>
+  </div>
+</div>
+
+<!-- Modal IA: generació de texts -->
+<div class="modal-overlay" id="aiModal">
+  <div class="modal" style="width:600px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:.95rem;font-weight:700">✨ Generar text amb IA</h3>
+      <button class="icon-btn" onclick="closeModal('aiModal')">✕</button>
+    </div>
+    <label>Monument (nom i context)</label>
+    <input type="text" id="aiPromptName" placeholder="Ex: Castell de Santa Bàrbara, Alacant, s. IX àrab"/>
+    <label style="margin-top:10px">Informació addicional (opcional)</label>
+    <textarea id="aiPromptExtra" style="min-height:65px" placeholder="Ex: Estil romànic, vista panoràmica, visita gratuïta, prop del port..."></textarea>
+    <label style="margin-top:10px">Idiomes a generar</label>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="aiLangPicker">
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="ca"> CA</label>
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="es"> ES</label>
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="en"> EN</label>
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="fr"> FR</label>
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="it"> IT</label>
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="ar"> AR</label>
+      <label style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:.8rem"><input type="checkbox" checked value="uk"> UK</label>
+    </div>
+
+    <!-- Resultat -->
+    <div id="aiResult" style="display:none;background:var(--surface2);border-radius:10px;padding:14px;max-height:280px;overflow-y:auto;margin-bottom:12px;font-size:.82rem;line-height:1.6"></div>
+    <div id="aiLoading" style="display:none;text-align:center;padding:20px;color:var(--text2)">
+      <div style="font-size:1.8rem;animation:spin 1.2s linear infinite">⚙️</div>
+      <div id="aiLoadingText" style="margin-top:8px;font-size:.85rem">Generant contingut en 7 idiomes…</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-success" id="aiGenerateBtn" onclick="generateAiText()">✨ Generar</button>
+      <button class="btn btn-gold" id="aiApplyBtn" style="display:none" onclick="applyAiText()">✅ Aplicar al punt</button>
+      <button class="btn btn-ghost" onclick="closeModal('aiModal')">Cancel·lar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /appShell -->
+
+<script>
+// ── AUTH — tres rols ──
+const ROLES = {
+  admin:       { pwd: 'admin123',  label: '🔑 Admin',        color: 'var(--accent)' },
+  collaborator:{ pwd: 'colab123',  label: '✏️ Col·laborador', color: 'var(--gold)'  },
+  sponsor:     { pwd: 'sponsor123',label: '🤝 Patrocinador',  color: 'var(--green)' },
+};
+let _sessionActive = false;
+let _currentRole   = null;
+
+// ── i18n Admin ──
+const ADMIN_I18N = {
+  ca: {
+    login_title:'Panell de gestió', login_pwd:'Contrasenya', login_btn:'Entrar →', login_err:'Contrasenya incorrecta',
+    tab_rutes:'🗺️ Rutes', tab_clients:'🍽️ Clients', tab_library:'📚 Llocs', tab_registres:'📬 Sol·licituds', tab_sponsors:'🤝 Patrocinadors', tab_analytics:'📊 Analítica',
+    back_web:'← Web pública', logout:'Sortir',
+    save:'💾 Guardar', cancel:'Cancel·lar', delete:'Eliminar', close:'Tancar',
+    confirm_delete:'Eliminar aquest element?', no_data:'Sense dades',
+    saved_ok:'✅ Guardat!', save_err:'⚠️ Error guardant', deleted:'Eliminat.',
+    ai_generate:'✨ Generar', ai_apply:'✅ Aplicar al punt', ai_loading:'Generant contingut en 7 idiomes…',
+    export_csv:'⬇️ Exportar CSV', clear_data:'🗑️ Esborrar dades',
+    role_admin:'🔑 Admin', role_collaborator:'✏️ Col·laborador', role_sponsor:'🤝 Patrocinador',
+  },
+  es: {
+    login_title:'Panel de gestión', login_pwd:'Contraseña', login_btn:'Entrar →', login_err:'Contraseña incorrecta',
+    tab_rutes:'🗺️ Rutas', tab_clients:'🍽️ Clientes', tab_library:'📚 Lugares', tab_registres:'📬 Solicitudes', tab_sponsors:'🤝 Patrocinadores', tab_analytics:'📊 Analítica',
+    back_web:'← Web pública', logout:'Salir',
+    save:'💾 Guardar', cancel:'Cancelar', delete:'Eliminar', close:'Cerrar',
+    confirm_delete:'¿Eliminar este elemento?', no_data:'Sin datos',
+    saved_ok:'✅ ¡Guardado!', save_err:'⚠️ Error al guardar', deleted:'Eliminado.',
+    ai_generate:'✨ Generar', ai_apply:'✅ Aplicar al punto', ai_loading:'Generando contenido en 7 idiomas…',
+    export_csv:'⬇️ Exportar CSV', clear_data:'🗑️ Borrar datos',
+    role_admin:'🔑 Admin', role_collaborator:'✏️ Colaborador', role_sponsor:'🤝 Patrocinador',
+  },
+  en: {
+    login_title:'Management Panel', login_pwd:'Password', login_btn:'Login →', login_err:'Incorrect password',
+    tab_rutes:'🗺️ Routes', tab_clients:'🍽️ Clients', tab_library:'📚 Places', tab_registres:'📬 Requests', tab_sponsors:'🤝 Sponsors', tab_analytics:'📊 Analytics',
+    back_web:'← Public website', logout:'Logout',
+    save:'💾 Save', cancel:'Cancel', delete:'Delete', close:'Close',
+    confirm_delete:'Delete this item?', no_data:'No data',
+    saved_ok:'✅ Saved!', save_err:'⚠️ Error saving', deleted:'Deleted.',
+    ai_generate:'✨ Generate', ai_apply:'✅ Apply to point', ai_loading:'Generating content in 7 languages…',
+    export_csv:'⬇️ Export CSV', clear_data:'🗑️ Clear data',
+    role_admin:'🔑 Admin', role_collaborator:'✏️ Collaborator', role_sponsor:'🤝 Sponsor',
+  },
+  fr: {
+    login_title:'Panneau de gestion', login_pwd:'Mot de passe', login_btn:'Entrer →', login_err:'Mot de passe incorrect',
+    tab_rutes:'🗺️ Parcours', tab_clients:'🍽️ Clients', tab_library:'📚 Lieux', tab_registres:'📬 Demandes', tab_sponsors:'🤝 Partenaires', tab_analytics:'📊 Analytique',
+    back_web:'← Site public', logout:'Déconnexion',
+    save:'💾 Enregistrer', cancel:'Annuler', delete:'Supprimer', close:'Fermer',
+    confirm_delete:'Supprimer cet élément?', no_data:'Aucune donnée',
+    saved_ok:'✅ Enregistré!', save_err:'⚠️ Erreur de sauvegarde', deleted:'Supprimé.',
+    ai_generate:'✨ Générer', ai_apply:'✅ Appliquer au point', ai_loading:'Génération du contenu en 7 langues…',
+    export_csv:'⬇️ Exporter CSV', clear_data:'🗑️ Effacer données',
+    role_admin:'🔑 Admin', role_collaborator:'✏️ Collaborateur', role_sponsor:'🤝 Partenaire',
+  },
+  it: {
+    login_title:'Pannello di gestione', login_pwd:'Password', login_btn:'Accedi →', login_err:'Password errata',
+    tab_rutes:'🗺️ Percorsi', tab_clients:'🍽️ Clienti', tab_library:'📚 Luoghi', tab_registres:'📬 Richieste', tab_sponsors:'🤝 Sponsor', tab_analytics:'📊 Analisi',
+    back_web:'← Sito pubblico', logout:'Esci',
+    save:'💾 Salva', cancel:'Annulla', delete:'Elimina', close:'Chiudi',
+    confirm_delete:'Eliminare questo elemento?', no_data:'Nessun dato',
+    saved_ok:'✅ Salvato!', save_err:'⚠️ Errore salvataggio', deleted:'Eliminato.',
+    ai_generate:'✨ Genera', ai_apply:'✅ Applica al punto', ai_loading:'Generazione contenuto in 7 lingue…',
+    export_csv:'⬇️ Esporta CSV', clear_data:'🗑️ Cancella dati',
+    role_admin:'🔑 Admin', role_collaborator:'✏️ Collaboratore', role_sponsor:'🤝 Sponsor',
+  },
+  ar: {
+    login_title:'لوحة الإدارة', login_pwd:'كلمة المرور', login_btn:'→ دخول', login_err:'كلمة مرور غير صحيحة',
+    tab_rutes:'🗺️ المسارات', tab_clients:'🍽️ العملاء', tab_library:'📚 الأماكن', tab_registres:'📬 الطلبات', tab_sponsors:'🤝 الرعاة', tab_analytics:'📊 التحليلات',
+    back_web:'← الموقع العام', logout:'خروج',
+    save:'💾 حفظ', cancel:'إلغاء', delete:'حذف', close:'إغلاق',
+    confirm_delete:'حذف هذا العنصر؟', no_data:'لا توجد بيانات',
+    saved_ok:'!✅ تم الحفظ', save_err:'⚠️ خطأ في الحفظ', deleted:'تم الحذف.',
+    ai_generate:'✨ توليد', ai_apply:'✅ تطبيق على النقطة', ai_loading:'…توليد المحتوى بـ 7 لغات',
+    export_csv:'⬇️ تصدير CSV', clear_data:'🗑️ مسح البيانات',
+    role_admin:'🔑 مدير', role_collaborator:'✏️ متعاون', role_sponsor:'🤝 راعٍ',
+  },
+  uk: {
+    login_title:'Панель управління', login_pwd:'Пароль', login_btn:'Увійти →', login_err:'Неправильний пароль',
+    tab_rutes:'🗺️ Маршрути', tab_clients:'🍽️ Клієнти', tab_library:'📚 Місця', tab_registres:'📬 Запити', tab_sponsors:'🤝 Спонсори', tab_analytics:'📊 Аналітика',
+    back_web:'← Публічний сайт', logout:'Вийти',
+    save:'💾 Зберегти', cancel:'Скасувати', delete:'Видалити', close:'Закрити',
+    confirm_delete:'Видалити цей елемент?', no_data:'Немає даних',
+    saved_ok:'✅ Збережено!', save_err:'⚠️ Помилка збереження', deleted:'Видалено.',
+    ai_generate:'✨ Генерувати', ai_apply:'✅ Застосувати до точки', ai_loading:'Генерація вмісту 7 мовами…',
+    export_csv:'⬇️ Експорт CSV', clear_data:'🗑️ Очистити дані',
+    role_admin:'🔑 Адмін', role_collaborator:'✏️ Співавтор', role_sponsor:'🤝 Спонсор',
+  },
+};
+
+// Detecta idioma (mateixa lògica que la web pública)
+let adminLang = (function() {
+  const supported = ['ca','es','en','fr','it','ar','uk'];
+  try { const s = localStorage.getItem('da_admin_lang'); if (s && supported.includes(s)) return s; } catch {}
+  const navLangs = navigator.languages || [navigator.language || 'ca'];
+  for (const nl of navLangs) {
+    const code = nl.split('-')[0].toLowerCase();
+    if (supported.includes(code)) return code;
+    if (['gl','eu','pt'].includes(code)) return 'es';
+  }
+  return 'en';
+})();
+
+function at(key) { return (ADMIN_I18N[adminLang] || ADMIN_I18N.en)[key] || (ADMIN_I18N.ca)[key] || key; }
+
+function applyAdminI18n() {
+  // Login
+  const sub = document.getElementById('authSubtitle'); if (sub) sub.textContent = at('login_title');
+  const loginBtn2 = document.getElementById('authLoginBtn'); if(loginBtn2) loginBtn2.textContent = at('login_btn');
+  const pwdEl2 = document.getElementById('authPwd'); if(pwdEl2) pwdEl2.placeholder = at('login_pwd');
+  // Tabs
+  const tabMap = { 'tab-rutes':'tab_rutes','tab-clients':'tab_clients','tab-library':'tab_library','tab-registres':'tab_registres','tab-sponsors':'tab_sponsors','tab-analytics':'tab_analytics' };
+  Object.entries(tabMap).forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.textContent = at(key); });
+  // Topbar (login i app)
+  const backBtn  = document.getElementById('topbarBackBtn');   if (backBtn)   backBtn.textContent  = at('back_web');
+  const logoutBtn = document.getElementById('topbarLogoutBtn'); if (logoutBtn) logoutBtn.textContent = at('logout');
+  const backOld  = document.querySelector('.btn-back[href]');  // fallback
+  // Botons IA
+  const aiGenBtn = document.getElementById('aiGenerateBtn'); if(aiGenBtn) aiGenBtn.textContent = at('ai_generate');
+  const aiAppBtn = document.getElementById('aiApplyBtn');    if(aiAppBtn) aiAppBtn.textContent = at('ai_apply');
+  const aiLoadTx = document.getElementById('aiLoadingText'); if(aiLoadTx) aiLoadTx.textContent = at('ai_loading');
+  // Botó export/clear analytics
+  const expBtn = document.querySelector('[onclick="exportAnalyticsCsv()"]'); if(expBtn) expBtn.textContent = at('export_csv');
+  const clrBtn = document.querySelector('[onclick="clearAnalytics()"]');    if(clrBtn) clrBtn.textContent = at('clear_data');
+  // Marca el botó d'idioma actiu (tots els selectors, login + topbar)
+  document.querySelectorAll('.admin-lang-btn').forEach(b => b.classList.toggle('sel', b.dataset.lang === adminLang));
+  // RTL per àrab
+  document.documentElement.dir = adminLang === 'ar' ? 'rtl' : 'ltr';
+}
+
+function setAdminLang(lang) {
+  adminLang = lang;
+  try { localStorage.setItem('da_admin_lang', lang); } catch {}
+  applyAdminI18n();
+  document.querySelectorAll('.admin-lang-btn').forEach(b => b.classList.toggle('sel', b.dataset.lang === lang));
+}
+
+function tryLogin(){
+  const pwd = document.getElementById('authPwd').value.trim();
+  for(const [role, cfg] of Object.entries(ROLES)){
+    let stored = cfg.pwd;
+    try { stored = localStorage.getItem('da_pwd_'+role) || cfg.pwd; } catch(e){}
+    if(pwd === stored){
+      _sessionActive = true;
+      _currentRole   = role;
+      try { localStorage.setItem('da_session', JSON.stringify({role, ts: Date.now()})); } catch(e){}
+      showApp();
+      return;
+    }
+  }
+  document.getElementById('authErr').textContent = at('login_err');
+  document.getElementById('authPwd').value = '';
+  document.getElementById('authPwd').focus();
+}
+
+function logout(){
+  _sessionActive = false;
+  _currentRole   = null;
+  try { localStorage.removeItem('da_session'); } catch(e){}
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('authPwd').value = '';
+  document.getElementById('authErr').textContent = '';
+  applyAdminI18n();
+}
+
+function showApp(){
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appShell').style.display   = 'flex';
+  applyRoleUI();
+  applyAdminI18n();
+  setTimeout(() => boot(), 50);
+}
+
+function applyRoleUI(){
+  const role = _currentRole;
+  const cfg  = ROLES[role] || ROLES.admin;
+  console.log('applyRoleUI role:', role);
+
+  // Badge de rol a la topbar
+  const badge = document.getElementById('roleBadge');
+  if(badge){
+    badge.textContent = cfg.label;
+    badge.style.cssText = `font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:12px;background:${role==='admin'?'rgba(79,127,255,.15)':role==='collaborator'?'rgba(240,180,41,.15)':'rgba(34,197,94,.15)'};color:${role==='admin'?'var(--accent)':role==='collaborator'?'var(--gold)':'var(--green)'}`;
+  }
+
+  // Tabs visibles per rol
+  const isAdmin = role === 'admin';
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? 'inline-flex' : 'none';
+  });
+  console.log('admin-only tabs:', document.querySelectorAll('.admin-only').length, 'isAdmin:', isAdmin);
+
+  // Restriccions per rol
+  window._editorReadonly = role === 'sponsor';
+  window._collaborator   = role === 'collaborator';
+
+  if(role === 'sponsor'){
+    document.querySelectorAll('#modeAdd, #modeDrag').forEach(b => b.style.display = 'none');
+  }
+  if(role === 'collaborator'){
+    document.querySelectorAll('#modeAdd, #modeDrag').forEach(b => b.style.pointerEvents = 'none');
+  }
+}
+
+// ── Storage ──
+const RK='descobreix_routes', CK='descobreix_clients';
+// ── Storage — suport window.storage (claude.ai) + localStorage (local) ──
+async function sGet(k){
+  try{
+    if(window.storage){
+      const r=await window.storage.get(k,true);
+      return r?JSON.parse(r.value):null;
+    } else {
+      const v=localStorage.getItem('da_'+k);
+      return v?JSON.parse(v):null;
+    }
+  }catch(e){console.warn('sGet error',k,e);return null;}
+}
+async function sSet(k,v){
+  try{
+    const json=JSON.stringify(v);
+    if(window.storage){
+      const result=await window.storage.set(k,json,true);
+      console.log('sSet',k,'size:',json.length,'result:',result);
+      return !!result;
+    } else {
+      localStorage.setItem('da_'+k, json);
+      return true;
+    }
+  }catch(e){
+    console.error('sSet error',k,e);
+    return false;
+  }
+}
+
+// ── Tabs ──
+let cMapInit=false;
+function switchTab(t){
+  document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+t).classList.add('active');
+  document.getElementById('tab-'+t)?.classList.add('active');
+  if(t==='clients'&&!cMapInit){initClientsTab();initClientsMap();cMapInit=true;}
+  if(t==='library') renderLibrary();
+  if(t==='registres') renderRegistres();
+  if(t==='sponsors') { loadSponsors().then(renderSponsors); }
+  if(t==='analytics') renderAnalytics();
+  setTimeout(()=>{if(t==='rutes'&&rMap)rMap.invalidateSize();if(t==='clients'&&cMap)cMap.invalidateSize();},80);
+}
+
+// ════════════════ RUTES ════════════════
+let rMap,appRoutes=[],selRouteId=null,mapMode='view',rMarkers=[],rPoly=null,editPtId=null,rModalEditId=null,rModalTags=[],dragSrc=null;
+
+function defaultRoutes(){return[
+  {id:'historica',name:'Ruta Històrica',desc:'Recorregut pel centre medieval.',color:'#0057a8',icon:'🏛️',tags:['historia'],pmr:true,duration:60,points:[
+    {id:'h1',lat:38.349116,lng:-0.47764,name:'Castell de Santa Bàrbara',desc:'Fortalesa d\'origen àrab.',emoji:'🏰',pmr:false},
+    {id:'h2',lat:38.347631,lng:-0.482658,name:'Barri de Santa Creu',desc:'Essència medieval.',emoji:'🌸',pmr:false},
+    {id:'h3',lat:38.346070,lng:-0.479525,name:'Església de Santa Maria',desc:'Gòtica sobre mesquita.',emoji:'⛪',pmr:true},
+    {id:'h4',lat:38.345371,lng:-0.482808,name:'Concatedral de Sant Nicolau',desc:'Cúpula blava.',emoji:'⛪',pmr:true},
+    {id:'h5',lat:38.345047,lng:-0.481151,name:'Plaça de l\'Ajuntament',desc:'Edifici barroc.',emoji:'🏛️',pmr:true},
+    {id:'h6',lat:38.344197,lng:-0.480813,name:'Explanada d\'Espanya',desc:'Mosaic ondulat.',emoji:'🌊',pmr:true},
+  ]},
+  {id:'guerra',name:'Ruta Guerra Civil',desc:'Memòria de la guerra.',color:'#991b1b',icon:'⚔️',tags:['guerra'],pmr:false,duration:120,points:[
+    {id:'g1',lat:38.357285,lng:-0.469239,name:'Camp del Bon Hivern',desc:'Max Aub.',emoji:'🏚️',pmr:false},
+    {id:'g2',lat:38.348177,lng:-0.486156,name:'Port d\'Alacant',desc:'Evacuació.',emoji:'⛵',pmr:true},
+    {id:'g3',lat:38.344029,lng:-0.479386,name:'Edifici Governació',desc:'Govern republicà.',emoji:'🏛️',pmr:true},
+  ]},
+  {id:'maritima',name:'Ruta Marítima',desc:'El litoral.',color:'#0891b2',icon:'🌊',tags:['maritima'],pmr:true,duration:90,points:[
+    {id:'m1',lat:38.344197,lng:-0.480813,name:'Explanada',desc:'Mosaic.',emoji:'🌴',pmr:true},
+    {id:'m2',lat:38.344475,lng:-0.478095,name:'Casa Carbonell',desc:'Modernista.',emoji:'🏠',pmr:true},
+    {id:'m3',lat:38.354500,lng:-0.460000,name:'Platja Postiguet',desc:'Platja.',emoji:'🏖️',pmr:true},
+  ]}
+];}
+
+async function initRoutesTab(){
+  await loadPlaces();
+  appRoutes=(await sGet(RK))||defaultRoutes();
+  rMap=L.map('admin-map').setView([38.3449,-0.4830],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:19}).addTo(rMap);
+  rMap.on('click',e=>{if(mapMode!=='add')return;if(!selRouteId){toast('Selecciona una ruta','err');return;}addPt(e.latlng.lat,e.latlng.lng);});
+  renderRList();
+  if(appRoutes.length)selRoute(appRoutes[0].id);
+}
+
+function renderRList(){
+  const el=document.getElementById('routeList');
+  document.getElementById('routeCount').textContent=`(${appRoutes.length})`;
+  if(!appRoutes.length){el.innerHTML='<div class="empty-state"><div class="big">🗺️</div><p>Cap ruta</p></div>';return;}
+  el.innerHTML=appRoutes.map(r=>`<div class="route-item ${r.id===selRouteId?'selected':''}" onclick="selRoute('${r.id}')">
+    <div class="route-color" style="background:${r.color}"></div>
+    <div class="route-info"><div class="route-name">${r.icon||'🗺️'} ${r.name}</div><div class="route-meta">${r.points.length} punts · ${r.duration||'?'}min${r.pmr?' · ♿':''}</div></div>
+    <div class="route-actions">
+      <button class="icon-btn" onclick="event.stopPropagation();openEditRModal('${r.id}')">✏️</button>
+      <button class="icon-btn danger" onclick="event.stopPropagation();delRoute('${r.id}')">🗑️</button>
+    </div></div>`).join('');
+}
+
+function selRoute(id){
+  selRouteId=id; editPtId=null;
+  if(window._radiCircle&&rMap){rMap.removeLayer(window._radiCircle);window._radiCircle=null;}
+  renderRList();renderRMap(id);renderREditor(id);
+}
+
+function renderRMap(id){
+  const r=appRoutes.find(r=>r.id===id);
+  rMarkers.forEach(m=>rMap.removeLayer(m));rMarkers=[];
+  if(rPoly){rMap.removeLayer(rPoly);rPoly=null;}
+  if(!r||!r.points.length)return;
+  document.getElementById('mapHint').textContent=mapMode==='add'?'📍 Clic per afegir punt':mapMode==='drag'?'✋ Arrossega els marcadors':`${r.name} — ${r.points.length} punts`;
+  rPoly=L.polyline(r.points.map(p=>[p.lat,p.lng]),{color:r.color,weight:4,opacity:.7}).addTo(rMap);
+  r.points.forEach((p,i)=>{
+    const drag=mapMode==='drag';
+    const hl=p.id===editPtId;
+    const ic=L.divIcon({className:'',html:`<div style="background:${hl?'#f0b429':r.color};color:${hl?'#222':'#fff'};width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid ${hl?'#f0b429':'#fff'};box-shadow:0 2px 8px rgba(0,0,0,.4)">${i+1}</div>`,iconSize:[27,27],iconAnchor:[13,13],popupAnchor:[0,-15]});
+    const m=L.marker([p.lat,p.lng],{draggable:drag,icon:ic}).addTo(rMap);
+    m.bindPopup(`<strong>${p.emoji} ${p.name}</strong><br><small>${p.desc||''}</small>`);
+    if(drag)m.on('dragend',e=>{const ll=e.target.getLatLng();movePt(p.id,ll.lat,ll.lng);});
+    m.on('click',()=>{editPtId=p.id;renderREditor(selRouteId);renderRMap(selRouteId);});
+    rMarkers.push(m);
+  });
+  rMap.fitBounds(rPoly.getBounds(),{padding:[35,35]});
+}
+
+function renderREditor(id){
+  const r=appRoutes.find(r=>r.id===id);const el=document.getElementById('editorBody');
+  if(!r){document.getElementById('editorTitle').textContent='Editor';el.innerHTML='<div class="empty-state"><div class="big">✏️</div><p>Selecciona una ruta</p></div>';return;}
+  document.getElementById('editorTitle').textContent=`${r.icon} ${r.name}`;
+  const ep=r.points.find(p=>p.id===editPtId);
+  // Resolem el lloc global vinculat (si en té)
+  const place = ep?.placeId ? appPlaces.find(pl=>pl.id===ep.placeId) : null;
+  // Dades efectives: lloc global té prioritat en camps globals; punt té els camps de ruta
+  const G = place || ep || {}; // globals
+  const emojis=['🏰','⛪','🏛️','🌸','🌊','🏖️','🌴','🍤','🎭','🏠','🚪','📚','🕳️','⛵','🌳','⚔️','♿','📍','🏔️','✨'];
+
+  el.innerHTML=`
+  <div class="fs"><div class="fs-title">Punts (${r.points.length})</div>
+    <div class="point-list">${r.points.map((p,i)=>{
+      const pl=p.placeId?appPlaces.find(x=>x.id===p.placeId):null;
+      return `<div class="point-row ${p.id===editPtId?'editing':''}" draggable="true" data-i="${i}"
+           onclick="editPt('${p.id}')"
+           ondragstart="ds(event,${i})" ondragover="dov(event)" ondrop="ddrop(event,${i})" ondragend="de(event)">
+        <span class="drag-handle">⠿</span>
+        <span class="point-num" style="background:${r.color}">${i+1}</span>
+        <span>${(pl||p).emoji||'📍'}</span>
+        <span class="point-name">${(pl||p).name}</span>
+        ${pl?`<span style="font-size:.62rem;color:var(--accent)" title="Vinculat a biblioteca">🔗</span>`:''}
+        <button class="icon-btn danger btn-sm" onclick="event.stopPropagation();rmPt('${p.id}')">✕</button>
+      </div>`;}).join('')}
+    </div>
+    <button class="btn btn-ghost btn-sm btn-full" onclick="setMode('add')">+ Afegir punt al mapa</button>
+  </div>
+
+  ${ep ? `
+  <div class="fs">
+    <div class="fs-title">✏️ ${(place||ep).name||'Punt seleccionat'}</div>
+
+    <!-- TABS -->
+    <div class="ed-tabs">
+      <button class="ed-tab global active" id="tabGlobal" onclick="switchEdTab('global')">🌐 Lloc</button>
+      <button class="ed-tab ruta" id="tabRuta" onclick="switchEdTab('ruta')">🗺️ En aquesta ruta</button>
+    </div>
+
+    <!-- PANEL GLOBAL -->
+    <div class="ed-panel active" id="panelGlobal">
+      ${place ? `
+        <div class="place-link-badge" onclick="unlinkPlace('${ep.id}')">
+          🔗 Vinculat a: <strong>${place.name}</strong> &nbsp;·&nbsp; Desvincular ✕
+        </div>
+        <div style="font-size:.74rem;color:var(--text2);margin-bottom:10px">
+          Els camps del lloc s'apliquen a totes les rutes. Edita'ls aquí i es reflectiran arreu.
+        </div>
+      ` : `
+        <div class="place-link-badge unlinked" onclick="openLinkPlaceModal('${ep.id}')">
+          ＋ Vincular a lloc existent de la biblioteca
+        </div>
+      `}
+      <label>Nom</label>
+      <input type="text" id="peName" value="${G.name||''}" oninput="luPt()"/>
+      <label>Emoji</label>
+      <div class="emoji-grid">${emojis.map(e=>`<div class="emoji-opt ${G.emoji===e?'sel':''}" onclick="setEmoji('${e}')">${e}</div>`).join('')}</div>
+      <div class="row2">
+        <div><label>Any / Període</label><input type="text" id="peAny" value="${G.any||''}" placeholder="s. XIII" oninput="luPt()"/></div>
+        <div><label>Preu entrada</label><input type="text" id="pePreu" value="${G.preu||''}" placeholder="Gratuït" oninput="luPt()"/></div>
+      </div>
+      <label>Horari</label>
+      <input type="text" id="peHorari" value="${G.horari||''}" placeholder="Dilluns–diumenge 10h–20h" oninput="luPt()"/>
+      <div class="row2">
+        <div><label>Telèfon</label><input type="text" id="peTel" value="${G.tel||''}" placeholder="+34 965…" oninput="luPt()"/></div>
+        <div><label>Web</label><input type="text" id="peWeb" value="${G.web||''}" placeholder="https://…" oninput="luPt()"/></div>
+      </div>
+      <label>Transport / Com arribar</label>
+      <input type="text" id="peTransport" value="${G.transport||''}" placeholder="Bus 21, 22…" oninput="luPt()"/>
+      <label>Imatge (URL)</label>
+      <input type="text" id="peImatge" value="${G.imatge||''}" placeholder="https://… .jpg" oninput="luPt()"/>
+      ${G.imatge?`<img src="${G.imatge}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px" onerror="this.style.display='none'">` : ''}
+      <label><input type="checkbox" id="pePmr" ${G.pmr?'checked':''} onchange="luPt()" style="width:auto;margin-right:6px;margin-bottom:0">Accessible PMR</label>
+      <div class="row2" style="margin-top:8px">
+        <div><label>Lat</label><input type="number" id="peLat" value="${ep.lat?.toFixed(6)||''}" step="0.000001" oninput="upCoords()"/></div>
+        <div><label>Lng</label><input type="number" id="peLng" value="${ep.lng?.toFixed(6)||''}" step="0.000001" oninput="upCoords()"/></div>
+      </div>
+      <label>Radi GPS: <strong id="geoRadiVal">${ep.geoRadi??50}</strong>m</label>
+      <input type="range" id="peGeoRadi" min="10" max="200" value="${ep.geoRadi??50}" step="5"
+             oninput="document.getElementById('geoRadiVal').textContent=this.value;luPt()"/>
+      <div style="display:flex;justify-content:space-between;font-size:.63rem;color:var(--text2);margin-top:-5px;margin-bottom:8px">
+        <span>10m</span><span>50m (def.)</span><span>200m</span>
+      </div>
+      ${place ? `<button class="btn btn-ghost btn-sm btn-full" style="margin-top:4px" onclick="savePlaceFromPoint('${ep.id}')">💾 Guardar canvis al lloc global</button>` : `<button class="btn btn-ghost btn-sm btn-full" style="margin-top:4px" onclick="saveAsNewPlace('${ep.id}')">📚 Guardar com a lloc a la biblioteca</button>`}
+    </div>
+
+    <!-- PANEL PER RUTA -->
+    <div class="ed-panel" id="panelRuta">
+      <div class="ruta-context-box">
+        <strong>📝 Contingut específic per a: ${r.icon} ${r.name}</strong>
+        Aquesta informació només apareix quan el monument es visita des d'aquesta ruta.
+        ${place ? `Els camps buits es complementen amb la informació global del lloc.` : ''}
+      </div>
+
+      <!-- Selector d'idioma per als textos -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:.72rem;color:var(--text2);font-weight:600">✍️ Idioma:</span>
+        ${['ca','es','en','fr','it','ar','uk'].map(l=>`
+          <button class="ed-lang-btn ${(ep._editLang||'ca')===l?'active':''}"
+            onclick="setEdLang('${ep.id}','${l}')"
+            style="padding:2px 8px;border-radius:5px;border:1px solid var(--border);font-size:.73rem;font-weight:700;cursor:pointer;background:${(ep._editLang||'ca')===l?'var(--accent)':'var(--surface2)'};color:${(ep._editLang||'ca')===l?'#fff':'var(--text2)'};transition:all .15s"
+          >${l.toUpperCase()}</button>`).join('')}
+      </div>
+      <div id="langIndicator" style="font-size:.7rem;color:var(--text2);margin-bottom:8px;padding:4px 8px;background:var(--surface);border-radius:5px;border-left:3px solid var(--accent)">
+        ${getEdLangLabel(ep._editLang||'ca')}
+      </div>
+
+      <label>Descripció (enfoc de la ruta)</label>
+      <textarea id="peDesc" oninput="luPt()" style="min-height:55px" placeholder="Com presenta la ruta aquest monument…">${(ep.desc&&typeof ep.desc==='object'?ep.desc[ep._editLang||'ca']:ep.desc)||''}</textarea>
+      <label>Història (des del punt de vista d'aquesta ruta)</label>
+      <textarea id="peHistoria" oninput="luPt()" style="min-height:90px" placeholder="Ex: A la Ruta de la Guerra Civil, explicar l'ús del castell com a presó franquista…">${(ep.historia&&typeof ep.historia==='object'?ep.historia[ep._editLang||'ca']:ep.historia)||''}</textarea>
+      <label>Curiositat</label>
+      <textarea id="peCuriositat" oninput="luPt()" style="min-height:60px" placeholder="Una dada sorprenent relacionada amb la temàtica de la ruta…">${(ep.curiositat&&typeof ep.curiositat==='object'?ep.curiositat[ep._editLang||'ca']:ep.curiositat)||''}</textarea>
+
+      <!-- Botó IA -->
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+        <button class="btn btn-gold" onclick="openAiModal('${ep.id}','${ep.name||''}','${r.name||''}')" style="display:inline-flex;align-items:center;gap:6px">
+          ✨ Generar textos amb IA
+        </button>
+        <span style="font-size:.72rem;color:var(--text2);margin-left:8px">Genera desc / història / curiositat en 7 idiomes automàticament</span>
+      </div>
+
+      <!-- Indicador de traduccions completades -->
+      <div style="margin-top:8px;font-size:.7rem;color:var(--text2)">
+        Traduccions completades:
+        ${['ca','es','en','fr','it','ar','uk'].map(l=>{
+          const d = ep.desc;
+          const hasContent = d && (typeof d==='object' ? !!d[l] : l==='ca' && !!d);
+          const bg = hasContent ? 'rgba(34,197,94,.15)' : 'rgba(255,255,255,.04)';
+          const col = hasContent ? 'var(--green)' : 'var(--text2)';
+          return '<span style="padding:1px 5px;border-radius:3px;margin:1px;display:inline-block;background:'+bg+';color:'+col+'">'+l.toUpperCase()+'</span>';
+        }).join('')}
+      </div>
+    </div>
+  </div>
+  ` : ''}
+  <button class="btn btn-success btn-full" onclick="saveRoutes()">💾 Guardar canvis</button>`;
+}
+
+function addPt(lat,lng){const r=appRoutes.find(r=>r.id===selRouteId);if(!r)return;const id='p_'+Date.now();r.points.push({id,lat,lng,name:`Punt ${r.points.length+1}`,desc:'',emoji:'📍',pmr:false});editPtId=id;renderRMap(selRouteId);renderREditor(selRouteId);toast('Punt afegit!','ok');}
+function editPt(id){
+  editPtId=id;
+  renderREditor(selRouteId);
+  renderRMap(selRouteId);
+  // Mostra cercle de radi al mapa
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(p=>p.id===id);
+  if(p&&rMap){
+    if(window._radiCircle){rMap.removeLayer(window._radiCircle);}
+    const radi=p.geoRadi||50;
+    window._radiCircle=L.circle([p.lat,p.lng],{
+      radius:radi,color:'#f0b429',fillColor:'#f0b429',fillOpacity:0.12,
+      weight:2,dashArray:'6 4'
+    }).addTo(rMap);
+    window._radiCircle.bindTooltip(`Radi: ${radi}m`,{permanent:true,direction:'top',className:'leaflet-tooltip'});
+  }
+}
+function rmPt(id){const r=appRoutes.find(r=>r.id===selRouteId);if(!r)return;r.points=r.points.filter(p=>p.id!==id);if(editPtId===id){editPtId=null;if(window._radiCircle){rMap.removeLayer(window._radiCircle);window._radiCircle=null;}}renderRMap(selRouteId);renderREditor(selRouteId);}
+const ED_LANG_LABELS = {ca:'Català / Valencià',es:'Español',en:'English',fr:'Français',it:'Italiano',ar:'العربية',uk:'Українська'};
+function getEdLangLabel(l){ return `Editant en: ${ED_LANG_LABELS[l]||l}`; }
+
+function setEdLang(ptId, lang) {
+  const r = appRoutes.find(r=>r.id===selRouteId);
+  const p = r?.points.find(p=>p.id===ptId);
+  if (!p) return;
+  // Guarda l'estat editat actual abans de canviar d'idioma
+  luPt();
+  // Canvia l'idioma d'edició
+  p._editLang = lang;
+  // Re-renderitza l'editor
+  renderREditor(selRouteId);
+  // Activa el subtab "En aquesta ruta"
+  switchEdTab('ruta');
+}
+
+function luPt(){
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(p=>p.id===editPtId);
+  if(!p)return;
+  const g=id=>{const el=document.getElementById(id);return el?el.value:undefined;};
+  const gc=id=>{const el=document.getElementById(id);return el?el.checked:false;};
+
+  // ── Camps específics de ruta: guardar per idioma ──
+  const lang = p._editLang || 'ca';
+  // Inicialitza com a objecte si encara és string (retrocompatibilitat)
+  ['desc','historia','curiositat'].forEach(field => {
+    if (typeof p[field] === 'string' && p[field]) {
+      p[field] = { ca: p[field] }; // migra string vell a {ca: ...}
+    } else if (!p[field] || typeof p[field] !== 'object') {
+      p[field] = {};
+    }
+  });
+  const descVal = g('peDesc'); if (descVal !== undefined) p.desc[lang] = descVal;
+  const histVal = g('peHistoria'); if (histVal !== undefined) p.historia[lang] = histVal;
+  const curVal  = g('peCuriositat'); if (curVal !== undefined) p.curiositat[lang] = curVal;
+
+  // ── Camps globals: van al lloc vinculat o al punt si no té lloc ──
+  const place = p.placeId ? appPlaces.find(pl=>pl.id===p.placeId) : null;
+  const target = place || p; // on escrivim els camps globals
+  if(g('peName'))   target.name      = g('peName');
+  target.any        = g('peAny')       ||'';
+  target.preu       = g('pePreu')      ||'';
+  target.horari     = g('peHorari')    ||'';
+  target.tel        = g('peTel')       ||'';
+  target.web        = g('peWeb')       ||'';
+  target.transport  = g('peTransport') ||'';
+  target.imatge     = g('peImatge')    ||'';
+  target.pmr        = gc('pePmr');
+  const emojiSel = document.querySelector('.emoji-opt.sel');
+  if(emojiSel) target.emoji = emojiSel.textContent.trim();
+
+  // ── Radi GPS: sempre al punt ──
+  const gr=document.getElementById('peGeoRadi');
+  if(gr) p.geoRadi=parseInt(gr.value)||50;
+  if(window._radiCircle&&p){ window._radiCircle.setRadius(p.geoRadi); window._radiCircle.setTooltipContent(`Radi: ${p.geoRadi}m`); }
+}
+
+// ── Tab switcher ──
+function switchEdTab(tab){
+  document.querySelectorAll('.ed-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ed-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('active');
+  document.getElementById('panel'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('active');
+}
+
+// ── Biblioteca de llocs ──
+const PLACES_KEY='descobreix_llocs';
+let appPlaces=[];
+
+async function loadPlaces(){
+  try{ appPlaces=(await sGet(PLACES_KEY))||[]; }
+  catch{ appPlaces=[]; }
+}
+async function savePlaces(){ await sSet(PLACES_KEY,appPlaces); }
+
+// Guarda el punt actual com a nou lloc a la biblioteca i el vincula
+async function saveAsNewPlace(ptId){
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(p=>p.id===ptId);
+  if(!p)return;
+  const id='pl_'+Date.now();
+  const place={id,name:p.name,emoji:p.emoji,any:p.any,preu:p.preu,horari:p.horari,
+    tel:p.tel,web:p.web,transport:p.transport,imatge:p.imatge,pmr:p.pmr,
+    lat:p.lat,lng:p.lng};
+  appPlaces.push(place);
+  p.placeId=id;
+  await savePlaces();
+  await saveRoutes();
+  toast('📚 Lloc creat i vinculat!','ok');
+  renderREditor(selRouteId);
+}
+
+// Guarda canvis als camps globals cap al lloc vinculat
+async function savePlaceFromPoint(ptId){
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(pt=>pt.id===ptId);
+  if(!p||!p.placeId)return;
+  // luPt ja ha escrit al lloc, només cal persistir
+  await savePlaces();
+  toast('🌐 Lloc global actualitzat!','ok');
+}
+
+// Desvincula un punt del lloc global (copia les dades al punt i esborra placeId)
+function unlinkPlace(ptId){
+  if(!confirm('Desvincular? Les dades globals es copiaran al punt però els canvis futurs no s\'aplicaran a la biblioteca.'))return;
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(pt=>pt.id===ptId);
+  if(!p||!p.placeId)return;
+  const place=appPlaces.find(pl=>pl.id===p.placeId);
+  if(place){Object.assign(p,{name:place.name,emoji:place.emoji,any:place.any,preu:place.preu,
+    horari:place.horari,tel:place.tel,web:place.web,transport:place.transport,
+    imatge:place.imatge,pmr:place.pmr});}
+  delete p.placeId;
+  saveRoutes();
+  renderREditor(selRouteId);
+  toast('Desvinculat.','ok');
+}
+
+// Modal per vincular a un lloc existent de la biblioteca
+function openLinkPlaceModal(ptId){
+  if(!appPlaces.length){toast('La biblioteca és buida. Afegeix llocs primer.','err');return;}
+  const opts=appPlaces.map(pl=>`<option value="${pl.id}">${pl.emoji||''} ${pl.name}</option>`).join('');
+  const html=`
+    <div id="linkModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;width:320px">
+        <h3 style="margin-bottom:14px;font-size:.95rem">🔗 Vincular a lloc de la biblioteca</h3>
+        <select id="linkPlaceSel" style="margin-bottom:14px">${opts}</select>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-full" onclick="confirmLinkPlace('${ptId}')">Vincular</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('linkModal').remove()">Cancel·lar</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function confirmLinkPlace(ptId){
+  const sel=document.getElementById('linkPlaceSel');
+  if(!sel)return;
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(pt=>pt.id===ptId);
+  if(p){p.placeId=sel.value;}
+  document.getElementById('linkModal')?.remove();
+  saveRoutes();
+  renderREditor(selRouteId);
+  toast('🔗 Vinculat!','ok');
+}
+function upCoords(){const r=appRoutes.find(r=>r.id===selRouteId);const p=r?.points.find(p=>p.id===editPtId);if(!p)return;const la=parseFloat(document.getElementById('peLat')?.value),lg=parseFloat(document.getElementById('peLng')?.value);if(!isNaN(la)&&!isNaN(lg)){p.lat=la;p.lng=lg;renderRMap(selRouteId);}}
+function setEmoji(e){
+  const r=appRoutes.find(r=>r.id===selRouteId);
+  const p=r?.points.find(p=>p.id===editPtId);
+  if(!p)return;
+  const place=p.placeId?appPlaces.find(pl=>pl.id===p.placeId):null;
+  if(place) place.emoji=e; else p.emoji=e;
+  renderRMap(selRouteId);renderREditor(selRouteId);
+  // Mantén el tab actiu
+  setTimeout(()=>switchEdTab('global'),0);
+}
+function movePt(id,la,lg){const r=appRoutes.find(r=>r.id===selRouteId);const p=r?.points.find(p=>p.id===id);if(!p)return;p.lat=la;p.lng=lg;if(rPoly)rPoly.setLatLngs(r.points.map(pt=>[pt.lat,pt.lng]));renderREditor(selRouteId);toast(`Mogut → ${la.toFixed(4)}, ${lg.toFixed(4)}`,'ok');}
+function ds(e,i){dragSrc=i;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function dov(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function de(e){e.target.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+function ddrop(e,ti){e.preventDefault();if(dragSrc===null||dragSrc===ti)return;const r=appRoutes.find(r=>r.id===selRouteId);if(!r)return;const[m]=r.points.splice(dragSrc,1);r.points.splice(ti,0,m);dragSrc=null;renderRMap(selRouteId);renderREditor(selRouteId);}
+function setMode(mode){mapMode=mode;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));document.getElementById('mode'+mode.charAt(0).toUpperCase()+mode.slice(1))?.classList.add('active');rMarkers.forEach(m=>mode==='drag'?m.dragging.enable():m.dragging.disable());const r=appRoutes.find(r=>r.id===selRouteId);document.getElementById('mapHint').textContent=mode==='add'?'📍 Clic al mapa per afegir':mode==='drag'?'✋ Arrossega els marcadors':(r?`${r.name} — ${r.points.length} punts`:'Selecciona una ruta');}
+function openNewRouteModal(){
+  rModalEditId=null;rModalTags=[];
+  document.getElementById('rModalTitle').textContent='Nova ruta';
+  ['mRName','mRDesc','mRIcon','mRNameEs','mRNameEn','mRNameFr','mRNameIt','mRNameAr','mRNameUk'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mRColor').value='#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0');
+  document.getElementById('mRPmr').checked=false;
+  document.querySelectorAll('#mRTags .tag-chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('routeModal').classList.add('open');
+}
+function openEditRModal(id){
+  const r=appRoutes.find(r=>r.id===id);if(!r)return;
+  rModalEditId=id;rModalTags=[...(r.tags||[])];
+  document.getElementById('rModalTitle').textContent='Editar ruta';
+  document.getElementById('mRName').value=r.name;
+  document.getElementById('mRDesc').value=r.desc||'';
+  document.getElementById('mRColor').value=r.color;
+  document.getElementById('mRIcon').value=r.icon||'🗺️';
+  document.getElementById('mRPmr').checked=r.pmr||false;
+  // Traduccions
+  const n=r.names||{};
+  ['es','en','fr','it','ar','uk'].forEach(l=>{
+    const el=document.getElementById('mRName'+l.charAt(0).toUpperCase()+l.slice(1));
+    if(el) el.value=n[l]||'';
+  });
+  document.querySelectorAll('#mRTags .tag-chip').forEach(c=>{const t=c.getAttribute('onclick').match(/'(\w+)'/)?.[1];c.classList.toggle('sel',r.tags?.includes(t));});
+  document.getElementById('routeModal').classList.add('open');
+}
+function toggleRTag(el,tag){el.classList.toggle('sel');if(rModalTags.includes(tag))rModalTags=rModalTags.filter(t=>t!==tag);else rModalTags.push(tag);}
+function saveRouteModal(){
+  const name=document.getElementById('mRName').value.trim();
+  if(!name){toast('El nom és obligatori','err');return;}
+  const names={
+    ca:name,
+    es:document.getElementById('mRNameEs').value.trim()||name,
+    en:document.getElementById('mRNameEn').value.trim()||name,
+    fr:document.getElementById('mRNameFr').value.trim()||name,
+    it:document.getElementById('mRNameIt').value.trim()||name,
+    ar:document.getElementById('mRNameAr').value.trim()||name,
+    uk:document.getElementById('mRNameUk').value.trim()||name
+  };
+  const d={name,names,desc:document.getElementById('mRDesc').value,color:document.getElementById('mRColor').value,icon:document.getElementById('mRIcon').value||'🗺️',tags:rModalTags,pmr:document.getElementById('mRPmr').checked,duration:60};
+  if(rModalEditId){Object.assign(appRoutes.find(r=>r.id===rModalEditId),d);}
+  else{appRoutes.push({id:'r_'+Date.now(),points:[],...d});}
+  closeModal('routeModal');renderRList();if(selRouteId)renderRMap(selRouteId);saveRoutes();
+}
+function delRoute(id){if(!confirm('Eliminar?'))return;appRoutes=appRoutes.filter(r=>r.id!==id);if(selRouteId===id){selRouteId=null;editPtId=null;}renderRList();renderRMap(null);renderREditor(null);saveRoutes();toast('Ruta eliminada.','ok');}
+async function saveRoutes(){
+  // Neteja propietats d'estat UI (_editLang) abans de persistir
+  const clean = appRoutes.map(r => ({
+    ...r,
+    points: r.points.map(p => { const {_editLang, ...rest} = p; return rest; })
+  }));
+  try {
+    const json = JSON.stringify(clean);
+    const ok = await sSet(RK, clean);
+    toast(ok ? at('saved_ok') : at('save_err'), ok ? 'ok' : 'err');
+  } catch(e) {
+    console.error('saveRoutes error:', e);
+    toast('⚠️ Error: ' + e.message.slice(0,60), 'err');
+  }
+  renderRList();
+}
+
+// ════════════════ CLIENTS ════════════════
+let cMap,appClients=[],cMarkers=[],cCircles=[],editCId=null,cModalEditId=null;
+const ETYPE={
+  restaurant:'🍽️', bar:'🍺', cafeteria:'☕', pastisseria:'🥐', gelateria:'🍦', mercat:'🛒',
+  hotel:'🏨', oci:'🎭',
+  turisme:'🧳', botiga:'🛍️', farmacia:'💊', supermercat:'🏪', benzinera:'⛽', transport:'🚌', esport:'⚽', musica:'🎵', art:'🎨', souvenir:'🎁',
+};
+
+function defaultClients(){return[
+  {id:'c1',name:'Restaurant El Port',type:'restaurant',emoji:'🍽️',phone:'+34 965 201 122',web:'',lat:38.3442,lng:-0.4793,address:'Av. del Port, 8',adTitle:'🍽️ Cuina mediterrània al port!',adText:'Arrossos i peixos frescos del dia. Terrassa amb vistes al mar.',adOffer:'10% de descompte amb Descobreix Alacant',radius:400,active:true,featured:true},
+  {id:'c2',name:'Cafè Modernista',type:'cafeteria',emoji:'☕',phone:'+34 965 143 200',web:'',lat:38.3453,lng:-0.4821,address:'Carrer Major, 34',adTitle:'☕ El millor cafè del centre!',adText:'Esmorzars artesanals des de les 8h. Al costat de l\'Ajuntament.',adOffer:'Cafè + croissant per 2,50€',radius:250,active:true,featured:false},
+  {id:'c3',name:'Taperia La Rambla',type:'bar',emoji:'🍺',phone:'+34 965 511 300',web:'',lat:38.3446,lng:-0.4835,address:'Rambla Méndez Núñez, 22',adTitle:'🍺 Tapes autèntiques alacantines!',adText:'Especialitat en espencat i morro. Cuina popular.',adOffer:'Tapa gratuïta amb cada beguda',radius:300,active:true,featured:false},
+  {id:'c4',name:'Gelateria Postiguet',type:'gelateria',emoji:'🍦',phone:'',web:'',lat:38.3544,lng:-0.4602,address:'Platja del Postiguet, s/n',adTitle:'🍦 Gelats artesans a la platja!',adText:'25 sabors elaborats cada dia.',adOffer:'2x1 en gelats de tub',radius:200,active:false,featured:false},
+];}
+
+async function initClientsTab(){appClients=(await sGet(CK))||defaultClients();renderCList();renderCStats();}
+
+function initClientsMap(){
+  cMap=L.map('clients-map').setView([38.3449,-0.4830],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:19}).addTo(cMap);
+  renderCMap();
+}
+
+function renderCList(){
+  const el=document.getElementById('clientList');
+  document.getElementById('clientCount').textContent=`(${appClients.length})`;
+  if(!appClients.length){el.innerHTML='<div class="empty-state"><div class="big">🍽️</div><p>Cap client. Afegeix-ne un!</p></div>';return;}
+  const sorted=[...appClients].sort((a,b)=>b.featured-a.featured||(b.active-a.active));
+  el.innerHTML=sorted.map(c=>`
+    <div class="client-card ${c.id===editCId?'selected':''} ${c.active?'':'inactive'}" onclick="selClient('${c.id}')">
+      <div class="client-top">
+        <span class="client-emoji">${c.emoji||ETYPE[c.type]||'🍽️'}</span>
+        <div class="client-info">
+          <div class="client-name">${c.featured?'⭐ ':''}${c.name}</div>
+          <div class="client-type">${ETYPE[c.type]||''} ${c.type} · ${c.address||''}</div>
+        </div>
+        <span class="badge ${c.active?'badge-green':'badge-red'}">${c.active?'Actiu':'Inactiu'}</span>
+      </div>
+      <div class="ad-preview">"${c.adTitle||'Sense anunci'}"</div>
+      <div class="card-actions">
+        <span class="badge badge-blue">📡 ${c.radius}m</span>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();togActive('${c.id}')">${c.active?'⏸':'▶️'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openClientModal('${c.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();delClient('${c.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCStats(){
+  const total=appClients.length,active=appClients.filter(c=>c.active).length,feat=appClients.filter(c=>c.featured).length;
+  document.getElementById('statsBar').innerHTML=`
+    <div class="stat-pill"><div class="dot" style="background:var(--green)"></div>Actius <strong>${active}</strong></div>
+    <div class="stat-pill"><div class="dot" style="background:var(--red)"></div>Inactius <strong>${total-active}</strong></div>
+    <div class="stat-pill"><div class="dot" style="background:var(--gold)"></div>Destacats <strong>${feat}</strong></div>`;
+}
+
+function clientTypeColor(type) {
+  const colors = {
+    restaurant:'#ef4444', bar:'#f97316', cafeteria:'#f59e0b', pastisseria:'#ec4899',
+    gelateria:'#8b5cf6', mercat:'#10b981', hotel:'#3b82f6', oci:'#6366f1',
+    turisme:'#0ea5e9', botiga:'#d946ef', souvenir:'#f43f5e', farmacia:'#22c55e',
+    supermercat:'#84cc16', art:'#a855f7', musica:'#06b6d4', esport:'#f97316',
+    transport:'#64748b',
+  };
+  return colors[type] || '#4f7fff';
+}
+
+function autoEmojiFromType(type) {
+  const el = document.getElementById('cEmoji');
+  if (el && (!el.value || Object.values(ETYPE).includes(el.value))) {
+    el.value = ETYPE[type] || '🏪';
+  }
+}
+
+function renderCMap(){
+  if(!cMap)return;
+  cMarkers.forEach(m=>cMap.removeLayer(m));cMarkers=[];
+  cCircles.forEach(c=>cMap.removeLayer(c));cCircles=[];
+  const vis=appClients.filter(c=>c.lat&&c.lng);
+  vis.forEach(c=>{
+    const baseCol = clientTypeColor(c.type);
+    const col = c.active ? (c.featured ? '#f0b429' : baseCol) : '#aaa';
+    const isShop = ['turisme','botiga','souvenir','art','musica','esport','supermercat','farmacia'].includes(c.type);
+    // Pin amb forma diferent: rodona per menjar/bar, quadrada arrodonida per botigues, estrella per hotels
+    const shape = c.type === 'hotel' ? 'border-radius:6px;transform:rotate(45deg)' :
+                  isShop ? 'border-radius:8px' : 'border-radius:50%';
+    const innerStyle = c.type === 'hotel' ? 'transform:rotate(-45deg)' : '';
+    const size = c.featured ? 36 : 30;
+    const ci=L.circle([c.lat,c.lng],{radius:c.radius,color:col,fillColor:col,fillOpacity:c.active?.1:.03,weight:c.active?2:1,dashArray:c.active?null:'6 4'}).addTo(cMap);
+    cCircles.push(ci);
+    const ic=L.divIcon({className:'',
+      html:`<div style="background:${col};color:#fff;width:${size}px;height:${size}px;${shape};display:flex;align-items:center;justify-content:center;font-size:${size*0.45}px;border:2.5px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.35);${c.active?'':'filter:grayscale(1);opacity:.5'}">
+              <span style="${innerStyle}">${c.emoji||ETYPE[c.type]||'🏪'}</span>
+              ${c.featured?`<span style="position:absolute;top:-5px;right:-5px;font-size:10px">⭐</span>`:''}
+            </div>`,
+      iconSize:[size,size],iconAnchor:[size/2,size/2],popupAnchor:[0,-size/2-4]});
+    const m=L.marker([c.lat,c.lng],{icon:ic}).addTo(cMap);
+    m.bindPopup(`<div style="font-family:sans-serif;min-width:190px">
+      <strong>${c.emoji||''} ${c.name}</strong>${c.featured?' ⭐':''}<br>
+      <small style="color:${col};font-weight:700;text-transform:uppercase;font-size:.68rem">${ETYPE[c.type]||''} ${c.type}</small><br>
+      <small style="color:#666">${c.address||''}</small>
+      <hr style="margin:6px 0;border-color:#eee">
+      <div style="font-size:.82rem;padding:5px;background:#f7f7f7;border-radius:5px"><strong>${c.adTitle||''}</strong><br>${c.adText||''}</div>
+      ${c.adOffer?`<div style="font-size:.78rem;margin-top:5px;color:#0057a8">🎁 ${c.adOffer}</div>`:''}
+      <br><small style="color:${c.active?col:'#999'}">${c.active?'● Actiu':'○ Inactiu'} · radi ${c.radius}m</small>
+    </div>`);
+    m.on('click',()=>selClient(c.id));
+    cMarkers.push(m);
+  });
+  if(vis.length){try{cMap.fitBounds(L.latLngBounds(vis.map(c=>[c.lat,c.lng])),{padding:[40,40]});}catch{}}
+}
+
+function selClient(id){editCId=id;renderCList();const c=appClients.find(c=>c.id===id);if(!c||!cMap)return;cMap.setView([c.lat,c.lng],16);const i=appClients.filter(c=>c.lat).findIndex(c=>c.id===id);if(i>=0)cMarkers[i]?.openPopup();}
+function togActive(id){const c=appClients.find(c=>c.id===id);if(!c)return;c.active=!c.active;renderCList();renderCStats();renderCMap();saveClients();toast(`${c.name}: ${c.active?'activat':'pausat'}`,c.active?'ok':'warn');}
+function delClient(id){if(!confirm('Eliminar?'))return;appClients=appClients.filter(c=>c.id!==id);renderCList();renderCStats();renderCMap();saveClients();toast('Client eliminat.','ok');}
+
+function openClientModal(id){
+  cModalEditId=id;const c=id?appClients.find(c=>c.id===id):null;
+  document.getElementById('cModalTitle').textContent=c?'Editar client':'Nou client';
+  document.getElementById('cName').value=c?.name||'';
+  document.getElementById('cType').value=c?.type||'restaurant';
+  document.getElementById('cEmoji').value=c?.emoji||'';
+  document.getElementById('cPhone').value=c?.phone||'';
+  document.getElementById('cWeb').value=c?.web||'';
+  document.getElementById('cLat').value=c?.lat||'';
+  document.getElementById('cLng').value=c?.lng||'';
+  document.getElementById('cAddress').value=c?.address||'';
+  document.getElementById('cAdTitle').value=c?.adTitle||'';
+  document.getElementById('cAdText').value=c?.adText||'';
+  document.getElementById('cAdOffer').value=c?.adOffer||'';
+  document.getElementById('cRadius').value=c?.radius||300;
+  document.getElementById('radVal').textContent=c?.radius||300;
+  document.getElementById('cActive').checked=c?c.active:true;
+  document.getElementById('cFeatured').checked=c?.featured||false;
+  document.getElementById('clientModal').classList.add('open');
+}
+
+function saveClient(){
+  const name=document.getElementById('cName').value.trim();
+  if(!name){toast('El nom és obligatori','err');return;}
+  const lat=parseFloat(document.getElementById('cLat').value),lng=parseFloat(document.getElementById('cLng').value);
+  if(isNaN(lat)||isNaN(lng)){toast('Coordenades invàlides','err');return;}
+  const d={name,type:document.getElementById('cType').value,emoji:document.getElementById('cEmoji').value||ETYPE[document.getElementById('cType').value]||'🍽️',phone:document.getElementById('cPhone').value,web:document.getElementById('cWeb').value,lat,lng,address:document.getElementById('cAddress').value,adTitle:document.getElementById('cAdTitle').value,adText:document.getElementById('cAdText').value,adOffer:document.getElementById('cAdOffer').value,radius:parseInt(document.getElementById('cRadius').value),active:document.getElementById('cActive').checked,featured:document.getElementById('cFeatured').checked};
+  if(cModalEditId){Object.assign(appClients.find(c=>c.id===cModalEditId),d);}
+  else{appClients.push({id:'c_'+Date.now(),...d});}
+  closeModal('clientModal');renderCList();renderCStats();renderCMap();saveClients();toast(`"${name}" guardat!`,'ok');
+}
+
+async function saveClients(){const ok=await sSet(CK,appClients);if(!ok)toast(at('save_err'),'err');}
+
+// ════════════════ BIBLIOTECA DE LLOCS ════════════════
+let selPlaceId = null;
+
+function renderLibrary(){
+  const list = document.getElementById('libraryList');
+  const detail = document.getElementById('libraryDetail');
+  if(!list) return;
+  if(!appPlaces.length){
+    list.innerHTML='<div class="empty-state"><div class="big">📚</div><p>Encara no hi ha llocs a la biblioteca.<br>Ves a una ruta i usa "Guardar com a lloc".</p></div>';
+    detail.innerHTML='';
+    return;
+  }
+  // Calcula en quantes rutes apareix cada lloc
+  function usages(plId){
+    const res=[];
+    appRoutes.forEach(r=>r.points.forEach(p=>{if(p.placeId===plId)res.push({route:r,point:p});}));
+    return res;
+  }
+  list.innerHTML = appPlaces.map(pl=>{
+    const u = usages(pl.id);
+    return `<div class="place-card ${pl.id===selPlaceId?'selected':''}" onclick="selPlace('${pl.id}')">
+      <div class="place-card-emoji">${pl.emoji||'📍'}</div>
+      <div class="place-card-info">
+        <div class="place-card-name">${pl.name}</div>
+        <div class="place-card-meta">${pl.any||''} ${pl.horari?'· '+pl.horari:''}</div>
+        <div class="place-usage-badge">🔗 ${u.length} ruta${u.length!==1?'s':''}</div>
+      </div>
+      <button class="icon-btn danger btn-sm" style="flex-shrink:0" onclick="event.stopPropagation();delPlace('${pl.id}')">🗑️</button>
+    </div>`;
+  }).join('');
+
+  if(selPlaceId) renderPlaceDetail(selPlaceId);
+  else detail.innerHTML='<div class="empty-state" style="margin-top:60px"><div class="big">📍</div><p>Selecciona un lloc</p></div>';
+}
+
+function selPlace(id){ selPlaceId=id; renderLibrary(); }
+
+function renderPlaceDetail(id){
+  const pl = appPlaces.find(p=>p.id===id);
+  if(!pl) return;
+  const detail = document.getElementById('libraryDetail');
+  const usages = [];
+  appRoutes.forEach(r=>r.points.forEach(p=>{ if(p.placeId===id) usages.push({route:r,point:p}); }));
+
+  detail.innerHTML=`
+    ${pl.imatge
+      ? `<img class="place-detail-img" src="${pl.imatge}" onerror="this.style.display='none'">`
+      : `<div class="place-detail-placeholder">${pl.emoji||'📍'}</div>`}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+      <div class="place-detail-title">${pl.emoji||''} ${pl.name}</div>
+      <button class="btn btn-ghost btn-sm" onclick="editPlaceDirect('${id}')">✏️ Editar</button>
+    </div>
+    <div class="place-detail-grid">
+      ${pl.any?`<div class="place-detail-item"><span class="lbl">Any</span><span class="val">${pl.any}</span></div>`:''}
+      ${pl.preu?`<div class="place-detail-item"><span class="lbl">Entrada</span><span class="val">${pl.preu}</span></div>`:''}
+      ${pl.horari?`<div class="place-detail-item" style="grid-column:1/-1"><span class="lbl">Horari</span><span class="val">${pl.horari}</span></div>`:''}
+      ${pl.tel?`<div class="place-detail-item"><span class="lbl">Telèfon</span><span class="val">${pl.tel}</span></div>`:''}
+      ${pl.web?`<div class="place-detail-item"><span class="lbl">Web</span><span class="val"><a href="${pl.web}" target="_blank" style="color:var(--accent)">Obrir →</a></span></div>`:''}
+      ${pl.transport?`<div class="place-detail-item" style="grid-column:1/-1"><span class="lbl">Transport</span><span class="val">${pl.transport}</span></div>`:''}
+    </div>
+    <div class="usage-list">
+      <div class="fs-title" style="margin-bottom:8px">Apareix a ${usages.length} ruta${usages.length!==1?'s':''}</div>
+      ${usages.length ? usages.map(u=>`
+        <div class="usage-item">
+          <div class="usage-dot" style="background:${u.route.color}"></div>
+          <strong>${u.route.icon} ${u.route.name}</strong>
+          <span style="color:var(--text2);font-size:.75rem">· Punt "${u.point.name||pl.name}"</span>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="goToRoutePoint('${u.route.id}','${u.point.id}')">Editar →</button>
+        </div>`).join('')
+      : '<div style="color:var(--text2);font-size:.8rem">No vinculat a cap ruta</div>'}
+    </div>`;
+}
+
+function goToRoutePoint(routeId, ptId){
+  switchTab('rutes');
+  setTimeout(()=>{ selRoute(routeId); setTimeout(()=>editPt(ptId),200); },100);
+}
+
+async function delPlace(id){
+  if(!confirm('Eliminar lloc de la biblioteca? Els punts vinculats perdran la vinculació però conservaran les dades.'))return;
+  // Desvincula tots els punts que el referencien
+  appRoutes.forEach(r=>r.points.forEach(p=>{ if(p.placeId===id) delete p.placeId; }));
+  appPlaces = appPlaces.filter(p=>p.id!==id);
+  if(selPlaceId===id) selPlaceId=null;
+  await savePlaces(); await saveRoutes();
+  renderLibrary(); toast('Lloc eliminat.','ok');
+}
+
+function editPlaceDirect(id){
+  // Troba la primera ruta+punt que usa aquest lloc i obre l'editor
+  for(const r of appRoutes){
+    const pt = r.points.find(p=>p.placeId===id);
+    if(pt){ goToRoutePoint(r.id, pt.id); return; }
+  }
+  toast('Aquest lloc no està vinculat a cap ruta.','err');
+}
+
+// ════════════════ SOL·LICITUDS D'AUTOREGISTRE ════════════════
+const REG_KEY = 'descobreix_registres';
+let appRegistres = [];
+let selRegId = null;
+
+async function loadRegistres(){
+  try{ const r=await sGet(REG_KEY); appRegistres=r||[]; } catch{ appRegistres=[]; }
+}
+async function saveRegistres(){ await sSet(REG_KEY, appRegistres); }
+
+function renderRegistres(){
+  const wrap = document.getElementById('regListWrap');
+  const detail = document.getElementById('regDetail');
+  if(!wrap) return;
+
+  const pending   = appRegistres.filter(r=>r.status==='pending').length;
+  const approved  = appRegistres.filter(r=>r.status==='approved').length;
+  const rejected  = appRegistres.filter(r=>r.status==='rejected').length;
+
+  document.getElementById('regStatPending').textContent  = pending;
+  document.getElementById('regStatApproved').textContent = approved;
+  document.getElementById('regStatRejected').textContent = rejected;
+  document.getElementById('regStatTotal').textContent    = appRegistres.length;
+
+  if(!appRegistres.length){
+    wrap.innerHTML='<div class="empty-state" style="margin-top:60px"><div class="big">📬</div><p>Cap sol·licitud encara.<br>El formulari públic és accessible a:<br><code style="color:var(--accent)">/registre_restaurant.html</code></p></div>';
+    detail.innerHTML='';
+    return;
+  }
+
+  const statusLabel = {pending:'⏳ Pendent', approved:'✅ Aprovada', rejected:'❌ Rebutjada'};
+  wrap.innerHTML = appRegistres.slice().reverse().map(r=>`
+    <div class="reg-card ${r.id===selRegId?'selected':''}">
+      <div class="reg-header">
+        <div class="reg-emoji">${r.emoji||'🍽️'}</div>
+        <div>
+          <div class="reg-name">${r.name}</div>
+          <div class="reg-type">${r.type||''} · ${r.address||''}</div>
+          <div style="margin-top:4px">
+            <span class="reg-status ${r.status}">${statusLabel[r.status]||r.status}</span>
+            <span style="font-size:.7rem;color:var(--text2);margin-left:8px">${new Date(r.ts).toLocaleDateString('ca')}</span>
+          </div>
+        </div>
+      </div>
+      ${r.status==='pending'?`
+      <div class="reg-actions">
+        <button class="btn btn-success btn-sm" onclick="approveReg('${r.id}')">✅ Aprovar i afegir</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectReg('${r.id}')">❌ Rebutjar</button>
+        <button class="btn btn-ghost btn-sm" onclick="selReg('${r.id}')">Detalls →</button>
+      </div>`:
+      `<button class="btn btn-ghost btn-sm" onclick="selReg('${r.id}')">Detalls →</button>`}
+    </div>`).join('');
+
+  if(selRegId) renderRegDetail(selRegId);
+  else detail.innerHTML='<div class="empty-state" style="margin-top:80px"><div class="big">📋</div><p>Selecciona una sol·licitud</p></div>';
+}
+
+function selReg(id){ selRegId=id; renderRegistres(); }
+
+function renderRegDetail(id){
+  const r = appRegistres.find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById('regDetail').innerHTML=`
+    <h3 style="font-size:1rem;margin-bottom:14px">${r.emoji||'🍽️'} ${r.name}</h3>
+    <div class="reg-preview-box">
+      <div class="fs-title" style="margin-bottom:8px">Dades sol·licitades</div>
+      ${[['Tipus',r.type],['Adreça',r.address],['Telèfon',r.phone],['Web',r.web],['Email',r.email],['Missatge',r.message]].filter(([,v])=>v).map(([k,v])=>`
+        <div style="margin-bottom:6px"><span style="font-size:.7rem;color:var(--text2);text-transform:uppercase;font-weight:700">${k}</span><br><span style="font-size:.84rem">${v}</span></div>`).join('')}
+    </div>
+    <div class="reg-preview-box" style="margin-top:10px">
+      <div class="fs-title" style="margin-bottom:8px">Anunci proposat</div>
+      <strong style="font-size:.88rem">${r.adTitle||r.name}</strong>
+      <p style="font-size:.8rem;color:var(--text2);margin:4px 0">${r.adText||''}</p>
+      ${r.adOffer?`<div style="font-size:.78rem;color:var(--green)">🎁 ${r.adOffer}</div>`:''}
+    </div>
+    ${r.status==='pending'?`
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-success btn-full" onclick="approveReg('${r.id}')">✅ Aprovar i afegir al sistema</button>
+      <button class="btn btn-danger" onclick="rejectReg('${r.id}')">❌</button>
+    </div>`:
+    `<div style="margin-top:14px;font-size:.8rem;color:var(--text2)">Sol·licitud ${r.status==='approved'?'aprovada':'rebutjada'} el ${new Date(r.updatedTs||r.ts).toLocaleDateString('ca')}</div>`}`;
+}
+
+async function approveReg(id){
+  const r = appRegistres.find(x=>x.id===id);
+  if(!r) return;
+  // Afegim directament com a client
+  appClients.push({
+    id:'c_'+Date.now(), name:r.name, type:r.type||'restaurant',
+    emoji:r.emoji||'🍽️', phone:r.phone||'', web:r.web||'',
+    lat:r.lat||38.3449, lng:r.lng||-0.4830, address:r.address||'',
+    adTitle:r.adTitle||r.name, adText:r.adText||'', adOffer:r.adOffer||'',
+    radius:300, active:true, featured:false
+  });
+  r.status='approved'; r.updatedTs=Date.now();
+  await saveClients(); await saveRegistres();
+  renderRegistres(); renderCList(); renderCStats();
+  toast(`"${r.name}" afegit com a client!`,'ok');
+}
+
+async function rejectReg(id){
+  const r = appRegistres.find(x=>x.id===id);
+  if(!r) return;
+  r.status='rejected'; r.updatedTs=Date.now();
+  await saveRegistres(); renderRegistres(); toast('Sol·licitud rebutjada.','ok');
+}
+
+// ── Utils ──
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+let stTimer;
+function toast(msg,type=''){const el=document.getElementById('status');el.textContent=msg;el.className='show '+(type||'');clearTimeout(stTimer);stTimer=setTimeout(()=>el.className='',2800);}
+
+// ── Boot ──
+async function boot(){
+  await initRoutesTab();
+  await loadRegistres();
+  if(_currentRole === 'admin'){
+    await loadSponsors();
+    renderSponsors();
+  }
+}
+
+// ════════════════ PATROCINADORS ════════════════
+const SP_KEY = 'descobreix_sponsors';
+let appSponsors = [];
+let editSpId = null;
+
+async function loadSponsors(){
+  try{ appSponsors = (await sGet(SP_KEY)) || []; } catch{ appSponsors=[]; }
+}
+async function saveSponsors(){
+  const ok = await sSet(SP_KEY, appSponsors);
+  if(!ok) toast(at('save_err'),'err');
+}
+
+function isActive(sp){
+  const now = Date.now();
+  const start = sp.dateStart ? new Date(sp.dateStart).getTime() : 0;
+  const end   = sp.dateEnd   ? new Date(sp.dateEnd).getTime()   : Infinity;
+  return sp.active && now >= start && now <= end;
+}
+
+function renderSponsors(){
+  const list = document.getElementById('sponsorList');
+  if(!list) return;
+  const active  = appSponsors.filter(isActive).length;
+  const expired = appSponsors.filter(s=>!isActive(s)).length;
+  const elA = document.getElementById('spStatActive');
+  const elE = document.getElementById('spStatExpired');
+  const elT = document.getElementById('spStatTotal');
+  if(elA) elA.textContent = active;
+  if(elE) elE.textContent = expired;
+  if(elT) elT.textContent = appSponsors.length;
+
+  if(!appSponsors.length){
+    list.innerHTML = '<div class="empty-state" style="margin-top:40px"><div class="big">🤝</div><p>Cap patrocinador encara.<br>Clica <strong>+ Nou patrocinador</strong> per afegir-ne un.</p></div>';
+    return;
+  }
+
+  const fmt = d => d ? new Date(d).toLocaleDateString('ca') : '—';
+  const routeNames = Object.fromEntries((appRoutes||[]).map(r=>[r.id, `${r.icon} ${r.name}`]));
+
+  list.innerHTML = appSponsors.map(sp => {
+    const act = isActive(sp);
+    const routes = (sp.routeIds||[]).map(id=>routeNames[id]||id).join(', ') || 'Cap ruta assignada';
+    return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:center">
+      ${sp.logo ? `<img src="${sp.logo}" style="width:64px;height:40px;object-fit:contain;border-radius:5px;background:var(--surface2);padding:4px;flex-shrink:0" onerror="this.style.display='none'">` : `<div style="width:64px;height:40px;background:var(--surface2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🤝</div>`}
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <strong style="font-size:.9rem">${sp.name}</strong>
+          <span style="font-size:.68rem;padding:1px 7px;border-radius:8px;font-weight:700;background:${act?'rgba(34,197,94,.15)':'rgba(239,68,68,.12)'};color:${act?'var(--green)':'var(--red)'}">${act?'ACTIU':'INACTIU'}</span>
+        </div>
+        <div style="font-size:.74rem;color:var(--text2)">📅 ${fmt(sp.dateStart)} → ${fmt(sp.dateEnd)}</div>
+        <div style="font-size:.74rem;color:var(--text2);margin-top:2px">🗺️ ${routes}</div>
+        ${sp.web ? `<a href="${sp.web}" target="_blank" style="font-size:.72rem;color:var(--accent)">${sp.web}</a>` : ''}
+        ${sp.note ? `<div style="font-size:.71rem;color:var(--text2);margin-top:3px;font-style:italic">📝 ${sp.note}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="icon-btn" onclick="openSponsorModal('${sp.id}')" title="Editar">✏️</button>
+        <button class="icon-btn danger" onclick="deleteSponsor('${sp.id}')" title="Eliminar">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSponsorModal(id){
+  editSpId = id || null;
+  const sp = id ? appSponsors.find(s=>s.id===id) : null;
+  document.getElementById('sponsorModalTitle').textContent = id ? 'Editar patrocinador' : 'Nou patrocinador';
+  document.getElementById('spName').value      = sp?.name || '';
+  document.getElementById('spWeb').value       = sp?.web  || '';
+  document.getElementById('spLogo').value      = sp?.logo || '';
+  document.getElementById('spDateStart').value = sp?.dateStart || '';
+  document.getElementById('spDateEnd').value   = sp?.dateEnd   || '';
+  document.getElementById('spNote').value      = sp?.note || '';
+  document.getElementById('spActive').checked  = sp ? sp.active !== false : true;
+  previewSpLogo();
+  // Picker de rutes
+  const picker = document.getElementById('spRoutePicker');
+  const selIds = sp?.routeIds || [];
+  picker.innerHTML = (appRoutes||[]).map(r=>`
+    <label style="display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:.78rem;background:${selIds.includes(r.id)?'rgba(79,127,255,.15)':'var(--surface)'}">
+      <input type="checkbox" value="${r.id}" ${selIds.includes(r.id)?'checked':''} style="width:auto;margin:0"/>
+      ${r.icon} ${r.name}
+    </label>`).join('');
+  document.getElementById('sponsorModal').classList.add('open');
+}
+
+function previewSpLogo(){
+  const url = document.getElementById('spLogo').value.trim();
+  const img = document.getElementById('spLogoPreview');
+  if(url){ img.src=url; img.style.display='block'; }
+  else { img.style.display='none'; }
+}
+
+async function saveSponsor(){
+  const name = document.getElementById('spName').value.trim();
+  if(!name){ toast('Cal el nom del patrocinador','err'); return; }
+  const routeIds = [...document.querySelectorAll('#spRoutePicker input:checked')].map(i=>i.value);
+  const data = {
+    id:        editSpId || 'sp_'+Date.now(),
+    name,
+    web:       document.getElementById('spWeb').value.trim(),
+    logo:      document.getElementById('spLogo').value.trim(),
+    dateStart: document.getElementById('spDateStart').value,
+    dateEnd:   document.getElementById('spDateEnd').value,
+    note:      document.getElementById('spNote').value.trim(),
+    active:    document.getElementById('spActive').checked,
+    routeIds,
+  };
+  if(editSpId){ const i=appSponsors.findIndex(s=>s.id===editSpId); if(i>=0) appSponsors[i]=data; }
+  else appSponsors.push(data);
+  await saveSponsors();
+  closeModal('sponsorModal');
+  renderSponsors();
+  toast('✅ Patrocinador guardat!','ok');
+}
+
+async function deleteSponsor(id){
+  if(!confirm('Eliminar aquest patrocinador?')) return;
+  appSponsors = appSponsors.filter(s=>s.id!==id);
+  await saveSponsors();
+  renderSponsors();
+  toast(at('deleted'),'ok');
+}
+
+// ══════════════════════════════════════════════
+// 📊 ANALÍTICA
+// ══════════════════════════════════════════════
+const AN_KEY = 'descobreix_analytics';
+let _analytics = { events: [] };
+
+async function loadAnalytics() {
+  try {
+    const r = await sGet(AN_KEY);
+    if (r) _analytics = r;
+    else _analytics = { events: [] };
+  } catch { _analytics = { events: [] }; }
+}
+
+function renderAnalytics() {
+  loadAnalytics().then(() => {
+    const events = _analytics.events || [];
+
+    // Stats globals
+    const impressions = events.filter(e => e.type === 'impression').length;
+    const clics       = events.filter(e => e.type === 'card_open').length;
+    const tel         = events.filter(e => e.type === 'click_tel').length;
+    const web         = events.filter(e => e.type === 'click_web').length;
+
+    document.getElementById('anStatImpressions').textContent = impressions;
+    document.getElementById('anStatClics').textContent       = clics;
+    document.getElementById('anStatTel').textContent         = tel;
+    document.getElementById('anStatWeb').textContent         = web;
+
+    // Taula per monument
+    const byMonument = {};
+    events.filter(e => e.type === 'card_open').forEach(e => {
+      const k = e.name || e.ptId || '?';
+      byMonument[k] = (byMonument[k] || 0) + 1;
+    });
+    const sorted = Object.entries(byMonument).sort((a,b) => b[1]-a[1]);
+    const maxVal = sorted[0]?.[1] || 1;
+    const table  = document.getElementById('analyticsTable');
+    if (!sorted.length) {
+      table.innerHTML = '<div style="color:var(--text2);font-size:.82rem;padding:12px">Cap dada disponible. Les dades s\'acumulen quan els usuaris visiten la web pública.</div>';
+    } else {
+      table.innerHTML = sorted.slice(0, 20).map(([name, count]) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface);border-radius:8px;font-size:.82rem">
+          <span style="flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
+          <div style="width:160px;background:var(--surface2);border-radius:4px;height:8px;overflow:hidden">
+            <div style="width:${Math.round(count/maxVal*100)}%;height:100%;background:var(--accent);border-radius:4px"></div>
+          </div>
+          <span style="width:32px;text-align:right;color:var(--text2)">${count}</span>
+        </div>`).join('');
+    }
+
+    // Mapa de calor per hora
+    const byHour = Array(24).fill(0);
+    events.forEach(e => { if (e.ts) byHour[new Date(e.ts).getHours()]++; });
+    const maxH = Math.max(...byHour, 1);
+    const heatmap = document.getElementById('analyticsHeatmap');
+    const hlabels = document.getElementById('analyticsHeatmapLabels');
+    heatmap.innerHTML = byHour.map((v, h) =>
+      `<div title="${h}h: ${v} events" style="flex:1;min-width:14px;background:var(--accent);opacity:${0.15 + 0.85*(v/maxH)};border-radius:3px 3px 0 0;height:${Math.max(4, Math.round(v/maxH*100))}%;transition:height .3s"></div>`
+    ).join('');
+    hlabels.innerHTML = byHour.map((_, h) =>
+      `<span style="flex:1;text-align:center;font-size:.6rem;color:var(--text2)">${h%6===0?h+'h':''}</span>`
+    ).join('');
+  });
+}
+
+function exportAnalyticsCsv() {
+  const events = _analytics.events || [];
+  if (!events.length) { toast('Cap dada per exportar.','warn'); return; }
+  const rows = [['tipus','nom','ruta','ts','hora']];
+  events.forEach(e => {
+    rows.push([e.type, e.name||'', e.route||'', e.ts||'', e.ts ? new Date(e.ts).toLocaleString('ca') : '']);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
+  a.download = 'analytics_alacant.csv';
+  a.click();
+  toast(at('saved_ok'),'ok');
+}
+
+async function clearAnalytics() {
+  if (!confirm('Esborrar totes les dades d\'analítica?')) return;
+  _analytics = { events: [] };
+  await sSet(AN_KEY, _analytics);
+  renderAnalytics();
+  toast(at('deleted'),'ok');
+}
+
+// ══════════════════════════════════════════════
+// ✨ EDITOR IA — Anthropic API
+// ══════════════════════════════════════════════
+let _aiTargetPtId  = null;
+let _aiGeneratedData = null;
+
+function openAiModal(ptId, ptName, routeName) {
+  _aiTargetPtId    = ptId;
+  _aiGeneratedData = null;
+  document.getElementById('aiPromptName').value  = ptName || '';
+  document.getElementById('aiPromptExtra').value = routeName ? `Ruta: ${routeName}` : '';
+  document.getElementById('aiResult').style.display  = 'none';
+  document.getElementById('aiLoading').style.display = 'none';
+  document.getElementById('aiApplyBtn').style.display = 'none';
+  document.getElementById('aiGenerateBtn').style.display = '';
+  document.getElementById('aiModal').classList.add('open');
+}
+
+async function generateAiText() {
+  const name  = document.getElementById('aiPromptName').value.trim();
+  if (!name) { toast('Indica el nom del monument.','warn'); return; }
+  const extra = document.getElementById('aiPromptExtra').value.trim();
+  const selectedLangs = [...document.querySelectorAll('#aiLangPicker input:checked')].map(cb => cb.value);
+  if (!selectedLangs.length) { toast('Selecciona almenys un idioma.','warn'); return; }
+
+  const langNames = { ca:'català', es:'castellà', en:'anglès', fr:'francès', it:'italià', ar:'àrab', uk:'ucraïnès' };
+  const langsStr = selectedLangs.map(l => `"${l}" (${langNames[l]||l})`).join(', ');
+
+  document.getElementById('aiLoading').style.display = 'block';
+  document.getElementById('aiResult').style.display  = 'none';
+  document.getElementById('aiGenerateBtn').style.display = 'none';
+  document.getElementById('aiApplyBtn').style.display    = 'none';
+
+  const systemPrompt = `Ets un expert en turisme cultural d'Alacant. Genera contingut per a una app de rutes turístiques.
+Retorna NOMÉS un JSON vàlid sense cap text addicional ni marques de codi.
+Format exacte:
+{
+  "desc":      { "ca":"...", "es":"...", "en":"...", "fr":"...", "it":"...", "ar":"...", "uk":"..." },
+  "historia":  { "ca":"...", "es":"...", "en":"...", "fr":"...", "it":"...", "ar":"...", "uk":"..." },
+  "curiositat":{ "ca":"...", "es":"...", "en":"...", "fr":"...", "it":"...", "ar":"...", "uk":"..." }
+}
+Longitud: desc ~80 paraules, historia ~120 paraules, curiositat ~40 paraules. Estil: evocador, culte, accessible.`;
+
+  const userPrompt = `Monument: ${name}${extra ? '\nContext: ' + extra : ''}
+Idiomes requerits: ${langsStr}
+Genera el JSON amb els tres camps (desc, historia, curiositat) per als idiomes sol·licitats.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+    const data = await resp.json();
+    const raw  = data.content?.map(b => b.text||'').join('') || '';
+    const json = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    _aiGeneratedData = json;
+
+    // Preview
+    let preview = '';
+    selectedLangs.forEach(l => {
+      preview += `<div style="margin-bottom:12px">
+        <strong style="font-size:.72rem;color:var(--accent);text-transform:uppercase">${l.toUpperCase()}</strong>
+        <div style="margin-top:4px"><em style="color:var(--text2);font-size:.7rem">Descripció</em><br>${json.desc?.[l]||'—'}</div>
+        <div style="margin-top:4px"><em style="color:var(--text2);font-size:.7rem">Història</em><br>${json.historia?.[l]||'—'}</div>
+        <div style="margin-top:4px"><em style="color:var(--text2);font-size:.7rem">Curiositat</em><br>${json.curiositat?.[l]||'—'}</div>
+      </div>`;
+    });
+
+    document.getElementById('aiResult').innerHTML = preview;
+    document.getElementById('aiResult').style.display = 'block';
+    document.getElementById('aiApplyBtn').style.display = '';
+    toast('✅ Text generat!','ok');
+  } catch(e) {
+    console.error('AI error:', e);
+    toast('Error generant el text. Comprova la consola.','err');
+    document.getElementById('aiGenerateBtn').style.display = '';
+  } finally {
+    document.getElementById('aiLoading').style.display = 'none';
+  }
+}
+
+function applyAiText() {
+  if (!_aiGeneratedData || !_aiTargetPtId) return;
+  const r = appRoutes.find(r => r.points.some(p => p.id === _aiTargetPtId));
+  if (!r) return;
+  const p = r.points.find(p => p.id === _aiTargetPtId);
+  if (!p) return;
+
+  // Inicialitza si cal
+  if (!p.desc      || typeof p.desc === 'string')      p.desc      = p.desc ? {ca: p.desc} : {};
+  if (!p.historia  || typeof p.historia === 'string')  p.historia  = p.historia ? {ca: p.historia} : {};
+  if (!p.curiositat|| typeof p.curiositat === 'string') p.curiositat= p.curiositat ? {ca: p.curiositat} : {};
+
+  // Aplica sense sobreescriure camps ja existents (si no vol)
+  const langs = ['ca','es','en','fr','it','ar','uk'];
+  langs.forEach(l => {
+    if (_aiGeneratedData.desc?.[l])      p.desc[l]      = _aiGeneratedData.desc[l];
+    if (_aiGeneratedData.historia?.[l])  p.historia[l]  = _aiGeneratedData.historia[l];
+    if (_aiGeneratedData.curiositat?.[l])p.curiositat[l] = _aiGeneratedData.curiositat[l];
+  });
+
+  closeModal('aiModal');
+  saveRoutes();
+  renderREditor(selRouteId);
+  toast('✅ Text aplicat al monument!','ok');
+}
+
+// CSS spin per al loading
+(function addAdminCss(){
+  const s = document.createElement('style');
+  s.textContent = `@keyframes spin { to { transform: rotate(360deg) } }`;
+  document.head.appendChild(s);
+})();
+
+// ── Comprova sessió activa (només si localStorage funciona) ──
+(function checkSession(){
+  try {
+    const raw = localStorage.getItem('da_session');
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(s && s.role && ROLES[s.role] && Date.now() - s.ts < 8 * 3600 * 1000){
+      _sessionActive = true;
+      _currentRole   = s.role;
+      showApp();
+    }
+  } catch(e) {
+    // localStorage no disponible (iframe) — login manual
+  }
+})();
+// Aplica idioma en carregar
+applyAdminI18n();
+</script>
+</body>
+</html>

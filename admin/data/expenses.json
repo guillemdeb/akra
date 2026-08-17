@@ -1,0 +1,17 @@
+[
+    {
+        "id": "1786968653_ee6867f5",
+        "date": "2026-08-17",
+        "concept": "hosting",
+        "category": "subministraments",
+        "supplier_id": "1786968609_26e1ef11",
+        "base": 35,
+        "vat_pct": 21,
+        "payment_method": "targeta",
+        "deductible": true,
+        "receipt_file": "",
+        "notes": "",
+        "tax": 7.35,
+        "total": 42.35
+    }
+]

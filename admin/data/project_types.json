@@ -1,0 +1,62 @@
+[
+    {
+        "id": "web",
+        "order": 1,
+        "active": true,
+        "label": {
+            "ca": "Webs",
+            "es": "Webs",
+            "en": "Web",
+            "fr": "Sites web",
+            "it": "Siti web"
+        }
+    },
+    {
+        "id": "ecommerce",
+        "order": 2,
+        "active": true,
+        "label": {
+            "ca": "E-commerce",
+            "es": "E-commerce",
+            "en": "E-commerce",
+            "fr": "E-commerce",
+            "it": "E-commerce"
+        }
+    },
+    {
+        "id": "marketing",
+        "order": 3,
+        "active": true,
+        "label": {
+            "ca": "Màrqueting",
+            "es": "Marketing",
+            "en": "Marketing",
+            "fr": "Marketing",
+            "it": "Marketing"
+        }
+    },
+    {
+        "id": "design",
+        "order": 4,
+        "active": true,
+        "label": {
+            "ca": "Disseny",
+            "es": "Diseño",
+            "en": "Design",
+            "fr": "Design",
+            "it": "Design"
+        }
+    },
+    {
+        "id": "app",
+        "order": 5,
+        "active": true,
+        "label": {
+            "ca": "Apps",
+            "es": "Apps",
+            "en": "Apps",
+            "fr": "Apps",
+            "it": "App"
+        }
+    }
+]

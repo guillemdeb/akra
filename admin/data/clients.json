@@ -1,0 +1,104 @@
+[
+    {
+        "id": "1784756165_f913a259",
+        "name": "Optica Congost",
+        "company": "",
+        "nif": "",
+        "email": "",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "cp": "",
+        "web_actual": "https:\/\/opticacongost.com\/",
+        "sector": "Optica",
+        "tags": [
+            "actiu"
+        ],
+        "stage": "auditoria",
+        "lead_source": "",
+        "lost_reason": "",
+        "notes": ""
+    },
+    {
+        "id": "1785487662_92cc8e49",
+        "name": "Alicante Ingenieria F1 SL",
+        "company": "Alicante Ingenieria S.L.",
+        "nif": "",
+        "email": "",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "cp": "",
+        "web_actual": "",
+        "sector": "Construcción",
+        "tags": [
+            "actiu"
+        ],
+        "stage": "guanyat",
+        "lead_source": "",
+        "lost_reason": "",
+        "notes": ""
+    },
+    {
+        "id": "1785488003_111834b3",
+        "name": "Alicante proyectos S.L.",
+        "company": "Alicante Proyectos S.L.",
+        "nif": "",
+        "email": "",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "cp": "",
+        "web_actual": "",
+        "sector": "",
+        "tags": [
+            "actiu"
+        ],
+        "stage": "guanyat",
+        "lead_source": "",
+        "lost_reason": "",
+        "notes": ""
+    },
+    {
+        "id": "1785491575_92698897",
+        "name": "Escuela de Danza la terreta",
+        "company": "",
+        "nif": "",
+        "email": "",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "cp": "",
+        "web_actual": "",
+        "sector": "",
+        "tags": [
+            "potencial"
+        ],
+        "stage": "lead",
+        "lead_source": "xarxes",
+        "lost_reason": "",
+        "notes": ""
+    },
+    {
+        "id": "1786968751_4daa76b8",
+        "name": "demo",
+        "company": "",
+        "logo": "",
+        "nif": "",
+        "email": "demo@demo.es",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "cp": "",
+        "web_actual": "",
+        "sector": "",
+        "tags": [],
+        "stage": "lead",
+        "lead_source": "",
+        "lost_reason": "",
+        "notes": "",
+        "hub_enabled": true,
+        "hub_password_hash": "$2y$10$QyLS15vraM10CTImxXMD4OLBfSR2BeBOXRUU0bFMGwabt0J0nDyp6",
+        "hub_lang": "es"
+    }
+]

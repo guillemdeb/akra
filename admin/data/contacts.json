@@ -1,0 +1,35 @@
+[
+    {
+        "id": "1785484492_7c2e5d07",
+        "client_id": "1784756165_f913a259",
+        "date": "2026-07-31",
+        "channel": "whatsapp",
+        "direction": "jo_client",
+        "message": "Buenos dias, perdona que te moleste. Tienes ya la clave del wordpress de Optica Congost?",
+        "response": "No. Voy súper liado. La semana que viene lo gestiono",
+        "status": "respost",
+        "follow_up": ""
+    },
+    {
+        "id": "1785487763_b4a591aa",
+        "client_id": "1785487662_92cc8e49",
+        "date": "2026-07-31",
+        "channel": "whatsapp",
+        "direction": "jo_client",
+        "message": "Buenos días.\r\n\r\nYa estamos a día 31 y sigo sin recibir ninguna respuesta a mis mensajes. Sinceramente, no sé qué debo pensar.\r\n\r\nAhora empieza agosto, un mes que por definición suele complicar cualquier gestión, y me preocupa que este asunto siga alargándose sin ninguna explicación por vuestra parte.\r\n\r\nCreo que, después de todo el trabajo realizado, de las facilidades que os he dado y de la paciencia que he tenido durante estos meses, no me merezco este comportamiento. Lo mínimo que esperaba era una respuesta, aunque solo fuera para indicarme cuándo pensáis resolver este tema.\r\n\r\nEspero que podamos dejarlo definitivamente cerrado cuanto antes.",
+        "response": "Darío se que te estoy jodiendo\r\nPero estoy pendiente de unos cobros\r\nQue los. Varones se hacen los remolones\r\nPalabra que en cuanto me paguen te llamo\r\nLo siento\r\nDe verdad que no te olvido Darío",
+        "status": "respost",
+        "follow_up": ""
+    },
+    {
+        "id": "1786106579_82e767d9",
+        "client_id": "1784756165_f913a259",
+        "date": "2026-08-07",
+        "channel": "whatsapp",
+        "direction": "jo_client",
+        "message": "Buenos días \r\nPerdona por la insistencia \r\nTenemos ya la clave",
+        "response": "[9:03, 7\/8\/2026] Dari i Sara Trives: Tenemos ya la clave?\r\n[10:00, 7\/8\/2026] Bartolo Congost: No. 🤦🏻‍♂️\r\n[10:00, 7\/8\/2026] Bartolo Congost: Este mes ha sido de locos y mañana me voy de vacaciones. Vuelvo el 17\r\n[10:01, 7\/8\/2026] Bartolo Congost: Si puedo gestionarlo hoy te digo algo, si no cuando vuelva",
+        "status": "respost",
+        "follow_up": ""
+    }
+]

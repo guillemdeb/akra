@@ -1,0 +1,54 @@
+{
+  "name": "Descobreix Alacant",
+  "short_name": "Alacant",
+  "description": "Rutes turístiques, monuments i restaurants a Alacant",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#003d6b",
+  "theme_color": "#003d6b",
+  "orientation": "portrait-primary",
+  "lang": "ca",
+  "categories": ["travel", "lifestyle", "navigation"],
+  "icons": [
+    { "src": "icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mapa de rutes turístiques"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mapa",
+      "short_name": "Mapa",
+      "description": "Obre el mapa de rutes",
+      "url": "./descobreix_alacant.html#mapa",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Passaport",
+      "short_name": "Passaport",
+      "description": "El teu passaport digital",
+      "url": "./descobreix_alacant.html#passaport",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "SOS",
+      "short_name": "SOS",
+      "description": "Emergències",
+      "url": "./descobreix_alacant.html#emergencies",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    }
+  ]
+}

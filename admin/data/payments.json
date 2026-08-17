@@ -1,0 +1,18 @@
+[
+    {
+        "id": "1785583932_22470665",
+        "invoice_id": "1785487894_3f50ff45",
+        "date": "2026-08-01",
+        "amount": 2499.99,
+        "method": "transferencia",
+        "reference": ""
+    },
+    {
+        "id": "1785583986_10a81e43",
+        "invoice_id": "1785488094_7020b94f",
+        "date": "2025-12-26",
+        "amount": 2000,
+        "method": "transferencia",
+        "reference": ""
+    }
+]
